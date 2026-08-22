@@ -2,10 +2,19 @@
 
 Start from `lab/RUNNER.md`.
 
-`ARC-R001 / T0001-BENCHMARK-HARNESS` is complete. The benchmark surface now has pinned ARC-AGI-2 public-training source metadata, deterministic development splitting, strict grid/task validation, explicit output-vs-task scoring, reproducibility tests, and a development validation path that does not require public-evaluation data.
+`ARC-R001 / T0001-BENCHMARK-HARNESS` is complete and remains authoritative for benchmark/split discipline.
 
-Next execute `T0001A-GEMMA-EXECUTION-PATH`. Build a provider-independent Gemma client around the authorized repository secret, verify the provider's current live model identifier, add deterministic request fingerprinting/cache plus usage/runtime accounting, and perform only a non-ARC smoke call for infrastructure validation. Never expose or commit the secret.
+`ARC-R002` substantially implemented `T0001A-GEMMA-EXECUTION-PATH` but did **not** satisfy its live-smoke success criterion. Durable work now includes:
 
-After that, unblock and execute `T0002-GEMMA-BASELINE` on the frozen development split. Do not use public evaluation as iterative feedback.
+- `src/arc_lab/target_model.py` — provider-neutral request/response interface, deterministic request fingerprints, filesystem cache, usage/runtime accounting, and Google Gen AI provider adapter;
+- `src/arc_lab/gemma_smoke.py` — non-ARC smoke call with required cache reuse on an identical second request;
+- `tests/test_target_model.py` — fingerprint/cache unit coverage;
+- `.github/workflows/gemma-smoke.yml` — secret-backed hosted smoke workflow with redacted metadata persistence.
 
-The GitHub connector could not surface a push-triggered Actions run for ARC-R001, so do not silently assume hosted CI is green; the implementation was locally exercised with 16 passing tests, and CI is configured to perform the pinned-corpus integration validation on GitHub.
+Current Google AI developer documentation lists `gemma-4-26b-a4b-it` and `gemma-4-31b-it` as current API model options. Local isolated verification of the new cache/fingerprint behavior passed 2/2 tests.
+
+However, no successful live Gemma call is claimed. The connected GitHub tooling available during ARC-R002 could not list or manually dispatch push-triggered Actions runs, and `lab/recon/gemma-smoke-latest.json` was not visible before shift close. This could mean the workflow had not completed, failed, or could not push evidence.
+
+Next execute the same highest-priority task `T0001A-GEMMA-EXECUTION-PATH`: first look for `lab/recon/gemma-smoke-latest.json` or inspect the smoke workflow run if the connector exposes it. If evidence is absent, rerun/repair the workflow. Only mark T0001A done after a live non-ARC call is verified with sanitized model/usage/runtime metadata and cache verification. Never expose the secret.
+
+Keep `T0002-GEMMA-BASELINE` blocked until T0001A is complete. Do not use public evaluation as iterative feedback.
