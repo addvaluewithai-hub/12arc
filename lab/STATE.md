@@ -1,9 +1,9 @@
 # ARC Research Lab — Current State
 
-Updated: 2026-08-23 00:02 EEST
+Updated: 2026-08-23 00:21 EEST
 Phase: **PHASE 0 — infrastructure + benchmark discipline**
-Latest completed research run: **ARC-R001**
-Next research run: **ARC-R002**
+Latest completed research run: **ARC-R002**
+Next research run: **ARC-R003**
 
 ## Target model policy
 
@@ -13,22 +13,28 @@ The research team invents the solver; Gemma executes controlled target-model exp
 
 ## Benchmark state
 
-`T0001-BENCHMARK-HARNESS` is complete.
+`T0001-BENCHMARK-HARNESS` is complete. The frozen public-training-derived development split remains authoritative; public evaluation remains milestone-only.
 
-- Official ARC-AGI-2 source metadata is pinned to upstream commit `f3283f727488ad98fe575ea6a5ac981e4a188e49`.
-- The 1000 public-training task IDs are committed with source/blob/hash metadata.
-- Deterministic seed `arc-lab-v1` produces 707 development-train, 174 development-validation and 119 development-holdout tasks.
-- Grid validation enforces ARC values and 1..30 dimensions.
-- Exact two-attempt scoring distinguishes per-test-output accuracy from full-task success.
-- The normal development command accepts only the training directory; CI is configured to sparse-checkout and validate the pinned training corpus without the public-evaluation directory.
-- Local implementation tests passed: 16/16. No Gemma inference and no ARC performance claim occurred in ARC-R001.
+## Gemma execution path
+
+`ARC-R002` implemented:
+
+- a provider-neutral target-model request/response interface;
+- deterministic SHA-256 request fingerprinting and filesystem caching;
+- request usage/runtime metadata capture;
+- a Google Gen AI provider adapter;
+- a non-ARC smoke command that requires the second identical request to hit cache;
+- unit tests for request fingerprints and cache reuse;
+- a GitHub Actions smoke workflow using `GEMINI_API_KEY` without committing or printing the secret.
+
+Current Google AI documentation lists `gemma-4-26b-a4b-it` and `gemma-4-31b-it` as live API model options. Isolated local verification of the new cache/fingerprint layer passed 2/2 tests.
 
 ## Current bottleneck
 
-A repository secret for Gemini has been configured by the operator, but the lab still needs a provider-independent Gemma execution adapter, deterministic request cache/accounting and a live non-benchmark smoke test before target-model benchmarking.
+The live hosted smoke call has not yet been verified by durable evidence. The workflow was committed, but the connected GitHub surface available to ARC-R002 could not list or dispatch push-triggered runs, and `lab/recon/gemma-smoke-latest.json` was not visible before shift close. Do not claim a successful Gemma API call from ARC-R002.
 
 ## Next task
 
-`T0001A-GEMMA-EXECUTION-PATH`.
+`T0001A-GEMMA-EXECUTION-PATH` remains `ready`: inspect or rerun the GitHub Actions smoke workflow, repair it if needed, and only mark it done after sanitized live evidence exists in Git.
 
-`T0002-GEMMA-BASELINE` remains blocked until that path is verified.
+`T0002-GEMMA-BASELINE` remains blocked until T0001A is verified.
