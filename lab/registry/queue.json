@@ -6,12 +6,16 @@
       "id": "T0001-BENCHMARK-HARNESS",
       "title": "Build deterministic ARC task loader, exact scorer and leakage-safe development split",
       "type": "infrastructure",
-      "status": "ready",
+      "status": "claimed",
       "priority": 100,
       "depends_on": [],
       "recommended_role": "benchmark-methodologist",
       "success_test": "Repository can validate ARC grids, score pass@2 predictions exactly, deterministically partition public-training task IDs, and prove via tests that public-evaluation files are not required by the default development command path.",
-      "claim": null
+      "claim": {
+        "shift_id": "chatgpt-20260822T2202+0300",
+        "claimed_at": "2026-08-22T22:02:00+03:00",
+        "lease_expires_at": "2026-08-23T00:02:00+03:00"
+      }
     },
     {
       "id": "T0002-GEMMA-BASELINE",
