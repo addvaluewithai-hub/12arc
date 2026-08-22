@@ -18,12 +18,16 @@
       "id": "T0001A-GEMMA-EXECUTION-PATH",
       "title": "Implement authorized Gemma provider adapter, deterministic cache and smoke test",
       "type": "infrastructure",
-      "status": "ready",
+      "status": "claimed",
       "priority": 95,
       "depends_on": ["T0001-BENCHMARK-HARNESS"],
       "recommended_role": "llm-experimenter",
       "success_test": "A GitHub Actions smoke workflow uses the repository GEMINI_API_KEY secret without exposing it, verifies the live provider model identifier, records request/usage metadata, and caches a non-benchmark test call through a provider-independent target-model interface.",
-      "claim": null
+      "claim": {
+        "shift_id": "scheduled-20260823T0021+0300",
+        "claimed_at": "2026-08-23T00:21:00+03:00",
+        "lease_expires_at": "2026-08-23T02:21:00+03:00"
+      }
     },
     {
       "id": "T0002-GEMMA-BASELINE",
