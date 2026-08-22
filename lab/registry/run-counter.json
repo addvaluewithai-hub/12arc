@@ -1,6 +1,13 @@
 {
   "schema_version": 1,
-  "next_run_number": 2,
+  "next_run_number": 3,
   "last_completed_run": "ARC-R001",
-  "active_reservations": []
+  "active_reservations": [
+    {
+      "run_id": "ARC-R002",
+      "task_id": "T0001A-GEMMA-EXECUTION-PATH",
+      "shift_id": "scheduled-20260823T0021+0300",
+      "reserved_at": "2026-08-23T00:21:00+03:00"
+    }
+  ]
 }
