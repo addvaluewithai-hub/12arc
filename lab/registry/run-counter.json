@@ -1,6 +1,13 @@
 {
   "schema_version": 1,
-  "next_run_number": 1,
+  "next_run_number": 2,
   "last_completed_run": null,
-  "active_reservations": []
+  "active_reservations": [
+    {
+      "run_id": "ARC-R001",
+      "task_id": "T0001-BENCHMARK-HARNESS",
+      "shift_id": "chatgpt-20260822T2202+0300",
+      "reserved_at": "2026-08-22T22:02:00+03:00"
+    }
+  ]
 }
