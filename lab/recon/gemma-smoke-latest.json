@@ -1,11 +1,54 @@
 {
-  "cache_verified": false,
+  "cache_verified": true,
+  "first_call": {
+    "cache_hit": false,
+    "input_tokens": 25,
+    "model_requested": "gemma-4-26b-a4b-it",
+    "model_resolved": "gemma-4-26b-a4b-it",
+    "output_tokens": null,
+    "provider_metadata": {
+      "model": {
+        "display_name": "Gemma 4 26B A4B IT",
+        "name": "models/gemma-4-26b-a4b-it",
+        "version": "001"
+      }
+    },
+    "runtime_seconds": 1.7467817309999987,
+    "text": "<redacted-non-benchmark-response>",
+    "text_nonempty": false,
+    "total_tokens": 86
+  },
+  "generation": {
+    "max_output_tokens": 64,
+    "temperature": 1.0,
+    "top_k": 64,
+    "top_p": 0.95
+  },
   "purpose": "non-ARC infrastructure smoke test",
+  "request_fingerprint": "43219ca7bec40964ad179243f3eacf4e69254d4b0ea6e548f7995a62a2725ff0",
   "schema_version": 1,
+  "second_call": {
+    "cache_hit": true,
+    "input_tokens": 25,
+    "model_requested": "gemma-4-26b-a4b-it",
+    "model_resolved": "gemma-4-26b-a4b-it",
+    "output_tokens": null,
+    "provider_metadata": {
+      "model": {
+        "display_name": "Gemma 4 26B A4B IT",
+        "name": "models/gemma-4-26b-a4b-it",
+        "version": "001"
+      }
+    },
+    "runtime_seconds": 1.7467817309999987,
+    "text": "<redacted-cached-response>",
+    "text_nonempty": false,
+    "total_tokens": 86
+  },
   "verified_live_call": false,
   "workflow": {
-    "run_id": "32601705751",
+    "run_id": "32601713417",
     "smoke_outcome": "failure",
-    "source_sha": "cc75919986d903f86660c606432dd5d994c522c8"
+    "source_sha": "6ffca68113b0927f9cd0f4c23449cc12184f93d8"
   }
 }
