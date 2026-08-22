@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "dataset": "ARC-AGI-2",
+  "source_repository": "arcprize/ARC-AGI-2",
+  "pinned_commit": "f3283f727488ad98fe575ea6a5ac981e4a188e49",
+  "public_training": {
+    "task_count": 1000,
+    "list_path": "data/training.txt",
+    "list_git_blob_sha1": "3c3f6f0384dfe22343f7a0e9fc7ad5480b5fb4db",
+    "tree_git_sha1": "dac7259367cc5099ef6a7b604a50a93affbbee33",
+    "local_id_list": "lab/benchmarks/arc-agi-2-training-ids.txt",
+    "local_id_list_sha256": "9dc93bc68f658d9077f76b882c2e26aff6a91cea1eb5415355837f83e6db0b00"
+  },
+  "public_evaluation": {
+    "task_count": 120,
+    "policy": "sealed milestone-only; not required by default development commands",
+    "list_path": "data/evaluation.txt",
+    "list_git_blob_sha1": "b23bb998340092702ce14d700553388b938837ad",
+    "tree_git_sha1": "8d04288aac3146b7c47d0b799c18bc9c0217d838"
+  },
+  "split_manifest": {
+    "generator": "arc-lab split-task-ids lab/benchmarks/arc-agi-2-training-ids.txt --source-commit f3283f727488ad98fe575ea6a5ac981e4a188e49",
+    "seed": "arc-lab-v1",
+    "reference_sha256": "9d1172858ce93f3ba47513fef3259bd9168f9d6aa7b200bedb8983087292fa70",
+    "counts": {
+      "dev_train": 707,
+      "dev_validation": 174,
+      "dev_holdout": 119
+    }
+  }
+}

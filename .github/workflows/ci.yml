@@ -16,3 +16,22 @@ jobs:
       - run: python -m pip install -e '.[dev]'
       - run: pytest -q
       - run: arc-lab validate-policy
+      - name: Reproduce frozen development split
+        run: |
+          arc-lab split-task-ids lab/benchmarks/arc-agi-2-training-ids.txt \
+            --source-commit f3283f727488ad98fe575ea6a5ac981e4a188e49 \
+            --output /tmp/arc-agi-2-dev-split.json
+          arc-lab verify-split-manifest \
+            lab/benchmarks/arc-agi-2-training-ids.txt \
+            /tmp/arc-agi-2-dev-split.json
+      - name: Validate pinned official public-training corpus without evaluation data
+        run: |
+          git init /tmp/arc-agi-2
+          git -C /tmp/arc-agi-2 remote add origin https://github.com/arcprize/ARC-AGI-2.git
+          git -C /tmp/arc-agi-2 sparse-checkout init --cone
+          git -C /tmp/arc-agi-2 sparse-checkout set data/training data/training.txt
+          git -C /tmp/arc-agi-2 fetch --depth=1 origin f3283f727488ad98fe575ea6a5ac981e4a188e49
+          git -C /tmp/arc-agi-2 checkout FETCH_HEAD
+          test ! -e /tmp/arc-agi-2/data/evaluation
+          arc-lab validate-development /tmp/arc-agi-2/data/training \
+            --ids-file lab/benchmarks/arc-agi-2-training-ids.txt
