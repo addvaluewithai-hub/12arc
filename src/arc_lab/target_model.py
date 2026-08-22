@@ -11,7 +11,9 @@ from typing import Any, Protocol
 
 @dataclass(frozen=True)
 class GenerationConfig:
-    temperature: float = 0.0
+    temperature: float = 1.0
+    top_p: float | None = 0.95
+    top_k: int | None = 64
     max_output_tokens: int = 64
 
 
@@ -105,6 +107,8 @@ class GoogleGenAIProvider:
             contents=request.prompt,
             config=types.GenerateContentConfig(
                 temperature=request.generation.temperature,
+                top_p=request.generation.top_p,
+                top_k=request.generation.top_k,
                 max_output_tokens=request.generation.max_output_tokens,
             ),
         )
