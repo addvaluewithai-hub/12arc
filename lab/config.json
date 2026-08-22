@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "project": "ARC Research Lab",
+  "competition": "ARC Prize 2026 / ARC-AGI-2",
+  "authoritative_runner": "lab/RUNNER.md",
+  "max_tasks_per_shift": 1,
+  "claim_lease_minutes": 120,
+  "primary_target_model": "gemma-4-26b-a4b-it",
+  "escalation_target_model": "gemma-4-31b-it",
+  "research_team_role": "invent algorithms, prompts, representations and experiments; do not substitute itself for target-model benchmark execution",
+  "development_feedback": "public-training-derived deterministic splits only",
+  "public_eval_policy": "milestone-only sealed evaluation; never use repeated public-eval feedback to tune the solver",
+  "score_metric": "exact task accuracy with up to two predicted outputs per test input",
+  "cost_metric": "score delta per target-model calls/tokens/runtime"
+}

@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "statuses": ["ready", "claimed", "blocked", "done", "cancelled"],
+  "tasks": [
+    {
+      "id": "T0001-BENCHMARK-HARNESS",
+      "title": "Build deterministic ARC task loader, exact scorer and leakage-safe development split",
+      "type": "infrastructure",
+      "status": "ready",
+      "priority": 100,
+      "depends_on": [],
+      "recommended_role": "benchmark-methodologist",
+      "success_test": "Repository can validate ARC grids, score pass@2 predictions exactly, deterministically partition public-training task IDs, and prove via tests that public-evaluation files are not required by the default development command path.",
+      "claim": null
+    },
+    {
+      "id": "T0002-GEMMA-BASELINE",
+      "title": "Establish fixed Gemma 4 26B A4B baseline on the frozen development split",
+      "type": "target-model-experiment",
+      "status": "blocked",
+      "priority": 90,
+      "depends_on": ["T0001-BENCHMARK-HARNESS"],
+      "recommended_role": "llm-experimenter",
+      "success_test": "A fully cached, reproducible baseline records exact accuracy, two-attempt policy, generation settings, calls/tokens/runtime, per-task outputs and failure taxonomy without using public-eval feedback.",
+      "blocker": "Requires an authorized Gemma execution path/API secret or connector; never commit secrets.",
+      "claim": null
+    },
+    {
+      "id": "T0003-FIRST-ARCHITECTURE-TOURNAMENT",
+      "title": "Compare direct prompting against structured hypothesis-generation + exact verification",
+      "type": "research",
+      "status": "blocked",
+      "priority": 80,
+      "depends_on": ["T0002-GEMMA-BASELINE"],
+      "recommended_role": "reasoning-systems-inventor",
+      "success_test": "Matched ablation shows whether structured generate-test-reject search produces a statistically and qualitatively defensible held-out improvement over direct prompting at controlled target-model budget.",
+      "claim": null
+    }
+  ]
+}

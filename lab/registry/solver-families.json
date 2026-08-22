@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "families": [
+    {"id": "DIRECT", "name": "direct text/grid prompting", "status": "baseline"},
+    {"id": "STRUCTURED", "name": "structured decomposition and explicit hypothesis protocol", "status": "candidate"},
+    {"id": "PROGRAM", "name": "program/DSL proposal plus exact execution verifier", "status": "candidate"},
+    {"id": "OBJECT", "name": "object-centric / relational scene representation", "status": "candidate"},
+    {"id": "SEARCH", "name": "multi-hypothesis inference-time search", "status": "candidate"},
+    {"id": "ROUTER", "name": "26B primary with selective 31B escalation", "status": "future"}
+  ]
+}

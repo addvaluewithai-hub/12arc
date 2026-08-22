@@ -2,46 +2,50 @@
 
 A reproducible research operating system for ARC-AGI-2.
 
-## Mission
+## Thesis
 
-Develop a solver architecture that makes a fixed open-weight model materially better at ARC-style novel reasoning through representations, inference-time algorithms, search, verification, tool use, prompt protocols, and learned or symbolic components.
+**The research team invents. Gemma executes. ARC judges.**
 
-The research team invents; the target model executes; ARC benchmarks judge.
+We are not treating the target model as the scientist. The lab uses research agents to invent better inference algorithms, prompt protocols, representations, search, verification and routing around a fixed open-weight model, then tests those changes objectively on held-out ARC tasks.
 
 ```text
 Research team / ChatGPT
         ↓
-hypothesis + algorithm + prompt protocol
+hypothesis + solver change
         ↓
-fixed Gemma baseline
+Gemma 4 fixed target model
         ↓
-ARC tasks
+ARC held-out tasks
         ↓
-exact scorer + failure analysis
+exact benchmark + regressions + cost
         ↓
 promote / reject / next experiment
 ```
 
-## Initial model policy
+## Initial target models
 
-- Treat Gemma as the experimental engine, not the research lead.
-- Keep the primary model fixed during controlled experiment series so score changes can be attributed to solver changes.
-- Use hosted inference during R&D when available; preserve a path to offline/open-weight execution for reproducibility.
-- Do not let model choice, prompt, search depth, representation, and benchmark split all change in the same experiment.
+- Primary: `gemma-4-26b-a4b-it`
+- Escalation candidate: `gemma-4-31b-it`
 
-## Research principles
+Hosted inference may be used during development, but mature solver paths must remain reproducible with the open weights offline because ARC Prize evaluation has no internet.
 
-1. Exact benchmark truth beats qualitative impressions.
-2. Every claimed improvement needs a fixed split, baseline, seed/config, compute budget, and regression accounting.
-3. Public evaluation tasks are not a day-to-day optimization loop. Development feedback comes from leakage-safe splits derived from the public training set.
-4. Cache model responses and never spend quota repeating identical work without a reason.
-5. Track score improvement per compute/API cost, not score alone.
-6. Analyze new solves and regressions task-by-task.
-7. Prefer architectures that can be reproduced without proprietary online APIs at evaluation time.
-8. One research shift changes one important thing and ends with a falsifiable verdict.
+## Research OS
 
-## Current phase
+Start with [`lab/RUNNER.md`](lab/RUNNER.md). It defines queue claiming, one-task-per-shift execution, leakage policy, experiment contracts, model discipline, persistence and handoff.
 
-**PHASE 0 — infrastructure + reconnaissance.** No solver result is claimed yet.
+Current phase: **infrastructure + benchmark discipline**. There is deliberately no ARC score claim yet.
 
-The authoritative research runner and benchmark discipline will live under `lab/`.
+## Core rules
+
+1. Development feedback uses deterministic splits derived from the public training set.
+2. Public evaluation is milestone-only, not a tuning loop.
+3. Keep the target model fixed inside controlled experiment series.
+4. Change one important variable at a time.
+5. Cache identical target-model requests.
+6. Report new solves and regressions, not only aggregate accuracy.
+7. Track score improvement per calls/tokens/runtime.
+8. Never credit a research agent's hand-solved output to Gemma.
+
+## License
+
+MIT-0 for lab-authored code/methods unless a file states otherwise. Third-party data/models retain their own licenses.
