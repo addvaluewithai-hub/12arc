@@ -1,0 +1,11 @@
+{
+  "cache_verified": false,
+  "purpose": "non-ARC infrastructure smoke test",
+  "schema_version": 1,
+  "verified_live_call": false,
+  "workflow": {
+    "run_id": "32601588503",
+    "smoke_outcome": "failure",
+    "source_sha": "f961bff6dfb77fde5878a0086ea532d81eb52c6e"
+  }
+}
