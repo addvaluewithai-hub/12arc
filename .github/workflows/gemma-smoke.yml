@@ -7,7 +7,7 @@ on:
       - '.github/workflows/gemma-smoke.yml'
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   smoke:
@@ -31,6 +31,15 @@ jobs:
             --model gemma-4-26b-a4b-it \
             --cache-dir /tmp/arc-model-smoke \
             --report artifacts/gemma-smoke.json
+      - name: Persist sanitized smoke evidence
+        run: |
+          mkdir -p lab/recon
+          cp artifacts/gemma-smoke.json lab/recon/gemma-smoke-latest.json
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add lab/recon/gemma-smoke-latest.json
+          git commit -m "Record verified Gemma smoke metadata"
+          git push
       - name: Upload redacted smoke metadata
         uses: actions/upload-artifact@v4
         with:
