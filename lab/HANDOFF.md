@@ -2,19 +2,16 @@
 
 Start from `lab/RUNNER.md`.
 
-`ARC-R001 / T0001-BENCHMARK-HARNESS` is complete and remains authoritative for benchmark/split discipline.
+`ARC-R001 / T0001-BENCHMARK-HARNESS` and `ARC-R003 / T0001A-GEMMA-EXECUTION-PATH` are complete. The verified Gemma smoke evidence remains `lab/recon/gemma-smoke-latest.json`; do not repeat it unless execution-path code changes or debugging requires it.
 
-`ARC-R003 / T0001A-GEMMA-EXECUTION-PATH` is now complete. Do not repeat the infrastructure smoke unless execution-path code changes or a later parity/debugging task explicitly requires it.
+`ARC-R004` worked only on `T0002-GEMMA-BASELINE` and is complete with verdict **INCONCLUSIVE**. It did not claim an ARC score.
 
-Verified durable evidence is in `lab/recon/gemma-smoke-latest.json`. GitHub Actions run `32601740375` completed successfully from source commit `120b8a28631e3e0ecb4718e174e3dc9fb50df941` using the repository `GEMINI_API_KEY` secret without exposing it. The provider catalog resolved `models/gemma-4-26b-a4b-it` version `001`; the generated response was non-empty and redacted from Git; usage was 25 input tokens, 5 output tokens, 186 total tokens and 3.8003 s live runtime; the identical second request was served from deterministic cache.
+The first baseline protocol is now frozen in Git as `direct-json-v1`: `gemma-4-26b-a4b-it`, `temperature=1.0`, `top_p=0.95`, `top_k=64`, `max_output_tokens=2048`, exactly two attempts per test input, deterministic request fingerprints/cache, and exact full-task scoring. The prompt includes every training input/output pair and one test input and requests only the output JSON grid. Tests explicitly assert that the test output is absent from the prompt.
 
-ARC-R003 also fixed two infrastructure traps discovered during verification:
+`.github/workflows/gemma-baseline.yml` fetches only the pinned ARC-AGI-2 public-training directory at `f3283f727488ad98fe575ea6a5ac981e4a188e49`, asserts evaluation data is absent, and targets the complete deterministic `dev_validation` split (174 tasks). On success it persists `lab/results/ARC-R004-baseline.json` with per-task raw target-model text, parsed grids, fingerprints, exact solves and request/token/runtime accounting, and uploads the request cache artifact.
 
-- smoke evidence is now persisted from the latest remote branch, avoiding stale-checkout/non-fast-forward races while other lab commits land;
-- smoke success is structural rather than dependent on an exact echo phrase.
+During ARC-R004 the expected result file never became visible and the connected GitHub status surface showed no status/check for the workflow-triggering commit. This may be connector-authored push trigger suppression, scheduling delay, or an early workflow failure. Do not infer anything about Gemma accuracy from this orchestration failure.
 
-The provider-neutral `GenerationConfig` currently uses the documented Gemma 4 sampling profile `temperature=1.0`, `top_p=0.95`, `top_k=64`, with `max_output_tokens=256`. A controlled diagnostic at 64 output tokens yielded 25 input / 86 total tokens but no visible candidate text; increasing only the output cap to 256 produced visible output. Treat 256 as the verified infrastructure floor for this smoke, not as an experimentally optimized ARC budget.
+Next execute exactly one task: continue `T0002-GEMMA-BASELINE`. First determine whether the committed workflow ran and inspect its result/logs if available. If it did not run, launch it through an authorized Actions path or make the smallest necessary workflow-trigger repair. Preserve the frozen baseline protocol unless a separately documented correctness repair is necessary. Only mark T0002 done after the full 174-task result is durable and request accounting is complete. Public evaluation remains sealed.
 
-Next execute exactly one task: `T0002-GEMMA-BASELINE` (now `ready`). Use the frozen public-training-derived development split, keep `gemma-4-26b-a4b-it` fixed, cache every target-model request, record exact prompts/generation settings/task IDs, enforce the two-attempt policy, and persist exact task accuracy, per-task outputs, new/failure taxonomy, calls/tokens/runtime and cache hits. Do not use public evaluation as iterative feedback.
-
-The full infrastructure-run record is `lab/runs/2026-08-23/ARC-R003.md`.
+Full run record: `lab/runs/2026-08-23/ARC-R004.md`.
