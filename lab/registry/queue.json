@@ -18,28 +18,24 @@
       "id": "T0001A-GEMMA-EXECUTION-PATH",
       "title": "Implement authorized Gemma provider adapter, deterministic cache and smoke test",
       "type": "infrastructure",
-      "status": "claimed",
+      "status": "done",
       "priority": 95,
       "depends_on": ["T0001-BENCHMARK-HARNESS"],
       "recommended_role": "llm-experimenter",
       "success_test": "A GitHub Actions smoke workflow uses the repository GEMINI_API_KEY secret without exposing it, verifies the live provider model identifier, records request/usage metadata, and caches a non-benchmark test call through a provider-independent target-model interface.",
-      "progress": "ARC-R002 implemented the provider-neutral client, deterministic cache/accounting, tests, and smoke workflow. Live smoke success is not yet verified because no persisted smoke evidence was visible through the connected GitHub surface.",
-      "claim": {
-        "shift_id": "scheduled-20260823T0106+0300",
-        "claimed_at": "2026-08-23T01:06:32+03:00",
-        "lease_expires_at": "2026-08-23T03:06:32+03:00"
-      }
+      "completed_run": "ARC-R003",
+      "progress": "ARC-R003 verified a live gemma-4-26b-a4b-it call through GitHub Actions, durable sanitized model/usage/runtime metadata, visible generated text, and deterministic second-call cache reuse. Evidence: lab/recon/gemma-smoke-latest.json; workflow run 32601740375.",
+      "claim": null
     },
     {
       "id": "T0002-GEMMA-BASELINE",
       "title": "Establish fixed Gemma 4 26B A4B baseline on the frozen development split",
       "type": "target-model-experiment",
-      "status": "blocked",
+      "status": "ready",
       "priority": 90,
       "depends_on": ["T0001-BENCHMARK-HARNESS", "T0001A-GEMMA-EXECUTION-PATH"],
       "recommended_role": "llm-experimenter",
       "success_test": "A fully cached, reproducible baseline records exact accuracy, two-attempt policy, generation settings, calls/tokens/runtime, per-task outputs and failure taxonomy without using public-eval feedback.",
-      "blocker": "Requires completion of T0001A-GEMMA-EXECUTION-PATH and a successful authorized Gemma smoke test; never commit secrets.",
       "claim": null
     },
     {
