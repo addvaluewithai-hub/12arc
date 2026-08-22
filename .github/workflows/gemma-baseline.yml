@@ -1,0 +1,73 @@
+name: gemma-baseline
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/gemma-baseline.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  baseline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    env:
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install lab
+        run: python -m pip install -e '.[dev,gemma]'
+      - name: Unit tests
+        run: pytest -q
+      - name: Fetch pinned public-training corpus only
+        run: |
+          git init /tmp/arc-agi-2
+          git -C /tmp/arc-agi-2 remote add origin https://github.com/arcprize/ARC-AGI-2.git
+          git -C /tmp/arc-agi-2 sparse-checkout init --cone
+          git -C /tmp/arc-agi-2 sparse-checkout set data/training
+          git -C /tmp/arc-agi-2 fetch --depth=1 origin f3283f727488ad98fe575ea6a5ac981e4a188e49
+          git -C /tmp/arc-agi-2 checkout FETCH_HEAD
+          test ! -e /tmp/arc-agi-2/data/evaluation
+      - name: Run fixed two-attempt baseline on frozen dev_validation
+        id: baseline
+        continue-on-error: true
+        run: |
+          test -n "$GEMINI_API_KEY"
+          python -m arc_lab.baseline \
+            /tmp/arc-agi-2/data/training \
+            lab/benchmarks/arc-agi-2-training-ids.txt \
+            --split dev_validation \
+            --cache-dir /tmp/arc-baseline-cache \
+            --output /tmp/arc-r004-baseline.json
+      - name: Persist baseline result from latest remote branch
+        if: steps.baseline.outcome == 'success'
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          for attempt in 1 2 3; do
+            git fetch origin "$GITHUB_REF_NAME"
+            git checkout -B arc-baseline-persist "origin/$GITHUB_REF_NAME"
+            mkdir -p lab/results
+            cp /tmp/arc-r004-baseline.json lab/results/ARC-R004-baseline.json
+            git add lab/results/ARC-R004-baseline.json
+            git commit -m "Record ARC-R004 Gemma baseline" || exit 0
+            if git push origin HEAD:"$GITHUB_REF_NAME"; then exit 0; fi
+          done
+          exit 1
+      - name: Upload request cache
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: arc-r004-target-cache
+          path: /tmp/arc-baseline-cache
+          if-no-files-found: warn
+      - name: Require successful baseline
+        if: always()
+        env:
+          OUTCOME: ${{ steps.baseline.outcome }}
+        run: test "$OUTCOME" = success
