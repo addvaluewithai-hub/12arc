@@ -39,6 +39,35 @@ def validate_smoke(
         raise ValueError("provider did not report a resolved model identifier")
 
 
+def _write_report(
+    path: Path,
+    request: TargetRequest,
+    first: TargetResponse,
+    second: TargetResponse,
+    *,
+    cache_verified: bool,
+) -> None:
+    report = {
+        "schema_version": 1,
+        "purpose": "non-ARC infrastructure smoke test",
+        "request_fingerprint": request.fingerprint(),
+        "generation": asdict(request.generation),
+        "first_call": {
+            **asdict(first),
+            "text": "<redacted-non-benchmark-response>",
+            "text_nonempty": bool(first.text.strip()),
+        },
+        "second_call": {
+            **asdict(second),
+            "text": "<redacted-cached-response>",
+            "text_nonempty": bool(second.text.strip()),
+        },
+        "cache_verified": cache_verified,
+    }
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n")
+
+
 def main(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(prog="python -m arc_lab.gemma_smoke")
     parser.add_argument("--model", default="gemma-4-26b-a4b-it")
@@ -52,32 +81,18 @@ def main(argv: list[str] | None = None) -> None:
             "This is an infrastructure smoke test, not an ARC benchmark task. "
             "Return one short line confirming that text generation is available."
         ),
-        solver_version="gemma-execution-path-v2",
+        solver_version="gemma-execution-path-v3",
         task_id="non-benchmark-smoke",
         attempt_index=0,
     )
     client = CachedTargetClient(GoogleGenAIProvider(), args.cache_dir)
     first = client.generate(request)
     second = client.generate(request)
+
+    report_path = Path(args.report)
+    _write_report(report_path, request, first, second, cache_verified=second.cache_hit is True)
     validate_smoke(first, second, requested_model=args.model)
 
-    report = {
-        "schema_version": 1,
-        "purpose": "non-ARC infrastructure smoke test",
-        "request_fingerprint": request.fingerprint(),
-        "first_call": {
-            **asdict(first),
-            "text": "<redacted-non-benchmark-response>",
-        },
-        "second_call": {
-            **asdict(second),
-            "text": "<redacted-cached-response>",
-        },
-        "cache_verified": True,
-    }
-    path = Path(args.report)
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n")
     print(
         json.dumps(
             {
