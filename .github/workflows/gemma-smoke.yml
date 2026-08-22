@@ -25,24 +25,80 @@ jobs:
       - name: Unit tests
         run: pytest -q
       - name: Authorized non-ARC Gemma smoke test
+        id: smoke
+        continue-on-error: true
         run: |
+          mkdir -p artifacts
           test -n "$GEMINI_API_KEY"
           python -m arc_lab.gemma_smoke \
             --model gemma-4-26b-a4b-it \
             --cache-dir /tmp/arc-model-smoke \
             --report artifacts/gemma-smoke.json
-      - name: Persist sanitized smoke evidence
+      - name: Prepare sanitized smoke evidence
+        if: always()
+        env:
+          SMOKE_OUTCOME: ${{ steps.smoke.outcome }}
+          WORKFLOW_RUN_ID: ${{ github.run_id }}
+          WORKFLOW_SHA: ${{ github.sha }}
         run: |
-          mkdir -p lab/recon
-          cp artifacts/gemma-smoke.json lab/recon/gemma-smoke-latest.json
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          path = Path("artifacts/gemma-smoke.json")
+          if path.exists():
+              payload = json.loads(path.read_text())
+          else:
+              payload = {
+                  "schema_version": 1,
+                  "purpose": "non-ARC infrastructure smoke test",
+                  "cache_verified": False,
+              }
+          payload["workflow"] = {
+              "run_id": os.environ["WORKFLOW_RUN_ID"],
+              "source_sha": os.environ["WORKFLOW_SHA"],
+              "smoke_outcome": os.environ["SMOKE_OUTCOME"],
+          }
+          payload["verified_live_call"] = (
+              os.environ["SMOKE_OUTCOME"] == "success"
+              and payload.get("cache_verified") is True
+              and bool(payload.get("first_call", {}).get("model_resolved"))
+          )
+          path.parent.mkdir(parents=True, exist_ok=True)
+          path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n")
+          PY
+      - name: Persist sanitized smoke evidence without stale-checkout race
+        if: always()
+        run: |
+          cp artifacts/gemma-smoke.json /tmp/gemma-smoke.json
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-          git add lab/recon/gemma-smoke-latest.json
-          git commit -m "Record verified Gemma smoke metadata"
-          git push
+          for attempt in 1 2 3; do
+            git fetch origin "$GITHUB_REF_NAME"
+            git checkout -B arc-smoke-persist "origin/$GITHUB_REF_NAME"
+            mkdir -p lab/recon
+            cp /tmp/gemma-smoke.json lab/recon/gemma-smoke-latest.json
+            git add lab/recon/gemma-smoke-latest.json
+            if git diff --cached --quiet; then
+              echo "Smoke evidence already current"
+              exit 0
+            fi
+            git commit -m "Record Gemma smoke outcome"
+            if git push origin HEAD:"$GITHUB_REF_NAME"; then
+              exit 0
+            fi
+          done
+          exit 1
       - name: Upload redacted smoke metadata
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: gemma-smoke-metadata
           path: artifacts/gemma-smoke.json
           if-no-files-found: error
+      - name: Require successful live smoke
+        if: always()
+        env:
+          SMOKE_OUTCOME: ${{ steps.smoke.outcome }}
+        run: test "$SMOKE_OUTCOME" = "success"
