@@ -14,7 +14,7 @@ class GenerationConfig:
     temperature: float = 1.0
     top_p: float | None = 0.95
     top_k: int | None = 64
-    max_output_tokens: int = 64
+    max_output_tokens: int = 256
 
 
 @dataclass(frozen=True)
