@@ -4,17 +4,17 @@ Start from `lab/RUNNER.md`.
 
 `ARC-R001 / T0001-BENCHMARK-HARNESS` is complete and remains authoritative for benchmark/split discipline.
 
-`ARC-R002` substantially implemented `T0001A-GEMMA-EXECUTION-PATH` but did **not** satisfy its live-smoke success criterion. Durable work now includes:
+`ARC-R003 / T0001A-GEMMA-EXECUTION-PATH` is now complete. Do not repeat the infrastructure smoke unless execution-path code changes or a later parity/debugging task explicitly requires it.
 
-- `src/arc_lab/target_model.py` — provider-neutral request/response interface, deterministic request fingerprints, filesystem cache, usage/runtime accounting, and Google Gen AI provider adapter;
-- `src/arc_lab/gemma_smoke.py` — non-ARC smoke call with required cache reuse on an identical second request;
-- `tests/test_target_model.py` — fingerprint/cache unit coverage;
-- `.github/workflows/gemma-smoke.yml` — secret-backed hosted smoke workflow with redacted metadata persistence.
+Verified durable evidence is in `lab/recon/gemma-smoke-latest.json`. GitHub Actions run `32601740375` completed successfully from source commit `120b8a28631e3e0ecb4718e174e3dc9fb50df941` using the repository `GEMINI_API_KEY` secret without exposing it. The provider catalog resolved `models/gemma-4-26b-a4b-it` version `001`; the generated response was non-empty and redacted from Git; usage was 25 input tokens, 5 output tokens, 186 total tokens and 3.8003 s live runtime; the identical second request was served from deterministic cache.
 
-Current Google AI developer documentation lists `gemma-4-26b-a4b-it` and `gemma-4-31b-it` as current API model options. Local isolated verification of the new cache/fingerprint behavior passed 2/2 tests.
+ARC-R003 also fixed two infrastructure traps discovered during verification:
 
-However, no successful live Gemma call is claimed. The connected GitHub tooling available during ARC-R002 could not list or manually dispatch push-triggered Actions runs, and `lab/recon/gemma-smoke-latest.json` was not visible before shift close. This could mean the workflow had not completed, failed, or could not push evidence.
+- smoke evidence is now persisted from the latest remote branch, avoiding stale-checkout/non-fast-forward races while other lab commits land;
+- smoke success is structural rather than dependent on an exact echo phrase.
 
-Next execute the same highest-priority task `T0001A-GEMMA-EXECUTION-PATH`: first look for `lab/recon/gemma-smoke-latest.json` or inspect the smoke workflow run if the connector exposes it. If evidence is absent, rerun/repair the workflow. Only mark T0001A done after a live non-ARC call is verified with sanitized model/usage/runtime metadata and cache verification. Never expose the secret.
+The provider-neutral `GenerationConfig` currently uses the documented Gemma 4 sampling profile `temperature=1.0`, `top_p=0.95`, `top_k=64`, with `max_output_tokens=256`. A controlled diagnostic at 64 output tokens yielded 25 input / 86 total tokens but no visible candidate text; increasing only the output cap to 256 produced visible output. Treat 256 as the verified infrastructure floor for this smoke, not as an experimentally optimized ARC budget.
 
-Keep `T0002-GEMMA-BASELINE` blocked until T0001A is complete. Do not use public evaluation as iterative feedback.
+Next execute exactly one task: `T0002-GEMMA-BASELINE` (now `ready`). Use the frozen public-training-derived development split, keep `gemma-4-26b-a4b-it` fixed, cache every target-model request, record exact prompts/generation settings/task IDs, enforce the two-attempt policy, and persist exact task accuracy, per-task outputs, new/failure taxonomy, calls/tokens/runtime and cache hits. Do not use public evaluation as iterative feedback.
+
+The full infrastructure-run record is `lab/runs/2026-08-23/ARC-R003.md`.
