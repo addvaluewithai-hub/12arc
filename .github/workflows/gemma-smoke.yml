@@ -1,0 +1,39 @@
+name: gemma-smoke
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/gemma-smoke.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install lab with Gemma adapter
+        run: python -m pip install -e '.[dev,gemma]'
+      - name: Unit tests
+        run: pytest -q
+      - name: Authorized non-ARC Gemma smoke test
+        run: |
+          test -n "$GEMINI_API_KEY"
+          python -m arc_lab.gemma_smoke \
+            --model gemma-4-26b-a4b-it \
+            --cache-dir /tmp/arc-model-smoke \
+            --report artifacts/gemma-smoke.json
+      - name: Upload redacted smoke metadata
+        uses: actions/upload-artifact@v4
+        with:
+          name: gemma-smoke-metadata
+          path: artifacts/gemma-smoke.json
+          if-no-files-found: error
