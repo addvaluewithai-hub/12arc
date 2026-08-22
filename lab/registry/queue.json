@@ -6,16 +6,24 @@
       "id": "T0001-BENCHMARK-HARNESS",
       "title": "Build deterministic ARC task loader, exact scorer and leakage-safe development split",
       "type": "infrastructure",
-      "status": "claimed",
+      "status": "done",
       "priority": 100,
       "depends_on": [],
       "recommended_role": "benchmark-methodologist",
       "success_test": "Repository can validate ARC grids, score pass@2 predictions exactly, deterministically partition public-training task IDs, and prove via tests that public-evaluation files are not required by the default development command path.",
-      "claim": {
-        "shift_id": "chatgpt-20260822T2202+0300",
-        "claimed_at": "2026-08-22T22:02:00+03:00",
-        "lease_expires_at": "2026-08-23T00:02:00+03:00"
-      }
+      "completed_run": "ARC-R001",
+      "claim": null
+    },
+    {
+      "id": "T0001A-GEMMA-EXECUTION-PATH",
+      "title": "Implement authorized Gemma provider adapter, deterministic cache and smoke test",
+      "type": "infrastructure",
+      "status": "ready",
+      "priority": 95,
+      "depends_on": ["T0001-BENCHMARK-HARNESS"],
+      "recommended_role": "llm-experimenter",
+      "success_test": "A GitHub Actions smoke workflow uses the repository GEMINI_API_KEY secret without exposing it, verifies the live provider model identifier, records request/usage metadata, and caches a non-benchmark test call through a provider-independent target-model interface.",
+      "claim": null
     },
     {
       "id": "T0002-GEMMA-BASELINE",
@@ -23,10 +31,10 @@
       "type": "target-model-experiment",
       "status": "blocked",
       "priority": 90,
-      "depends_on": ["T0001-BENCHMARK-HARNESS"],
+      "depends_on": ["T0001-BENCHMARK-HARNESS", "T0001A-GEMMA-EXECUTION-PATH"],
       "recommended_role": "llm-experimenter",
       "success_test": "A fully cached, reproducible baseline records exact accuracy, two-attempt policy, generation settings, calls/tokens/runtime, per-task outputs and failure taxonomy without using public-eval feedback.",
-      "blocker": "Requires an authorized Gemma execution path/API secret or connector; never commit secrets.",
+      "blocker": "Requires completion of T0001A-GEMMA-EXECUTION-PATH and a successful authorized Gemma smoke test; never commit secrets.",
       "claim": null
     },
     {

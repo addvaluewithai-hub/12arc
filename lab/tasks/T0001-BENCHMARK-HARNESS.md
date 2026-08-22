@@ -1,20 +1,27 @@
 # T0001 — Benchmark Harness
 
-Status: READY
+Status: DONE
+Completed by: `ARC-R001`
 
 ## Mission
 
 Make future ARC claims trustworthy before spending model quota.
 
-## Deliverables
+## Delivered
 
-- validate the official ARC-AGI-2 JSON task shape;
-- exact grid equality and pass@2 scoring;
-- deterministic split of public-training task IDs into development train/validation/holdout;
-- dataset manifest with source/version/hash once the official data is vendored or fetched;
-- tests for malformed grids and scoring edge cases;
-- a development command path that does not require public-evaluation solutions.
+- strict ARC-AGI-2 grid/task validation, including 1..30 dimensions and values 0..9;
+- exact grid equality and two-attempt scoring;
+- separate per-test-output accuracy and full-task success metrics;
+- deterministic public-training split generation from seed `arc-lab-v1`;
+- pinned official ARC-AGI-2 source metadata and the 1000 public-training task-ID list;
+- reproducible split reference: 707 dev-train / 174 dev-validation / 119 dev-holdout, manifest SHA-256 `9d1172858ce93f3ba47513fef3259bd9168f9d6aa7b200bedb8983087292fa70`;
+- malformed-grid, scoring, split and benchmark-policy tests;
+- a default development validation path that takes a training directory only;
+- CI steps that sparse-checkout the pinned public-training corpus without the public-evaluation directory and validate it.
 
-## Success test
+## Verification
 
-A clean checkout can run tests and deterministically reproduce the same split manifest from the same task-ID list. No Gemma score is claimed in this task.
+Local implementation test run: 16 passed.
+No Gemma call, ARC score or public-evaluation tuning occurred.
+
+Hosted push-triggered CI status was not observable through the available GitHub connector at completion; see `lab/HANDOFF.md` and the ARC-R001 report.
