@@ -5,6 +5,10 @@ on:
   push:
     paths:
       - '.github/workflows/gemma-smoke.yml'
+      - 'src/arc_lab/target_model.py'
+      - 'src/arc_lab/gemma_smoke.py'
+      - 'tests/test_target_model.py'
+      - 'pyproject.toml'
 
 permissions:
   contents: write
