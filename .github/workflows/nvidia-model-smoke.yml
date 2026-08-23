@@ -9,13 +9,17 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: nvidia-model-smoke
+  cancel-in-progress: true
+
 env:
   NVIDIA_ENDPOINT: https://integrate.api.nvidia.com/v1/chat/completions
 
 jobs:
   smoke:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 12
     env:
       NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
     steps:
@@ -30,6 +34,20 @@ jobs:
       - name: Verify NVIDIA secret exists
         run: test -n "$NVIDIA_API_KEY"
 
+      - name: Configure evidence commits
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Persist smoke start breadcrumb
+        run: |
+          mkdir -p lab/recon
+          printf '{"status":"started","run_id":"%s","trigger_sha":"%s","secret_persisted":false}\n' "$GITHUB_RUN_ID" "$GITHUB_SHA" > lab/recon/nvidia-model-smoke-start.json
+          git add lab/recon/nvidia-model-smoke-start.json
+          git commit -m "Record NVIDIA smoke start" || true
+          git pull --rebase origin main
+          git push origin HEAD:main
+
       - name: Probe four NVIDIA-hosted models
         shell: bash
         run: |
@@ -37,6 +55,7 @@ jobs:
           python - <<'PY'
           import json
           import os
+          import subprocess
           import time
           import urllib.error
           import urllib.request
@@ -51,7 +70,26 @@ jobs:
               "google/gemma-4-31b-it",
           ]
 
-          results = []
+          def persist(report, label):
+              text = json.dumps(report, indent=2, sort_keys=True) + "\n"
+              Path("artifacts/nvidia-model-smoke.json").write_text(text)
+              Path("lab/recon/nvidia-model-smoke-latest.json").write_text(text)
+              subprocess.run(["git", "add", "lab/recon/nvidia-model-smoke-latest.json"], check=True)
+              committed = subprocess.run(["git", "commit", "-m", f"Record NVIDIA smoke: {label}"], check=False).returncode == 0
+              if committed:
+                  subprocess.run(["git", "pull", "--rebase", "origin", "main"], check=True)
+                  subprocess.run(["git", "push", "origin", "HEAD:main"], check=True)
+
+          report = {
+              "schema_version": 1,
+              "purpose": "NVIDIA API key / hosted-model availability smoke test; non-ARC",
+              "endpoint": endpoint,
+              "secret_persisted": False,
+              "models": [],
+              "complete": False,
+          }
+          persist(report, "probe initialized")
+
           for model in models:
               payload = {
                   "model": model,
@@ -73,7 +111,7 @@ jobs:
               started = time.perf_counter()
               status = None
               body = ""
-              error = None
+              transport_error = None
               try:
                   with urllib.request.urlopen(req, timeout=120) as response:
                       status = response.status
@@ -81,9 +119,9 @@ jobs:
               except urllib.error.HTTPError as exc:
                   status = exc.code
                   body = exc.read().decode("utf-8", errors="replace")
-                  error = f"HTTP {exc.code}"
+                  transport_error = f"HTTP {exc.code}"
               except Exception as exc:
-                  error = f"{type(exc).__name__}: {exc}"
+                  transport_error = f"{type(exc).__name__}: {exc}"
               latency = time.perf_counter() - started
 
               data = None
@@ -119,7 +157,7 @@ jobs:
                       else:
                           api_error = {"message": str(err)[:500]}
 
-              results.append({
+              report["models"].append({
                   "model_requested": model,
                   "http_status": status,
                   "request_succeeded": status == 200,
@@ -130,39 +168,21 @@ jobs:
                   "finish_reason": finish_reason,
                   "usage": usage,
                   "latency_seconds": round(latency, 3),
-                  "transport_error": error,
+                  "transport_error": transport_error,
                   "api_error": api_error,
               })
+              persist(report, model.replace("/", "-"))
 
-          report = {
-              "schema_version": 1,
-              "purpose": "NVIDIA API key / hosted-model availability smoke test; non-ARC",
-              "endpoint": endpoint,
-              "secret_persisted": False,
-              "models": results,
-              "all_http_200": all(item["http_status"] == 200 for item in results),
-          }
-          text = json.dumps(report, indent=2, sort_keys=True) + "\n"
-          Path("artifacts/nvidia-model-smoke.json").write_text(text)
-          Path("lab/recon/nvidia-model-smoke-latest.json").write_text(text)
+          report["complete"] = True
+          report["all_http_200"] = all(item["http_status"] == 200 for item in report["models"])
+          persist(report, "probe complete")
           print(json.dumps(report, indent=2, sort_keys=True))
           PY
 
-      - name: Persist sanitized smoke evidence
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add lab/recon/nvidia-model-smoke-latest.json
-          if git diff --cached --quiet; then
-            echo "No evidence change to commit"
-          else
-            git commit -m "Record NVIDIA model smoke evidence"
-            git push origin HEAD:main
-          fi
-
       - name: Upload smoke artifact
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: nvidia-model-smoke
           path: artifacts/nvidia-model-smoke.json
-          if-no-files-found: error
+          if-no-files-found: warn
