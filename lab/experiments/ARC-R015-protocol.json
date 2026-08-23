@@ -1,0 +1,38 @@
+{
+  "attempts_per_test": 1,
+  "exposure_note": "Foundation-model ARC-specific pretraining/exposure is not independently established by this run; scores are competition-utility evidence, not clean de-novo reasoning attribution.",
+  "falsification": "equal exact solves => INCONCLUSIVE",
+  "generation": {
+    "max_output_tokens": 4096,
+    "temperature": 0.0,
+    "top_k": null,
+    "top_p": 1.0
+  },
+  "hypothesis": "Under identical direct-JSON decoding and one attempt per test input, one NVIDIA candidate will solve more tasks on the frozen slice; an exact-solve tie is inconclusive rather than broken by reputation.",
+  "manifest_sha256": "d159e7209e785fa0879d249ffc989dc6092eab996d3c6c1468131f5dce0154d0",
+  "models": [
+    "deepseek-ai/deepseek-v4-flash-0731",
+    "nvidia/nemotron-3-ultra-550b-a55b"
+  ],
+  "primary_metric": "exact full-task solves",
+  "primary_variable": "target model identifier",
+  "provider": "nvidia-nim",
+  "public_evaluation_used": false,
+  "role": "llm-experimenter",
+  "run": "ARC-R015",
+  "schema_version": 1,
+  "secondary": [
+    "parseability",
+    "tokens",
+    "runtime",
+    "provider failures"
+  ],
+  "selection_rule": "first 3 lexicographically sorted dev_validation IDs under arc-lab-v1",
+  "split": "dev_validation",
+  "success_threshold": "strictly more exact full-task solves for one model",
+  "task_ids": [
+    "00dbd492",
+    "05f2a901",
+    "0607ce86"
+  ]
+}
