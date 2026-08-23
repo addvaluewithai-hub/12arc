@@ -1,6 +1,8 @@
 {
   "schema_version": 1,
-  "next_run_number": 17,
+  "next_run_number": 18,
   "last_completed_run": "ARC-R016",
-  "active_reservations": []
+  "active_reservations": [
+    {"run_id":"ARC-R017","task_id":"T0003-FIRST-ARCHITECTURE-TOURNAMENT","shift_id":"hourly-20260823T2238+0300","reserved_at":"2026-08-23T22:38:00+03:00"}
+  ]
 }
