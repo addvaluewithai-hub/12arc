@@ -47,26 +47,34 @@ Commit `342af8c1716091de09922cf4cc2977423dd0cb35` changes only `.github/workflow
 
 No solver-facing Python code, prompt, scorer, model identifier, generation setting, task selection or attempt count changed.
 
-A single request was issued in commit `ed9e1cd011bece32c4e3bef7cd72beab12a348a3`. At shift evidence cutoff, no new durable start/outcome breadcrumb was yet visible, so ARC-R008 claims no new Gemma calls, tokens, runtime, score, solves, regressions or parse-failure count.
+A single request was issued in commit `ed9e1cd011bece32c4e3bef7cd72beab12a348a3`.
+
+## Live treatment evidence at shift cutoff
+
+GitHub Actions run `32614602241` is the only observed ARC-R008 baseline run. Its durable start breadcrumb identifies the expected trigger SHA, model, protocol, 174-task split and `status=running`.
+
+The workflow job had already completed successfully through checkout, Python setup, install, 23 unit tests, start-breadcrumb persistence, pinned public-training-only fetch, cumulative cache restore, and seed download from the 57-response prior artifact. The frozen baseline step was `in_progress` at cutoff. No second concurrent ARC-R008 run was observed.
+
+Because the run had not completed, ARC-R008 claims no new Gemma calls, tokens, runtime, exact score, solves, regressions or parse-failure count. The treatment has verified the previously untested restore/seed path, but not yet the save/growth/completion half of the hypothesis.
 
 ## Failure analysis
 
-Primary execution failure: provider free-tier input-token-per-minute quota. The previous workflow discarded useful progress between runs, making quota failures non-monotonic and encouraging repeated spend.
+Primary historical execution failure: provider free-tier input-token-per-minute quota. The previous workflow discarded useful progress between runs, making quota failures non-monotonic and encouraging repeated spend.
 
 Secondary observed cluster: all 57 cached responses have empty visible text even though token usage is non-zero. This may reflect output-budget exhaustion, response-channel/SDK behavior, or model behavior; it is not safe to infer which without preserved finish/thought metadata. It must be investigated only after the baseline can progress reproducibly, or as a separately controlled treatment.
 
 ## Adversarial review
 
-The new cache machinery does not itself prove the baseline will finish. A 55-minute job may still hit 429 repeatedly, and Actions cache restore order must be observed in a real run. The seed artifact contains provider outputs generated under the exact same model/prompt/config fingerprints, so reuse is methodologically valid; however, if provider behavior changed despite identical identifiers, cache reuse intentionally freezes the earlier responses and measures the declared cached protocol rather than fresh nondeterminism.
+The new cache machinery does not itself prove the baseline will finish. A 55-minute job may still hit 429 repeatedly, and the successful restore/seed steps do not prove the post-run cache will be larger than 57 files. The seed artifact contains provider outputs generated under the exact same model/prompt/config fingerprints, so reuse is methodologically valid; however, if provider behavior changed despite identical identifiers, cache reuse intentionally freezes the earlier responses and measures the declared cached protocol rather than fresh nondeterminism.
 
 The empty-response cluster could eventually make the exact baseline score very low or zero, but no such score is claimed until all task attempts are durably accounted for.
 
 ## Resource accounting
 
-New target-model execution directly evidenced during ARC-R008: **0 calls / 0 tokens / 0 runtime claimed** at cutoff.
+New target-model execution directly evidenced as completed during ARC-R008: **0 calls / 0 tokens / 0 runtime claimed** at cutoff because the live step was still running and no completed accounting artifact existed.
 
 Prior partial-cache evidence audited: 57 unique live responses, 171,674 input tokens, 288,239 total tokens, 2,471.675 seconds provider runtime. Output-token field was `null` in those cache records, so no invented output-token total is reported.
 
 ## Next task
 
-Continue `T0002-GEMMA-BASELINE` only. First inspect the ARC-R008 request outcome and cache-file count. Do not issue another request while a baseline run is active. If the cumulative cache grows, continue the same frozen protocol until complete. If it does not, isolate the cache/restore or quota behavior as the next single orchestration variable. Do not start T0003 until T0002 has a complete audited result.
+Continue `T0002-GEMMA-BASELINE` only. First inspect run `32614602241` and `lab/recon/gemma-baseline-latest.json`. Do not issue another request while that run is active. If its cumulative cache grows beyond 57 files, the monotonic-progress hypothesis gains support and the next shift should continue the exact frozen protocol. If it does not, isolate cache-save or quota behavior as the next single orchestration variable. Do not start T0003 until T0002 has a complete audited result.
