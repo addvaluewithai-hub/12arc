@@ -1,4 +1,6 @@
+import json
 from pathlib import Path
+from unittest.mock import patch
 
 import pytest
 
@@ -6,12 +8,15 @@ from arc_lab.gemma_smoke import validate_smoke
 from arc_lab.target_model import (
     CachedTargetClient,
     GenerationConfig,
+    NvidiaNIMProvider,
     TargetRequest,
     TargetResponse,
 )
 
 
 class FakeProvider:
+    provider_id = "fake-provider"
+
     def __init__(self):
         self.calls = 0
 
@@ -54,6 +59,12 @@ def test_request_fingerprint_changes_with_experimental_inputs():
     assert base.fingerprint() != changed.fingerprint()
 
 
+def test_request_fingerprint_can_include_provider_identity():
+    request = _request()
+    assert request.fingerprint("nvidia-nim") == request.fingerprint("nvidia-nim")
+    assert request.fingerprint("nvidia-nim") != request.fingerprint("google-genai")
+
+
 def test_identical_request_reuses_cache(tmp_path: Path):
     provider = FakeProvider()
     client = CachedTargetClient(provider, tmp_path)
@@ -67,6 +78,20 @@ def test_identical_request_reuses_cache(tmp_path: Path):
     assert first.text == second.text == "ok"
     assert provider.calls == 1
     assert len(list(tmp_path.glob("*.json"))) == 1
+
+
+def test_same_request_on_different_providers_uses_different_cache_keys(tmp_path: Path):
+    first_provider = FakeProvider()
+    second_provider = FakeProvider()
+    second_provider.provider_id = "other-provider"
+    request = _request()
+
+    CachedTargetClient(first_provider, tmp_path).generate(request)
+    CachedTargetClient(second_provider, tmp_path).generate(request)
+
+    assert first_provider.calls == 1
+    assert second_provider.calls == 1
+    assert len(list(tmp_path.glob("*.json"))) == 2
 
 
 def test_live_call_pacing_waits_between_uncached_requests(tmp_path: Path):
@@ -134,6 +159,66 @@ def test_negative_live_call_interval_is_rejected(tmp_path: Path):
             tmp_path,
             min_live_call_interval_seconds=-1.0,
         )
+
+
+class _Headers(dict):
+    def items(self):
+        return super().items()
+
+
+class _FakeHTTPResponse:
+    status = 200
+    headers = _Headers({"X-RateLimit-Limit": "40", "Content-Type": "application/json"})
+
+    def __init__(self, payload: dict):
+        self._payload = payload
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc, tb):
+        return False
+
+    def read(self):
+        return json.dumps(self._payload).encode()
+
+
+def test_nvidia_provider_parses_usage_without_persisting_reasoning_text():
+    payload = {
+        "model": "deepseek-ai/deepseek-v4-flash-0731",
+        "choices": [
+            {
+                "finish_reason": "stop",
+                "message": {"content": "OK", "reasoning_content": "private reasoning"},
+            }
+        ],
+        "usage": {"prompt_tokens": 9, "completion_tokens": 3, "total_tokens": 12},
+    }
+    provider = NvidiaNIMProvider(api_key="test-secret")
+    request = TargetRequest(
+        model="deepseek-ai/deepseek-v4-flash-0731",
+        prompt="Reply OK",
+        solver_version="smoke",
+        task_id="non-benchmark-smoke",
+        attempt_index=0,
+    )
+    with patch("urllib.request.urlopen", return_value=_FakeHTTPResponse(payload)):
+        response = provider.generate(request)
+
+    assert response.text == "OK"
+    assert response.input_tokens == 9
+    assert response.output_tokens == 3
+    assert response.total_tokens == 12
+    assert response.provider_metadata["provider"] == "nvidia-nim"
+    assert response.provider_metadata["reasoning_chars"] == len("private reasoning")
+    assert "private reasoning" not in json.dumps(response.provider_metadata)
+    assert response.provider_metadata["rate_limit_headers"]["x-ratelimit-limit"] == "40"
+
+
+def test_nvidia_provider_requires_environment_secret(monkeypatch):
+    monkeypatch.delenv("NVIDIA_API_KEY", raising=False)
+    with pytest.raises(RuntimeError, match="NVIDIA_API_KEY"):
+        NvidiaNIMProvider()
 
 
 def _smoke_response(*, cache_hit: bool, text: str = "available") -> TargetResponse:
