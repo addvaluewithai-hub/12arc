@@ -1,0 +1,168 @@
+name: nvidia-model-smoke
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'lab/triggers/nvidia-model-smoke.request'
+
+permissions:
+  contents: write
+
+env:
+  NVIDIA_ENDPOINT: https://integrate.api.nvidia.com/v1/chat/completions
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Verify NVIDIA secret exists
+        run: test -n "$NVIDIA_API_KEY"
+
+      - name: Probe four NVIDIA-hosted models
+        shell: bash
+        run: |
+          mkdir -p artifacts lab/recon
+          python - <<'PY'
+          import json
+          import os
+          import time
+          import urllib.error
+          import urllib.request
+          from pathlib import Path
+
+          endpoint = os.environ["NVIDIA_ENDPOINT"]
+          api_key = os.environ["NVIDIA_API_KEY"]
+          models = [
+              "nvidia/nemotron-3-ultra-550b-a55b",
+              "deepseek-ai/deepseek-v4-flash-0731",
+              "openai/gpt-oss-120b",
+              "google/gemma-4-31b-it",
+          ]
+
+          results = []
+          for model in models:
+              payload = {
+                  "model": model,
+                  "messages": [{"role": "user", "content": "Reply with exactly OK."}],
+                  "max_tokens": 128,
+                  "temperature": 1.0,
+                  "stream": False,
+              }
+              req = urllib.request.Request(
+                  endpoint,
+                  data=json.dumps(payload).encode("utf-8"),
+                  headers={
+                      "Authorization": f"Bearer {api_key}",
+                      "Content-Type": "application/json",
+                      "Accept": "application/json",
+                  },
+                  method="POST",
+              )
+              started = time.perf_counter()
+              status = None
+              body = ""
+              error = None
+              try:
+                  with urllib.request.urlopen(req, timeout=120) as response:
+                      status = response.status
+                      body = response.read().decode("utf-8", errors="replace")
+              except urllib.error.HTTPError as exc:
+                  status = exc.code
+                  body = exc.read().decode("utf-8", errors="replace")
+                  error = f"HTTP {exc.code}"
+              except Exception as exc:
+                  error = f"{type(exc).__name__}: {exc}"
+              latency = time.perf_counter() - started
+
+              data = None
+              try:
+                  data = json.loads(body) if body else None
+              except json.JSONDecodeError:
+                  pass
+
+              content = ""
+              reasoning = ""
+              finish_reason = None
+              response_model = None
+              usage = None
+              api_error = None
+              if isinstance(data, dict):
+                  response_model = data.get("model")
+                  usage = data.get("usage")
+                  choices = data.get("choices") or []
+                  if choices:
+                      first = choices[0] or {}
+                      finish_reason = first.get("finish_reason")
+                      message = first.get("message") or {}
+                      content = message.get("content") or ""
+                      reasoning = message.get("reasoning_content") or message.get("reasoning") or ""
+                  if data.get("error"):
+                      err = data["error"]
+                      if isinstance(err, dict):
+                          api_error = {
+                              "type": err.get("type"),
+                              "code": err.get("code"),
+                              "message": str(err.get("message", ""))[:500],
+                          }
+                      else:
+                          api_error = {"message": str(err)[:500]}
+
+              results.append({
+                  "model_requested": model,
+                  "http_status": status,
+                  "request_succeeded": status == 200,
+                  "response_model": response_model,
+                  "content_chars": len(content) if isinstance(content, str) else 0,
+                  "content_preview": content[:120] if isinstance(content, str) else "",
+                  "reasoning_chars": len(reasoning) if isinstance(reasoning, str) else 0,
+                  "finish_reason": finish_reason,
+                  "usage": usage,
+                  "latency_seconds": round(latency, 3),
+                  "transport_error": error,
+                  "api_error": api_error,
+              })
+
+          report = {
+              "schema_version": 1,
+              "purpose": "NVIDIA API key / hosted-model availability smoke test; non-ARC",
+              "endpoint": endpoint,
+              "secret_persisted": False,
+              "models": results,
+              "all_http_200": all(item["http_status"] == 200 for item in results),
+          }
+          text = json.dumps(report, indent=2, sort_keys=True) + "\n"
+          Path("artifacts/nvidia-model-smoke.json").write_text(text)
+          Path("lab/recon/nvidia-model-smoke-latest.json").write_text(text)
+          print(json.dumps(report, indent=2, sort_keys=True))
+          PY
+
+      - name: Persist sanitized smoke evidence
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add lab/recon/nvidia-model-smoke-latest.json
+          if git diff --cached --quiet; then
+            echo "No evidence change to commit"
+          else
+            git commit -m "Record NVIDIA model smoke evidence"
+            git push origin HEAD:main
+          fi
+
+      - name: Upload smoke artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: nvidia-model-smoke
+          path: artifacts/nvidia-model-smoke.json
+          if-no-files-found: error
