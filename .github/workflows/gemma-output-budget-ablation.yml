@@ -1,0 +1,83 @@
+name: gemma-output-budget-ablation
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'lab/triggers/gemma-output-budget-ablation.request'
+
+permissions:
+  contents: write
+
+env:
+  GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+
+jobs:
+  ablate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install lab
+        run: python -m pip install -e '.[dev,gemma]'
+      - name: Unit tests
+        run: pytest -q
+      - name: Fetch pinned public-training corpus only
+        run: |
+          git init /tmp/arc-agi-2
+          git -C /tmp/arc-agi-2 remote add origin https://github.com/arcprize/ARC-AGI-2.git
+          git -C /tmp/arc-agi-2 sparse-checkout init --cone
+          git -C /tmp/arc-agi-2 sparse-checkout set data/training
+          git -C /tmp/arc-agi-2 fetch --depth=1 origin f3283f727488ad98fe575ea6a5ac981e4a188e49
+          git -C /tmp/arc-agi-2 checkout FETCH_HEAD
+          test ! -e /tmp/arc-agi-2/data/evaluation
+      - name: Run matched 2048-to-8192 output-budget ablation
+        run: |
+          test -n "$GEMINI_API_KEY"
+          python -m arc_lab.output_budget_ablation \
+            /tmp/arc-agi-2/data/training \
+            lab/benchmarks/arc-agi-2-training-ids.txt \
+            --cache-dir /tmp/arc-r012-output-budget-cache \
+            --output /tmp/arc-r012-output-budget.json
+      - name: Verify prompt identity against ARC-R011 comparator
+        run: |
+          python - <<'PY'
+          import json
+          old=json.load(open('lab/recon/gemma-empty-output-latest.json'))
+          new=json.load(open('/tmp/arc-r012-output-budget.json'))
+          assert old['prompt_sha256'] == new['prompt_sha256'], (old['prompt_sha256'], new['prompt_sha256'])
+          assert old['model'] == new['model']
+          assert old['task_id'] == new['task_id']
+          assert old['test_index'] == new['test_index']
+          assert old['attempt_index'] == new['attempt_index']
+          old_gen=dict(old['generation']); new_gen=dict(new['generation'])
+          assert old_gen.pop('max_output_tokens') == 2048
+          assert new_gen.pop('max_output_tokens') == 8192
+          assert old_gen == new_gen
+          print('matched comparator verified')
+          PY
+      - name: Persist sanitized ablation evidence
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          for attempt in 1 2 3; do
+            git fetch origin "$GITHUB_REF_NAME"
+            git checkout -B arc-r012-persist "origin/$GITHUB_REF_NAME"
+            mkdir -p lab/recon
+            cp /tmp/arc-r012-output-budget.json lab/recon/gemma-output-budget-ablation-latest.json
+            git add lab/recon/gemma-output-budget-ablation-latest.json
+            git commit -m "Record ARC-R012 Gemma output-budget ablation" || exit 0
+            if git push origin HEAD:"$GITHUB_REF_NAME"; then exit 0; fi
+          done
+          exit 1
+      - name: Upload ablation cache
+        uses: actions/upload-artifact@v4
+        with:
+          name: arc-r012-output-budget-ablation-${{ github.run_id }}
+          path: |
+            /tmp/arc-r012-output-budget.json
+            /tmp/arc-r012-output-budget-cache
+          if-no-files-found: error
