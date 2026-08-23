@@ -1,4 +1,4 @@
-ARC-R008
-requested_at=2026-08-23T06:13:00+03:00
+ARC-R009
+requested_at=2026-08-23T07:18:00+03:00
 protocol=direct-json-v1
-purpose=quota-resumable frozen T0002 baseline using cumulative cache
+purpose=quota-pacing validation with cumulative cache and 61-second live-call start interval
