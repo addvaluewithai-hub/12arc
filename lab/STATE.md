@@ -1,9 +1,9 @@
 # ARC Research Lab — Current State
 
-Updated: 2026-08-23 08:06 EEST
+Updated: 2026-08-23 09:24 EEST
 Phase: **PHASE 1 — fixed-model baseline establishment**
-Latest completed research run: **ARC-R010**
-Next research run: **ARC-R011**
+Latest completed research run: **ARC-R011**
+Next research run: **ARC-R012**
 
 ## Target model policy
 
@@ -13,30 +13,30 @@ The research team invents the solver; Gemma executes controlled target-model exp
 
 ## Benchmark and execution state
 
-`T0001-BENCHMARK-HARNESS` and `T0001A-GEMMA-EXECUTION-PATH` are complete. The frozen public-training-derived split remains authoritative and public evaluation remains milestone-only. The live Gemma execution path was verified in ARC-R003.
+`T0001-BENCHMARK-HARNESS` and `T0001A-GEMMA-EXECUTION-PATH` are complete. The frozen public-training-derived split remains authoritative and public evaluation remains milestone-only.
 
 ## Frozen baseline
 
-The solver protocol remains `direct-json-v1`: all 174 deterministic `dev_validation` tasks, `gemma-4-26b-a4b-it`, `temperature=1.0`, `top_p=0.95`, `top_k=64`, `max_output_tokens=2048`, exactly two attempts per test input, deterministic request fingerprints/cache and exact full-task scoring. ARC-R010 changed no solver-facing behavior.
+The comparator remains `direct-json-v1`: all 174 deterministic `dev_validation` tasks, `gemma-4-26b-a4b-it`, `temperature=1.0`, `top_p=0.95`, `top_k=64`, `max_output_tokens=2048`, exactly two attempts per test input, deterministic request fingerprints/cache and exact full-task scoring.
 
-## ARC-R010 findings
+## ARC-R011 finding
 
-ARC-R010 audited paced run `32617284889` to completion. With a minimum 61 seconds between uncached live-call starts, the baseline process ran for the full deliberate 42-minute timebox without the previously observed `generate_content_free_tier_input_token_count=16000` 429. It then exited `124` solely because of the process timebox; cumulative cache save, outcome persistence and artifact upload succeeded.
+ARC-R011 isolated the dominant empty-output failure without changing the frozen generation settings. Response telemetry was added to the provider adapter and one fresh deterministic `dev_validation` request was executed on task `00dbd492`, test index 0.
 
-Artifact `9487805832` (`sha256:1265c30c29616943bc005ccead464236ae2f408a43db0420f9597894732c5436`) contains 113 unique cached responses: 313,622 input tokens, 544,707 total tokens and 4,938.450 seconds aggregate provider runtime. Relative to the prior 72-response cache, the paced run added 41 responses, 78,206 input tokens, 162,051 total tokens and 1,816.402 seconds runtime.
+The request used 2,982 input tokens and **2,045 thought tokens**, emitted no candidate/output tokens, had zero visible text, and stopped with **`MAX_TOKENS`** under `max_output_tokens=2048`. Runtime was 43.2723 seconds and total usage was 5,027 tokens. The only candidate part was marked `thought=true`; no final candidate was available for the adapter to extract. Durable evidence: `lab/recon/gemma-empty-output-latest.json`.
 
-Observed single-request input-token counts remain 248..9,634; zero of 113 observed requests is >=16,000 input tokens. This strongly supports that the prior 16k failure was aggregate input-TPM pressure, not an intrinsically oversized observed ARC request. No evidence points to RPM as the blocker in this run. The 16k TPM limit is therefore a throughput constraint that conservative pacing/resume can avoid for the observed request distribution.
+A matched re-audit of ARC-R010 artifact `9487805832` found `total_tokens - input_tokens = 2,045` exactly for **113/113** cached responses, with zero visible text throughout. Aggregate generated-but-not-visible usage is 231,085 tokens. Combined with the fresh explicit `thoughts_token_count=2045` and `MAX_TOKENS`, this explains the entire observed empty-output cluster as per-request generation-budget exhaustion by thoughts.
 
-However, all 113/113 cached responses still have empty visible text while total token usage is non-zero; recorded output/candidate token fields are null. This is now the dominant correctness blocker. Continuing to spend full-split calls before isolating this response-generation/extraction failure would be wasteful.
+This is separate from quota throughput. ARC-R010 already showed 61-second pacing avoids the prior aggregate 16k input-TPM failure for observed prompts. ARC-R011 shows the current correctness blocker is the frozen 2048 output budget, not RPM, TPM, or a `response.text` extraction defect.
 
-No ARC score is claimed because the complete frozen two-attempt/all-test-input baseline has not finished.
+No ARC score is claimed because the full two-attempt/all-test-input baseline remains incomplete.
 
 ## Current bottleneck
 
-The immediate research question is no longer TPM-vs-RPM. It is why `gemma-4-26b-a4b-it` produces/records empty visible responses under the frozen baseline despite substantial total token usage. The next shift should perform a small controlled cached diagnostic on the empty-output cluster, changing one response-generation or extraction variable at a time, before resuming large-scale baseline accumulation.
+Before resuming full-split accumulation, run a small matched ablation on the same deterministic request changing exactly one variable: increase `max_output_tokens` while holding model, prompt and sampling fixed. The immediate falsifiable question is whether a larger budget changes the finish mode from `MAX_TOKENS`/thought-only to a non-empty final candidate.
 
-Do not interpret the partial 113-response cache as ARC accuracy. Keep public evaluation sealed and preserve the fixed baseline comparator.
+Do not mix in 31B routing yet, do not change multiple generation variables simultaneously, and keep public evaluation sealed.
 
 ## Next task
 
-`T0002-GEMMA-BASELINE` remains `ready` for ARC-R011. `T0003-FIRST-ARCHITECTURE-TOURNAMENT` remains blocked until T0002 has a durable complete result.
+`T0002-GEMMA-BASELINE` remains `ready` for ARC-R012. `T0003-FIRST-ARCHITECTURE-TOURNAMENT` remains blocked until T0002 has a durable complete result.
