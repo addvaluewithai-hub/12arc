@@ -1,8 +1,6 @@
 {
   "schema_version": 1,
   "next_run_number": 19,
-  "last_completed_run": "ARC-R017",
-  "active_reservations": [
-    {"run_id":"ARC-R018","task_id":"T0004-COMPACT-HYPOTHESIS-SEARCH","shift_id":"hourly-20260824T0038+0300","reserved_at":"2026-08-24T00:38:00+03:00"}
-  ]
+  "last_completed_run": "ARC-R018",
+  "active_reservations": []
 }
