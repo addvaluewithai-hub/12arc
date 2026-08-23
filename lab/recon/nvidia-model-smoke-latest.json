@@ -37,6 +37,20 @@
         "prompt_tokens": 9,
         "total_tokens": 12
       }
+    },
+    {
+      "api_error": null,
+      "content_chars": 0,
+      "content_preview": "",
+      "finish_reason": null,
+      "http_status": null,
+      "latency_seconds": 120.123,
+      "model_requested": "openai/gpt-oss-120b",
+      "reasoning_chars": 0,
+      "request_succeeded": false,
+      "response_model": null,
+      "transport_error": "TimeoutError: The read operation timed out",
+      "usage": null
     }
   ],
   "purpose": "NVIDIA API key / hosted-model availability smoke test; non-ARC",
