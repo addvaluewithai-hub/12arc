@@ -4,11 +4,15 @@ on:
   workflow_dispatch:
   push:
     paths:
-      - '.github/workflows/gemma-baseline.yml'
       - 'lab/triggers/gemma-baseline.request'
 
 permissions:
   contents: write
+  actions: read
+
+concurrency:
+  group: gemma-baseline-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
   baseline:
@@ -60,6 +64,23 @@ jobs:
           git -C /tmp/arc-agi-2 fetch --depth=1 origin f3283f727488ad98fe575ea6a5ac981e4a188e49
           git -C /tmp/arc-agi-2 checkout FETCH_HEAD
           test ! -e /tmp/arc-agi-2/data/evaluation
+      - name: Restore cumulative request cache
+        id: cache-restore
+        uses: actions/cache/restore@v4
+        with:
+          path: /tmp/arc-baseline-cache
+          key: arc-r004-target-cache-${{ github.run_id }}
+          restore-keys: |
+            arc-r004-target-cache-
+      - name: Seed cache from best pre-resume artifact
+        if: steps.cache-restore.outputs.cache-matched-key == ''
+        uses: actions/download-artifact@v4
+        with:
+          name: arc-r004-target-cache
+          path: /tmp/arc-baseline-cache
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          repository: ${{ github.repository }}
+          run-id: 32612165079
       - name: Run fixed two-attempt baseline on frozen dev_validation
         id: baseline
         continue-on-error: true
@@ -71,6 +92,12 @@ jobs:
             --split dev_validation \
             --cache-dir /tmp/arc-baseline-cache \
             --output /tmp/arc-r004-baseline.json
+      - name: Save cumulative request cache
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: /tmp/arc-baseline-cache
+          key: arc-r004-target-cache-${{ github.run_id }}
       - name: Persist baseline outcome from latest remote branch
         if: always()
         env:
@@ -86,6 +113,7 @@ jobs:
           import json, os
           from pathlib import Path
           result_path = Path("/tmp/arc-r004-baseline.json")
+          cache_dir = Path("/tmp/arc-baseline-cache")
           payload = {
               "schema_version": 1,
               "protocol": "direct-json-v1",
@@ -98,6 +126,7 @@ jobs:
               "github_run_attempt": os.environ["GITHUB_RUN_ATTEMPT"],
               "trigger_sha": os.environ["GITHUB_SHA"],
               "result_present": result_path.exists(),
+              "cache_file_count": len(list(cache_dir.glob("*.json"))) if cache_dir.exists() else 0,
           }
           Path("lab/recon/gemma-baseline-latest.json").write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n")
           PY
@@ -110,11 +139,11 @@ jobs:
             if git push origin HEAD:"$GITHUB_REF_NAME"; then exit 0; fi
           done
           exit 1
-      - name: Upload request cache
+      - name: Upload request cache audit artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: arc-r004-target-cache
+          name: arc-r004-target-cache-${{ github.run_id }}
           path: /tmp/arc-baseline-cache
           if-no-files-found: warn
       - name: Require successful baseline
@@ -123,4 +152,4 @@ jobs:
           OUTCOME: ${{ steps.baseline.outcome }}
         run: test "$OUTCOME" = success
 
-# ARC-R007 observability repair: persist a start/outcome breadcrumb so absence of the final result no longer conflates scheduling with execution failure.
+# ARC-R008 quota-resume repair: only the dedicated request file triggers pushes, a concurrency lock prevents duplicate live baselines, and cumulative request cache is restored/saved across runs. direct-json-v1 is unchanged.
