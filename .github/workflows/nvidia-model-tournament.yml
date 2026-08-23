@@ -1,0 +1,54 @@
+name: nvidia-model-tournament
+on:
+  push:
+    paths: ['lab/triggers/nvidia-model-tournament.request']
+permissions:
+  contents: write
+jobs:
+  tournament:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    env:
+      NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install -e '.[dev]'
+      - run: pytest -q
+      - name: Fetch pinned public training only
+        run: |
+          git init /tmp/arc-agi-2
+          git -C /tmp/arc-agi-2 remote add origin https://github.com/arcprize/ARC-AGI-2.git
+          git -C /tmp/arc-agi-2 sparse-checkout init --cone
+          git -C /tmp/arc-agi-2 sparse-checkout set data/training
+          git -C /tmp/arc-agi-2 fetch --depth=1 origin f3283f727488ad98fe575ea6a5ac981e4a188e49
+          git -C /tmp/arc-agi-2 checkout FETCH_HEAD
+          test ! -e /tmp/arc-agi-2/data/evaluation
+      - name: Freeze protocol before inference
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from arc_lab.nvidia_tournament import protocol_manifest
+          p=Path('lab/experiments/ARC-R015-protocol.json'); p.parent.mkdir(parents=True,exist_ok=True)
+          p.write_text(json.dumps(protocol_manifest(Path('lab/benchmarks/arc-agi-2-training-ids.txt')),indent=2,sort_keys=True)+'\n')
+          PY
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add lab/experiments/ARC-R015-protocol.json
+          git commit -m 'ARC-R015: freeze tournament protocol'
+          git pull --rebase origin "$GITHUB_REF_NAME"
+          git push origin HEAD:"$GITHUB_REF_NAME"
+      - name: Execute frozen tournament
+        run: |
+          test -n "$NVIDIA_API_KEY"
+          python -m arc_lab.nvidia_tournament /tmp/arc-agi-2/data/training lab/benchmarks/arc-agi-2-training-ids.txt --cache-dir /tmp/arc-r015-cache --output /tmp/ARC-R015-result.json
+      - name: Persist sanitized result
+        run: |
+          git pull --rebase origin "$GITHUB_REF_NAME"
+          mkdir -p lab/results
+          cp /tmp/ARC-R015-result.json lab/results/ARC-R015-tournament.json
+          git add lab/results/ARC-R015-tournament.json
+          git commit -m 'ARC-R015: persist NVIDIA tournament result'
+          git push origin HEAD:"$GITHUB_REF_NAME"
