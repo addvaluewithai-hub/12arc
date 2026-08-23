@@ -1,23 +1,59 @@
 # Handoff
 
-Start from `lab/RUNNER.md`.
+Start from `lab/RUNNER.md` and current Git state. Do not continue the old Gemma plan from historical reports.
 
-`ARC-R001 / T0001-BENCHMARK-HARNESS` and `ARC-R003 / T0001A-GEMMA-EXECUTION-PATH` are complete. Public evaluation remains sealed.
+## Active operator direction
 
-`ARC-R013` worked only on `T0002-GEMMA-BASELINE` and **REJECTED** the ARC-R012 `max_output_tokens=8192` treatment after its durable evidence appeared.
+Routine research has pivoted to **NVIDIA NIM**. Repository Actions secret `NVIDIA_API_KEY` is configured; never expose or persist its value.
 
-The full frozen comparator remains `direct-json-v1`: `gemma-4-26b-a4b-it`, `temperature=1.0`, `top_p=0.95`, `top_k=64`, `max_output_tokens=2048`, exactly two attempts per test input, deterministic cache/fingerprints, exact full-task scoring, all 174 deterministic `dev_validation` tasks.
+Active provisional target models:
 
-ARC-R011 established the empty-output mechanism on deterministic task `00dbd492`, test index 0: with the frozen 2048 output cap, the call used 2,982 input tokens and 2,045 thought tokens, emitted zero candidate tokens, returned zero visible text and finished `MAX_TOKENS`. Runtime 43.2723 s; total usage 5,027. Across 113 cached baseline responses, `total_tokens - input_tokens = 2,045` for 113/113 and visible text is empty.
+- `deepseek-ai/deepseek-v4-flash-0731` — provisional primary;
+- `nvidia/nemotron-3-ultra-550b-a55b` — provisional escalation/second candidate.
 
-ARC-R012 then triggered a one-variable ablation on that exact request, changing only `max_output_tokens` from 2048 to 8192. The durable result is now at `lab/recon/gemma-output-budget-ablation-latest.json`, persisted by GitHub Actions bot commit `1d5de993efb38580d7dcce1e1869b9576eab36b5`.
+Gemma (`gemma-4-26b-a4b-it`, `gemma-4-31b-it`) and `openai/gpt-oss-120b` are legacy comparators only. Do not spend routine scheduled calls on them unless a future queue item explicitly requires a controlled comparator/parity study.
 
-The 8192 treatment used the same 2,982 input tokens, consumed 8,189 thought tokens, emitted no final candidate/output tokens, returned zero visible text, produced no parsed grid, and again finished `MAX_TOKENS`. Total tokens were 11,171 and runtime 172.106133682 s. Relative to the 2048 comparator, the extra configured allowance was +6,144 tokens and the observed thought-token increase was exactly +6,144. Runtime increased by 128.833833682 s with no usable output.
+Full decision memo: `lab/decisions/2026-08-23-nvidia-model-pivot.md`.
 
-Therefore merely increasing the output cap is not a viable repair at 8192. ARC-R013 issued **zero new target-model calls** and no duplicate treatment request.
+## Fresh operational evidence
 
-Next execute exactly one task: continue `T0002-GEMMA-BASELINE`. The next falsifiable uncertainty is whether the authorized Gemma API exposes a reproducible thinking-control mechanism that can keep the same `gemma-4-26b-a4b-it`, task `00dbd492`, prompt SHA `aefa22e7984e5bcf94f7c213cf3634db4b824d48f61ad3088ebd3fd9196bb578`, sampling and bounded output budget while preventing thoughts from consuming the entire response allowance. If supported, test thinking control as the sole model-facing variable on this same request before changing the full baseline. If unsupported, durably establish that API/model limitation before changing prompt protocol or routing.
+A sanitized non-ARC NVIDIA multi-model smoke result is persisted at `lab/recon/nvidia-model-smoke-latest.json`.
 
-Keep the earlier input-TPM issue separate: 61-second pacing already avoided the aggregate 16k input-TPM 429 for a 42-minute chunk. Do not mix in 31B routing, provider changes, prompt changes, public evaluation or another output-cap increase in the same experiment.
+Using the same `NVIDIA_API_KEY` and common NVIDIA endpoint:
 
-Full record: `lab/runs/2026-08-23/ARC-R013.md`.
+- Nemotron 3 Ultra returned HTTP 200 / `OK` in ~0.687 s with 21 prompt, 20 completion and 41 total tokens; reasoning content was present.
+- DeepSeek V4 Flash returned HTTP 200 / `OK.` in ~0.667 s with 9 prompt, 3 completion and 12 total tokens.
+- GPT-OSS-120B timed out after 120 s.
+- Gemma 4 31B timed out after 120 s.
+
+The two timeouts were not 401/403 responses, but they are irrelevant to routine research after the operator pivot. The smoke establishes authorization/availability for DeepSeek and Nemotron only; it does not establish sustained NVIDIA RPM/TPM/RPD limits.
+
+## Historical Gemma work
+
+ARC-R013 was the last Gemma-focused research run. It rejected the 8192-output-token repair: on deterministic task `00dbd492`, changing only `max_output_tokens` 2048 -> 8192 caused thought tokens 2,045 -> 8,189 while visible/final output remained empty and finish reason remained `MAX_TOKENS`. The prior 16k Google input-TPM issue was separately manageable through pacing. Preserve these results as history; do not continue debugging Gemma by default.
+
+`T0002-GEMMA-BASELINE` is now **cancelled** by operator direction.
+
+## Next scheduled shift: ARC-R014
+
+Execute exactly one task: `T0001B-NVIDIA-EXECUTION-PATH`.
+
+Promote NVIDIA NIM into the existing provider-neutral target-model layer. Required outcome:
+
+- adapter reads only `NVIDIA_API_KEY` from environment/Actions secret;
+- model-facing interface remains provider-neutral;
+- request fingerprint/cache includes provider/model/settings and reuses identical calls;
+- usage/runtime/error metadata are persisted without secrets;
+- live non-ARC smoke through the adapter succeeds for both DeepSeek V4 Flash and Nemotron 3 Ultra;
+- tests verify deterministic caching/accounting;
+- do not run a broad ARC benchmark in this infrastructure shift.
+
+Then release the claim and stop. Do not chain into the tournament.
+
+## After ARC-R014
+
+`T0002B-NVIDIA-MODEL-TOURNAMENT`: compare **DeepSeek V4 Flash vs Nemotron 3 Ultra only** on a small frozen public-training-derived development slice with controlled prompt/settings/budget. Record exact solves, parseability, reasoning/output tokens, latency, failures, cache behavior and known ARC-specific model exposure. Select the primary model by evidence, not reputation.
+
+Then `T0002C-NVIDIA-BASELINE` establishes the winner's full frozen development baseline. Only after that does `T0003-FIRST-ARCHITECTURE-TOURNAMENT` begin.
+
+Public evaluation remains sealed/milestone-only throughout.
