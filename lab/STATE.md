@@ -1,9 +1,10 @@
 # ARC Research Lab — Current State
 
-Updated: 2026-08-23 23:37 EEST
+Updated: 2026-08-24 00:47 EEST
 Phase: **PHASE 2 — architecture research**
 Latest completed research run: **ARC-R017**
-Next research run: **ARC-R018**
+Active research run: **ARC-R018**
+Next unallocated research run: **ARC-R019**
 
 ## Fixed comparator and model policy
 
@@ -15,12 +16,16 @@ ARC-R016 direct-JSON baseline is frozen at **45/174 = 25.8621%** exact accuracy 
 
 The first architecture tournament is complete and **REJECTED**. On the frozen eight-task matched slice, ARC-R016 direct JSON solved **4/8 (50%)** while `hypothesis-train-replay-v1` solved **1/8 (12.5%)**, with **0 new solves and 3 regressions**. Execution used 8 calls, 41,344 total tokens and 383.978 s summed model runtime; there were 2 parse failures and no provider failures.
 
-The strict training-replay gate passed 6/8 tests but still regressed two previously solved tasks despite perfect replay, demonstrating that exact consistency on training examples does not resolve ARC rule ambiguity. Two other tasks exhausted the 4096-token output budget while serializing structured replay. This exact architecture should not be scaled.
+The strict training-replay gate passed 6/8 tests but still regressed previously solved tasks, showing that exact training consistency does not resolve rule ambiguity. Two tasks also exhausted the 4096-token output cap while serializing full replay.
 
-Durable evidence: `lab/results/ARC-R017-architecture-tournament.json` and `lab/runs/2026-08-23/ARC-R017.md`.
+## ARC-R018 active experiment
 
-## Next bottleneck
+`T0004-COMPACT-HYPOTHESIS-SEARCH` is claimed for ARC-R018 under role **reasoning-systems-inventor**.
 
-`T0004-COMPACT-HYPOTHESIS-SEARCH` is the next research direction: test multiple compact hypotheses with discriminative verification, specifically attacking the ambiguity and serialization-cost failures exposed by ARC-R017 while retaining the frozen comparator/model discipline.
+Treatment `compact-hypothesis-select-v1` is a matched follow-up on the same eight deterministic `dev_validation` task IDs. Stage 1 asks fixed DeepSeek V4 Flash for exactly three compact distinct rules plus one candidate test grid per rule, with no full training-grid replay. Stage 2 receives the training pairs plus only the three rule texts — not the test input or candidate test grids — and discriminates the best-supported rule. Configured output allowance is 3072 + 512 = 3584 tokens/test, below the frozen comparator's 4096-token cap.
 
-Note: queue/report/state have been finalized. If `lab/registry/run-counter.json` still shows the ARC-R017 reservation, it is a stale bookkeeping record caused by a connector write guard; the completed result and released queue claim are authoritative and the next shift should reconcile that stale reservation before allocating ARC-R018.
+The experiment contract and implementation are persisted at `lab/runs/2026-08-24/ARC-R018.md` and `src/arc_lab/compact_hypothesis_search.py`; tests are in `tests/test_compact_hypothesis_search.py`; workflow is `.github/workflows/r018-compact-hypothesis-search.yml`; trigger commit is `cf1c1d4f2164923b2393aff37441145de0a1dd19`.
+
+At this state update, `lab/results/ARC-R018-compact-hypothesis-search.json` has **not yet landed**. Do not claim a score or verdict until that durable result exists. Keep the ARC-R018 claim/reservation and reconcile the workflow/result next shift rather than allocating ARC-R019.
+
+Public evaluation has not been used.
