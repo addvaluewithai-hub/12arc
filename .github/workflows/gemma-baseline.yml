@@ -71,3 +71,5 @@ jobs:
         env:
           OUTCOME: ${{ steps.baseline.outcome }}
         run: test "$OUTCOME" = success
+
+# ARC-R005 orchestration trigger: preserve the frozen direct-json-v1 protocol unchanged.
