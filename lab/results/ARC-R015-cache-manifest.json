@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "run": "ARC-R015",
+  "provider": "nvidia-nim",
+  "cache_policy": "Deterministic provider/model/prompt/settings/solver/task/attempt fingerprinting via CachedTargetClient.",
+  "cache_directory_in_workflow": "/tmp/arc-r015-cache",
+  "cache_persisted_after_workflow": false,
+  "response_content_hashes_available": false,
+  "note": "The workflow used the deterministic cache path during execution but kept it in ephemeral runner storage. No repeated identical inference occurred (0 cache hits). Exact request fingerprints survive in the sanitized result; response bodies and cache-record hashes are unavailable and must not be fabricated. Future baseline workflows should persist a sanitized cache manifest or durable cache artifact without exposing secrets/reasoning text.",
+  "requests": [
+    {"model":"deepseek-ai/deepseek-v4-flash-0731","task_id":"00dbd492","test_index":0,"request_fingerprint":"e4fd7f00438734add735189c558b1adb70bf73ad563e6d39bd8e7da57da7581c","status":"success","cache_hit":false},
+    {"model":"deepseek-ai/deepseek-v4-flash-0731","task_id":"05f2a901","test_index":0,"request_fingerprint":null,"status":"provider_timeout","cache_hit":false,"note":"Fingerprint was not persisted in the exception record by ARC-R015; do not invent it."},
+    {"model":"deepseek-ai/deepseek-v4-flash-0731","task_id":"0607ce86","test_index":0,"request_fingerprint":"410d1ee226d38ceba75d5e46f0ce281692fd9bdaa821c0f5b003365e6f4d48ca","status":"success","cache_hit":false},
+    {"model":"nvidia/nemotron-3-ultra-550b-a55b","task_id":"00dbd492","test_index":0,"request_fingerprint":"b1f39f75e527087e91a368e84981f739bacfaf3cc91edcb0c2cd900fc95a65d0","status":"success_unparseable_length","cache_hit":false},
+    {"model":"nvidia/nemotron-3-ultra-550b-a55b","task_id":"05f2a901","test_index":0,"request_fingerprint":"b4254435c49e9632db77aad7999408eefd5892ce0062e909ceefe517d16ad2bf","status":"success_unparseable_length","cache_hit":false},
+    {"model":"nvidia/nemotron-3-ultra-550b-a55b","task_id":"0607ce86","test_index":0,"request_fingerprint":"cc9a71a71c20422a24c4902bacd730275a95f4c9dc487c409ea802742b1416ce","status":"success_unparseable_length","cache_hit":false}
+  ]
+}
