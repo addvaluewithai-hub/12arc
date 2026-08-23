@@ -4,6 +4,8 @@ import hashlib
 import json
 import os
 import time
+import urllib.error
+import urllib.request
 from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any, Callable, Protocol
@@ -26,9 +28,12 @@ class TargetRequest:
     attempt_index: int
     generation: GenerationConfig = GenerationConfig()
 
-    def fingerprint(self) -> str:
-        payload = json.dumps(asdict(self), sort_keys=True, separators=(",", ":"))
-        return hashlib.sha256(payload.encode()).hexdigest()
+    def fingerprint(self, provider_id: str | None = None) -> str:
+        payload: dict[str, Any] = asdict(self)
+        if provider_id is not None:
+            payload["provider_id"] = provider_id
+        encoded = json.dumps(payload, sort_keys=True, separators=(",", ":"))
+        return hashlib.sha256(encoded.encode()).hexdigest()
 
 
 @dataclass
@@ -45,6 +50,8 @@ class TargetResponse:
 
 
 class TargetProvider(Protocol):
+    provider_id: str
+
     def generate(self, request: TargetRequest) -> TargetResponse: ...
 
 
@@ -67,6 +74,13 @@ class CachedTargetClient:
         self._sleep = sleep
         self._last_live_call_started: float | None = None
 
+    @property
+    def provider_id(self) -> str:
+        value = getattr(self.provider, "provider_id", None)
+        if not isinstance(value, str) or not value:
+            return self.provider.__class__.__name__
+        return value
+
     def _wait_for_live_slot(self) -> None:
         if self._last_live_call_started is None:
             return
@@ -76,7 +90,7 @@ class CachedTargetClient:
             self._sleep(remaining)
 
     def generate(self, request: TargetRequest) -> TargetResponse:
-        key = request.fingerprint()
+        key = request.fingerprint(self.provider_id)
         path = self.cache_dir / f"{key}.json"
         if path.exists():
             payload = json.loads(path.read_text())
@@ -93,7 +107,134 @@ class CachedTargetClient:
         return response
 
 
+class NvidiaNIMProvider:
+    provider_id = "nvidia-nim"
+    default_endpoint = "https://integrate.api.nvidia.com/v1/chat/completions"
+
+    def __init__(
+        self,
+        api_key: str | None = None,
+        *,
+        endpoint: str | None = None,
+        timeout_seconds: float = 120.0,
+    ):
+        key = api_key or os.environ.get("NVIDIA_API_KEY")
+        if not key:
+            raise RuntimeError("NVIDIA_API_KEY is required")
+        self._api_key = key
+        self.endpoint = endpoint or self.default_endpoint
+        self.timeout_seconds = timeout_seconds
+
+    @staticmethod
+    def _safe_error_payload(body: str) -> dict[str, Any] | None:
+        try:
+            data = json.loads(body)
+        except json.JSONDecodeError:
+            return None
+        if not isinstance(data, dict):
+            return None
+        error = data.get("error")
+        if isinstance(error, dict):
+            return {
+                "type": error.get("type"),
+                "code": error.get("code"),
+                "message": str(error.get("message", ""))[:500],
+            }
+        if error is not None:
+            return {"message": str(error)[:500]}
+        return None
+
+    def generate(self, request: TargetRequest) -> TargetResponse:
+        generation = request.generation
+        payload: dict[str, Any] = {
+            "model": request.model,
+            "messages": [{"role": "user", "content": request.prompt}],
+            "temperature": generation.temperature,
+            "max_tokens": generation.max_output_tokens,
+            "stream": False,
+        }
+        if generation.top_p is not None:
+            payload["top_p"] = generation.top_p
+        if generation.top_k is not None:
+            payload["top_k"] = generation.top_k
+
+        http_request = urllib.request.Request(
+            self.endpoint,
+            data=json.dumps(payload).encode("utf-8"),
+            headers={
+                "Authorization": f"Bearer {self._api_key}",
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+            },
+            method="POST",
+        )
+
+        started = time.perf_counter()
+        try:
+            with urllib.request.urlopen(http_request, timeout=self.timeout_seconds) as response:
+                status = response.status
+                body = response.read().decode("utf-8", errors="replace")
+                headers = dict(response.headers.items())
+        except urllib.error.HTTPError as exc:
+            body = exc.read().decode("utf-8", errors="replace")
+            safe_error = self._safe_error_payload(body)
+            detail = safe_error or {"message": body[:500]}
+            raise RuntimeError(f"NVIDIA NIM HTTP {exc.code}: {detail}") from exc
+        except Exception as exc:
+            raise RuntimeError(f"NVIDIA NIM transport failure: {type(exc).__name__}: {exc}") from exc
+
+        runtime = time.perf_counter() - started
+        if status != 200:
+            raise RuntimeError(f"NVIDIA NIM unexpected HTTP status {status}")
+        try:
+            data = json.loads(body)
+        except json.JSONDecodeError as exc:
+            raise RuntimeError("NVIDIA NIM returned non-JSON response") from exc
+        if not isinstance(data, dict):
+            raise RuntimeError("NVIDIA NIM returned unexpected response shape")
+
+        choices = data.get("choices") or []
+        first = choices[0] if choices else {}
+        message = first.get("message") or {} if isinstance(first, dict) else {}
+        text = message.get("content") or "" if isinstance(message, dict) else ""
+        reasoning = ""
+        if isinstance(message, dict):
+            reasoning = message.get("reasoning_content") or message.get("reasoning") or ""
+        usage = data.get("usage") or {}
+        if not isinstance(usage, dict):
+            usage = {}
+
+        rate_headers = {
+            key.lower(): value
+            for key, value in headers.items()
+            if key.lower().startswith("x-ratelimit") or key.lower() in {"retry-after"}
+        }
+        return TargetResponse(
+            model_requested=request.model,
+            model_resolved=data.get("model"),
+            text=text if isinstance(text, str) else str(text),
+            input_tokens=usage.get("prompt_tokens"),
+            output_tokens=usage.get("completion_tokens"),
+            total_tokens=usage.get("total_tokens"),
+            runtime_seconds=runtime,
+            provider_metadata={
+                "provider": self.provider_id,
+                "endpoint": self.endpoint,
+                "finish_reason": first.get("finish_reason") if isinstance(first, dict) else None,
+                "reasoning_chars": len(reasoning) if isinstance(reasoning, str) else 0,
+                "usage_details": {
+                    key: value
+                    for key, value in usage.items()
+                    if key not in {"prompt_tokens", "completion_tokens", "total_tokens"}
+                },
+                "rate_limit_headers": rate_headers,
+            },
+        )
+
+
 class GoogleGenAIProvider:
+    provider_id = "google-genai"
+
     def __init__(self, api_key: str | None = None):
         try:
             from google import genai
@@ -197,6 +338,7 @@ class GoogleGenAIProvider:
             total_tokens=self._get(usage, "total_token_count"),
             runtime_seconds=runtime,
             provider_metadata={
+                "provider": self.provider_id,
                 "model": model_info,
                 "response_diagnostics": self.response_diagnostics(response),
             },
