@@ -2,22 +2,18 @@
 
 Start from `lab/RUNNER.md`.
 
-`ARC-R001 / T0001-BENCHMARK-HARNESS` and `ARC-R003 / T0001A-GEMMA-EXECUTION-PATH` are complete. The verified Gemma smoke evidence remains `lab/recon/gemma-smoke-latest.json`; do not repeat it unless execution-path code changes or debugging requires it.
+`ARC-R001 / T0001-BENCHMARK-HARNESS` and `ARC-R003 / T0001A-GEMMA-EXECUTION-PATH` are complete. Public evaluation remains sealed.
 
-`ARC-R009` worked only on `T0002-GEMMA-BASELINE` and ended **INCONCLUSIVE** for benchmark completion. It did not claim an ARC score.
+`ARC-R010` worked only on `T0002-GEMMA-BASELINE` and ended **INCONCLUSIVE** for benchmark completion, but it resolved the immediate quota diagnosis. No ARC score was claimed and ARC-R010 itself made zero new model calls.
 
-The baseline solver protocol remains frozen as `direct-json-v1`: `gemma-4-26b-a4b-it`, `temperature=1.0`, `top_p=0.95`, `top_k=64`, `max_output_tokens=2048`, exactly two attempts per test input, deterministic request fingerprints/cache, exact full-task scoring, and all 174 deterministic `dev_validation` tasks. Public evaluation remains sealed.
+The frozen baseline remains `direct-json-v1`: `gemma-4-26b-a4b-it`, `temperature=1.0`, `top_p=0.95`, `top_k=64`, `max_output_tokens=2048`, exactly two attempts per test input, deterministic cache/fingerprints, exact full-task scoring, all 174 deterministic `dev_validation` tasks.
 
-ARC-R009 audited ARC-R008 run `32614602241` to completion. It restored the cumulative cache successfully, added 15 unique responses, then failed again on Gemini free-tier input-token-per-minute quota (`16000`, model dimension `gemma-4-26b`, RetryInfo about 15 seconds). Its run-namespaced artifact is `9486671723`.
+ARC-R010 audited completed paced run `32617284889`. With 61-second minimum spacing between uncached live-call starts, the run executed for the full deliberate 42-minute process timebox without the prior 16k input-TPM 429. It stopped only on exit code 124 from the timebox, then successfully saved cumulative cache, persisted outcome, and uploaded artifact `9487805832` with digest `sha256:1265c30c29616943bc005ccead464236ae2f408a43db0420f9597894732c5436`.
 
-The 72-response cumulative artifact contains 235,416 recorded input tokens, 382,656 total tokens and 3,122.048 seconds aggregate provider runtime. Relative to the prior 57-response cache, the run added 63,742 input tokens, 94,417 total tokens and 650.373 seconds runtime. All 72 cached responses have empty visible `text`; recorded candidate/output tokens total zero. Observed single-request input-token counts range 248..9,634. Do not convert this partial attempt-level evidence into ARC task accuracy.
+That artifact contains 113 unique cached responses, 313,622 input tokens, 544,707 total tokens and 4,938.450 seconds aggregate provider runtime. It adds 41 responses, 78,206 input tokens, 162,051 total tokens and 1,816.402 seconds runtime beyond the prior 72-response cache.
 
-ARC-R009's single treatment is quota-paced bounded execution. `CachedTargetClient` now supports a provider-neutral minimum interval between starts of uncached live calls; cache hits bypass the wait. The hosted baseline sets `ARC_TARGET_MIN_LIVE_CALL_INTERVAL_SECONDS=61`, and the baseline process is timeboxed at 42 minutes inside the 55-minute job so cache-save/outcome steps can still execute. Exit code 124 is durably classified as `partial_timebox`. Prompt, model, generation settings, output budget, scoring, task split, attempt policy and request fingerprints are unchanged.
+Observed per-request input tokens are still 248..9,634; none of the 113 observed requests is >=16,000. This supports the conclusion that the earlier provider failure was aggregate input tokens per minute, not evidence that an observed ARC request individually exceeds the 16k quota. There is no evidence of an RPM blocker from the paced run. The 16k TPM limit is a manageable throughput constraint under conservative pacing/resume, though pacing is slow.
 
-Deterministic unit coverage was added for pacing, cache-hit bypass and invalid negative intervals. In paced run `32617284889`, the workflow unit-test step passed, the pinned public-training-only fetch passed, and cumulative Actions-cache restore succeeded; fallback artifact seeding was skipped because a cache existed.
+The dominant blocker is now separate: **113/113 cached responses have empty visible `text` despite non-zero total token usage**, and output/candidate token fields are null. Do not spend another full baseline chunk blindly. First isolate whether this is thinking/output-budget behavior, provider response semantics, SDK parsing, or adapter extraction using a small controlled cached diagnostic changing one variable at a time.
 
-The request commit for the current paced run is `7ded98e4a328dadfd1e435e76254faba6f9c66fe`. Its durable start breadcrumb records `min_live_call_interval_seconds=61.0`, the correct fixed model/protocol/split and 174 tasks. At ARC-R009 cutoff run `32617284889` remained in the frozen baseline step.
-
-Next execute exactly one task: continue `T0002-GEMMA-BASELINE`. **Do not trigger another baseline while run `32617284889` is active.** First inspect that run, `lab/recon/gemma-baseline-latest.json`, its log and its run-namespaced cache artifact. The immediate test is whether the paced run avoids the same input-token-per-minute 429 and grows cache beyond 72. If it ends `partial_timebox` with monotonic cache growth and no quota 429, continue the exact same frozen protocol. If it still hits the quota, determine whether the offending individual request itself exceeds 16,000 input tokens before changing any solver-facing variable. Keep the empty-response cluster separate.
-
-Full run record: `lab/runs/2026-08-23/ARC-R009.md`.
+Next execute exactly one task: continue `T0002-GEMMA-BASELINE`. Preserve the frozen comparator and leakage policy. Full record: `lab/runs/2026-08-23/ARC-R010.md`.
