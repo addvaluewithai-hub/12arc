@@ -1,9 +1,9 @@
 # ARC Research Lab — Current State
 
-Updated: 2026-08-23 04:15 EEST
+Updated: 2026-08-23 05:12 EEST
 Phase: **PHASE 1 — fixed-model baseline establishment**
-Latest completed research run: **ARC-R006**
-Next research run: **ARC-R007**
+Latest completed research run: **ARC-R007**
+Next research run: **ARC-R008**
 
 ## Target model policy
 
@@ -17,20 +17,26 @@ The research team invents the solver; Gemma executes controlled target-model exp
 
 ## Frozen baseline
 
-The baseline protocol remains `direct-json-v1`: all 174 deterministic `dev_validation` tasks, `gemma-4-26b-a4b-it`, `temperature=1.0`, `top_p=0.95`, `top_k=64`, `max_output_tokens=2048`, exactly two attempts per test input, deterministic cache/fingerprints and exact full-task scoring. ARC-R006 did not change this protocol.
+The baseline protocol remains `direct-json-v1`: all 174 deterministic `dev_validation` tasks, `gemma-4-26b-a4b-it`, `temperature=1.0`, `top_p=0.95`, `top_k=64`, `max_output_tokens=2048`, exactly two attempts per test input, deterministic cache/fingerprints and exact full-task scoring. ARC-R007 did not change this protocol.
 
-## ARC-R006
+## ARC-R007
 
-ARC-R006 made one orchestration repair: `.github/workflows/gemma-baseline.yml` now accepts pushes to the dedicated `lab/triggers/gemma-baseline.request` path, and request commit `b3e9270e4863d42b734414c643c7b44101f4fe90` was issued. Result-path pushes are not triggers, preventing persistence loops.
+ARC-R007 changed only orchestration observability. `.github/workflows/gemma-baseline.yml` now persists `lab/recon/gemma-baseline-latest.json` at execution start and baseline outcome, independently of whether the final benchmark succeeds.
 
-`lab/results/ARC-R004-baseline.json` was still absent in the shift observation window, and the connected GitHub status surface exposed no status contexts for the request commit. Therefore no workflow execution result or Gemma benchmark evidence is inferred.
+This resolved the prior ambiguity: GitHub Actions scheduling is functional. Run `32612153608` passed checkout, Python setup, installation, unit tests, breadcrumb persistence and the pinned public-training-only fetch, then entered the frozen baseline step. Run `32612165079` also reached the frozen baseline step.
 
-Verdict: **INCONCLUSIVE**. No ARC score, target-model calls/tokens/runtime, new solves or regressions are claimed.
+The second run was an accidental duplicate caused by both the workflow-file treatment commit and an explicit request commit matching push triggers. This is recorded as a negative orchestration result and potential duplicate API-spend confound. No cancellation action was available through the connected GitHub surface.
+
+At ARC-R007 evidence cutoff both runs were still in progress. Therefore no ARC score, target-model calls/tokens/runtime, solves, parse failures, new solves or regressions are claimed.
+
+Verdict: **INCONCLUSIVE** for T0002 completion, but the scheduling uncertainty is resolved.
 
 ## Current bottleneck
 
-Obtain durable complete execution evidence for the frozen 174-task baseline. The trigger mechanism is now decoupled from workflow-source edits; remaining uncertainty is Actions scheduling/permissions, runtime/quota, or execution failure.
+Obtain and audit durable completion evidence from the already-running frozen baseline jobs. Do not issue another baseline trigger while either run remains active. If they complete, audit the result for all 174 tasks, two-attempt policy, exact scoring, parsing failures, cache accounting, calls/tokens/runtime and per-attempt records. If they fail, use the new durable outcome evidence/logs to isolate the remaining failure.
+
+Before any later trigger, add duplicate-run protection (for example workflow concurrency and/or removal of workflow-source push triggering) without changing `direct-json-v1`.
 
 ## Next task
 
-`T0002-GEMMA-BASELINE` remains `ready` for ARC-R007. First audit the durable result if it appears; otherwise inspect Actions evidence if available. `T0003-FIRST-ARCHITECTURE-TOURNAMENT` remains blocked.
+`T0002-GEMMA-BASELINE` remains `ready` for ARC-R008. `T0003-FIRST-ARCHITECTURE-TOURNAMENT` remains blocked until T0002 has durable complete evidence.
