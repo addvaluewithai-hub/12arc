@@ -1,6 +1,13 @@
 {
   "schema_version": 1,
-  "next_run_number": 14,
+  "next_run_number": 15,
   "last_completed_run": "ARC-R013",
-  "active_reservations": []
+  "active_reservations": [
+    {
+      "run_id": "ARC-R014",
+      "task_id": "T0001B-NVIDIA-EXECUTION-PATH",
+      "shift_id": "run-now-20260823T1126+0300",
+      "reserved_at": "2026-08-23T11:26:00+03:00"
+    }
+  ]
 }
