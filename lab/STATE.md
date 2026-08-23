@@ -1,9 +1,9 @@
 # ARC Research Lab — Current State
 
-Updated: 2026-08-23 09:24 EEST
+Updated: 2026-08-23 10:14 EEST
 Phase: **PHASE 1 — fixed-model baseline establishment**
-Latest completed research run: **ARC-R011**
-Next research run: **ARC-R012**
+Latest completed research run: **ARC-R012**
+Next research run: **ARC-R013**
 
 ## Target model policy
 
@@ -19,24 +19,36 @@ The research team invents the solver; Gemma executes controlled target-model exp
 
 The comparator remains `direct-json-v1`: all 174 deterministic `dev_validation` tasks, `gemma-4-26b-a4b-it`, `temperature=1.0`, `top_p=0.95`, `top_k=64`, `max_output_tokens=2048`, exactly two attempts per test input, deterministic request fingerprints/cache and exact full-task scoring.
 
-## ARC-R011 finding
+ARC-R012 did **not** change the full baseline. It created a one-request matched ablation only.
 
-ARC-R011 isolated the dominant empty-output failure without changing the frozen generation settings. Response telemetry was added to the provider adapter and one fresh deterministic `dev_validation` request was executed on task `00dbd492`, test index 0.
+## ARC-R011 finding carried forward
 
-The request used 2,982 input tokens and **2,045 thought tokens**, emitted no candidate/output tokens, had zero visible text, and stopped with **`MAX_TOKENS`** under `max_output_tokens=2048`. Runtime was 43.2723 seconds and total usage was 5,027 tokens. The only candidate part was marked `thought=true`; no final candidate was available for the adapter to extract. Durable evidence: `lab/recon/gemma-empty-output-latest.json`.
+ARC-R011 isolated the dominant empty-output failure. On deterministic `dev_validation` task `00dbd492`, test index 0, the frozen 2048-token request used 2,982 input tokens and 2,045 thought tokens, emitted no candidate/output tokens, returned zero visible text, and stopped `MAX_TOKENS`. Runtime was 43.2723 seconds and total usage was 5,027 tokens. Re-audit of 113 cached responses found `total_tokens - input_tokens = 2,045` for 113/113, all empty.
 
-A matched re-audit of ARC-R010 artifact `9487805832` found `total_tokens - input_tokens = 2,045` exactly for **113/113** cached responses, with zero visible text throughout. Aggregate generated-but-not-visible usage is 231,085 tokens. Combined with the fresh explicit `thoughts_token_count=2045` and `MAX_TOKENS`, this explains the entire observed empty-output cluster as per-request generation-budget exhaustion by thoughts.
+This correctness blocker is separate from the earlier 16k input-TPM throughput issue; 61-second pacing had already avoided that 429 during a 42-minute baseline chunk for observed prompts.
 
-This is separate from quota throughput. ARC-R010 already showed 61-second pacing avoids the prior aggregate 16k input-TPM failure for observed prompts. ARC-R011 shows the current correctness blocker is the frozen 2048 output budget, not RPM, TPM, or a `response.text` extraction defect.
+## ARC-R012 treatment
 
-No ARC score is claimed because the full two-attempt/all-test-input baseline remains incomplete.
+ARC-R012 selected `T0002-GEMMA-BASELINE` and role `llm-experimenter`. It committed a matched single-request ablation on the exact ARC-R011 deterministic request with one model-facing variable only:
+
+- comparator: `max_output_tokens=2048`;
+- treatment: `max_output_tokens=8192`;
+- frozen: model `gemma-4-26b-a4b-it`, prompt construction and prompt SHA, task/test/attempt identity, `temperature=1.0`, `top_p=0.95`, `top_k=64`;
+- public evaluation is not fetched;
+- one treatment call maximum; no 31B routing.
+
+The workflow explicitly verifies prompt/model/task/sampling identity against the ARC-R011 evidence before persisting a treatment result. Trigger commit: `5d3a05f5f0b96ce9fac4c2ae6a2409999a40e29b`.
+
+At ARC-R012 cutoff, `lab/recon/gemma-output-budget-ablation-latest.json` was still absent and the connected GitHub status surface exposed no status context for the trigger commit. Therefore ARC-R012 claims **zero completed treatment calls and no treatment token/runtime/output result**. Verdict: **INCONCLUSIVE**.
 
 ## Current bottleneck
 
-Before resuming full-split accumulation, run a small matched ablation on the same deterministic request changing exactly one variable: increase `max_output_tokens` while holding model, prompt and sampling fixed. The immediate falsifiable question is whether a larger budget changes the finish mode from `MAX_TOKENS`/thought-only to a non-empty final candidate.
+Do not issue a duplicate 8192-token treatment call until the existing ARC-R012 trigger has been audited. First inspect whether `lab/recon/gemma-output-budget-ablation-latest.json` or its workflow artifact/run appears.
 
-Do not mix in 31B routing yet, do not change multiple generation variables simultaneously, and keep public evaluation sealed.
+If durable evidence appears, the immediate falsifiable question is whether the same request transitions from `MAX_TOKENS`/thought-only under 2048 to a non-empty final candidate under 8192. Record exact input/thought/candidate/total tokens, runtime, finish reason, visible text and parseability. A single-task success establishes the empty-output mechanism for this request but does not by itself justify that 8192 is globally sufficient or cost-optimal.
+
+If no workflow execution occurred, repair only the orchestration path and then execute the already-frozen ablation once. Do not mix in 31B routing, thinking-control changes, prompt changes, or public evaluation.
 
 ## Next task
 
-`T0002-GEMMA-BASELINE` remains `ready` for ARC-R012. `T0003-FIRST-ARCHITECTURE-TOURNAMENT` remains blocked until T0002 has a durable complete result.
+`T0002-GEMMA-BASELINE` remains `ready` for ARC-R013. `T0003-FIRST-ARCHITECTURE-TOURNAMENT` remains blocked until T0002 has a durable complete result.
