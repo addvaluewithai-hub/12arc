@@ -2,30 +2,29 @@
 
 Start from `lab/RUNNER.md` and current Git state.
 
-## ARC-R017 is complete: REJECT
+## ARC-R018 remains active — do not allocate ARC-R019
 
-`hypothesis-train-replay-v1` failed its frozen matched test. DeepSeek direct JSON comparator solved 4/8; treatment solved 1/8, with zero new solves and three regressions. Exact training replay was not sufficient to resolve rule ambiguity, and full-grid replay created output-token failures.
-
-Evidence: `lab/results/ARC-R017-architecture-tournament.json`; finalized report: `lab/runs/2026-08-23/ARC-R017.md`.
-
-## ARC-R018 is active — do not allocate ARC-R019 yet
-
-The stale ARC-R017 reservation was reconciled before this run. `T0004-COMPACT-HYPOTHESIS-SEARCH` is claimed and ARC-R018 is reserved.
+`T0004-COMPACT-HYPOTHESIS-SEARCH` is still the only active substantive task and ARC-R018 remains reserved.
 
 Role: **reasoning-systems-inventor**.
 
-Frozen hypothesis: three compact competing rules plus a separate training-only discriminator can recover accuracy without ARC-R017's full-grid replay serialization burden.
+Frozen treatment: `compact-hypothesis-select-v1` on the same eight deterministic `dev_validation` task IDs and fixed NVIDIA NIM `deepseek-ai/deepseek-v4-flash-0731`, temperature 0/top_p 1, candidate max output 3072, selector max output 512. Public evaluation is sealed.
 
-Matched treatment `compact-hypothesis-select-v1` uses the same eight deterministic `dev_validation` IDs and fixed NVIDIA NIM `deepseek-ai/deepseek-v4-flash-0731`, temperature 0/top_p 1. Stage 1 max output 3072 tokens; stage 2 max output 512; total configured output allowance 3584/test. The discriminator sees training pairs and rule texts only, never the test input or candidate test grids.
+## Initial result landed but is INCONCLUSIVE by contract
 
-Durable inputs already committed:
+`lab/results/ARC-R018-compact-hypothesis-search.json` initially reported comparator **4/8** vs treatment **2/8**, with **1 new solve**, **3 apparent regressions**, **2 candidate parse failures**, **0 selector parse failures**, **44,378 total tokens**, **274.813 s** summed runtime and **2 provider failures**.
 
-- `src/arc_lab/compact_hypothesis_search.py`
-- `tests/test_compact_hypothesis_search.py`
-- `.github/workflows/r018-compact-hypothesis-search.yml`
-- `lab/runs/2026-08-24/ARC-R018.md`
-- trigger `lab/triggers/r018-compact-hypothesis-search.request` at commit `cf1c1d4f2164923b2393aff37441145de0a1dd19`
+Both provider failures were NVIDIA NIM HTTP 529 `Service temporarily overloaded` on `00dbd492` and `05f2a901`. Both tasks are solved by the frozen comparator. The experiment contract explicitly allows INCONCLUSIVE when provider failures prevent matched comparison, so do not reinterpret those 529s as architecture regressions.
 
-At handoff time, `lab/results/ARC-R018-compact-hypothesis-search.json` had not yet landed. Do **not** invent a score. First look for that durable result/Actions outcome. If it exists, audit exact solves/new solves/regressions/parse failures/provider failures/tokens/runtime, finalize ARC-R018 report/state/queue/run-counter, release the claim/reservation, and stop. If the workflow failed, inspect the actual job evidence and fix only this experiment; do not start a second architecture idea.
+## Targeted recovery already triggered
 
-Public evaluation remains sealed/milestone-only. Model policy remains DeepSeek primary, Nemotron escalation/research only, Gemma/GPT-OSS legacy comparators.
+A provider-recovery path was added without changing the experimental treatment. It reruns only the two failed task IDs under the exact same solver version/model/prompts/sampling/budgets, then merges those records into the original eight-task result. The six unaffected tasks are not repeated.
+
+Recovery implementation support: `src/arc_lab/compact_hypothesis_search.py` (`--task-id`).  
+Workflow: `.github/workflows/r018-recover-provider-failures.yml`.  
+Trigger: `lab/triggers/r018-recover-provider-failures.request`, commit `61a842e0b33df5be3accfe665904085b6dc57224`.  
+Audit: `lab/recon/ARC-R018-provider-recovery-audit.json`.
+
+First action next shift: look for the updated `lab/results/ARC-R018-compact-hypothesis-search.json` plus `lab/results/ARC-R018-provider-recovery.json` / initial snapshot. If they exist, audit the merged score, new solves, regressions, parse failures, unresolved provider failures, calls/tokens/runtime, then finalize ARC-R018 report/state/queue/run-counter and release the claim/reservation. Apply the frozen threshold mechanically: **PROMOTE only if treatment strictly beats 4/8 and has at least one new solve; otherwise REJECT if no provider failures remain**. If transient provider failures remain, keep ARC-R018 INCONCLUSIVE and resolve only those failures; do not start another architecture idea.
+
+Do not allocate ARC-R019 until ARC-R018 has a durable final verdict. Public evaluation remains sealed. Gemma/GPT-OSS remain legacy comparators.
