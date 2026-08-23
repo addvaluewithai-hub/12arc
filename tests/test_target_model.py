@@ -28,6 +28,16 @@ class FakeProvider:
         )
 
 
+def _request(attempt_index: int = 0) -> TargetRequest:
+    return TargetRequest(
+        model="gemma-4-26b-a4b-it",
+        prompt="Return exactly OK.",
+        solver_version="test",
+        task_id="non-benchmark-smoke",
+        attempt_index=attempt_index,
+    )
+
+
 def test_request_fingerprint_changes_with_experimental_inputs():
     base = TargetRequest(
         model="gemma-4-26b-a4b-it",
@@ -47,13 +57,7 @@ def test_request_fingerprint_changes_with_experimental_inputs():
 def test_identical_request_reuses_cache(tmp_path: Path):
     provider = FakeProvider()
     client = CachedTargetClient(provider, tmp_path)
-    request = TargetRequest(
-        model="gemma-4-26b-a4b-it",
-        prompt="Return exactly OK.",
-        solver_version="test",
-        task_id="non-benchmark-smoke",
-        attempt_index=0,
-    )
+    request = _request()
 
     first = client.generate(request)
     second = client.generate(request)
@@ -63,6 +67,73 @@ def test_identical_request_reuses_cache(tmp_path: Path):
     assert first.text == second.text == "ok"
     assert provider.calls == 1
     assert len(list(tmp_path.glob("*.json"))) == 1
+
+
+def test_live_call_pacing_waits_between_uncached_requests(tmp_path: Path):
+    provider = FakeProvider()
+    now = [100.0]
+    sleeps: list[float] = []
+
+    def clock() -> float:
+        return now[0]
+
+    def sleep(seconds: float) -> None:
+        sleeps.append(seconds)
+        now[0] += seconds
+
+    client = CachedTargetClient(
+        provider,
+        tmp_path,
+        min_live_call_interval_seconds=61.0,
+        clock=clock,
+        sleep=sleep,
+    )
+    client.generate(_request(0))
+    now[0] += 43.0
+    client.generate(_request(1))
+
+    assert provider.calls == 2
+    assert sleeps == [18.0]
+
+
+def test_cache_hits_do_not_consume_live_call_slots(tmp_path: Path):
+    provider = FakeProvider()
+    now = [100.0]
+    sleeps: list[float] = []
+
+    def clock() -> float:
+        return now[0]
+
+    def sleep(seconds: float) -> None:
+        sleeps.append(seconds)
+        now[0] += seconds
+
+    client = CachedTargetClient(
+        provider,
+        tmp_path,
+        min_live_call_interval_seconds=61.0,
+        clock=clock,
+        sleep=sleep,
+    )
+    first = _request(0)
+    client.generate(first)
+    now[0] += 10.0
+    cached = client.generate(first)
+    now[0] += 33.0
+    client.generate(_request(1))
+
+    assert cached.cache_hit is True
+    assert provider.calls == 2
+    assert sleeps == [18.0]
+
+
+def test_negative_live_call_interval_is_rejected(tmp_path: Path):
+    with pytest.raises(ValueError, match="non-negative"):
+        CachedTargetClient(
+            FakeProvider(),
+            tmp_path,
+            min_live_call_interval_seconds=-1.0,
+        )
 
 
 def _smoke_response(*, cache_hit: bool, text: str = "available") -> TargetResponse:
