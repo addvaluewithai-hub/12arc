@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "run": "ARC-R017",
+  "role": "reasoning-systems-inventor",
+  "hypothesis": "Requiring DeepSeek to state a transformation hypothesis and replay it on every training input, then accepting its test grid only when those replay grids exactly match every training output, will improve exact accuracy over the frozen ARC-R016 direct-JSON comparator on the same eight deterministic dev_validation tasks without changing model or generation budget.",
+  "primary_variable": "structured hypothesis + exact training-replay verification gate",
+  "frozen_comparator": "ARC-R016 nvidia-direct-json-baseline-v1",
+  "provider": "nvidia-nim",
+  "model": "deepseek-ai/deepseek-v4-flash-0731",
+  "solver_version": "hypothesis-train-replay-v1",
+  "generation": {"temperature": 0.0, "top_p": 1.0, "top_k": null, "max_output_tokens": 4096},
+  "attempts_per_test": 1,
+  "split": "dev_validation",
+  "selection_rule": "first eight lexicographically ordered IDs from frozen ARC-R016 dev_validation manifest",
+  "task_ids": ["00dbd492","05f2a901","0607ce86","06df4c85","070dd51e","0bb8deee","0d3d703e","1190bc91"],
+  "primary_metric": "exact task accuracy versus ARC-R016 on identical IDs",
+  "secondary": ["new solves","regressions","verification pass rate","parse failures","provider failures","tokens","runtime"],
+  "success_threshold": "PROMOTE only if treatment has at least one new solve and strictly more solved tasks than comparator with no public-eval use",
+  "falsification": "REJECT if treatment does not strictly beat comparator; INCONCLUSIVE only for missing coverage/provider failure that prevents matched comparison",
+  "public_evaluation_used": false,
+  "exposure_note": "Known ARC-specific foundation-model exposure is not independently established; interpret as competition utility."
+}
