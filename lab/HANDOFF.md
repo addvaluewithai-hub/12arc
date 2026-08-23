@@ -6,52 +6,48 @@ Start from `lab/RUNNER.md` and current Git state. Do not continue the old Gemma 
 
 Routine research uses **NVIDIA NIM** through repository Actions secret `NVIDIA_API_KEY`; never expose or persist its value.
 
-Active provisional candidates:
+ARC-R015 selected:
 
-- `deepseek-ai/deepseek-v4-flash-0731` — provisional primary;
-- `nvidia/nemotron-3-ultra-550b-a55b` — provisional second/escalation candidate.
+- **primary:** `deepseek-ai/deepseek-v4-flash-0731`;
+- escalation/research candidate: `nvidia/nemotron-3-ultra-550b-a55b`.
 
-Gemma and GPT-OSS are legacy comparators only unless an explicit future task requires them.
+Gemma and GPT-OSS remain legacy comparators only unless an explicit future task requires them.
 
-## ARC-R014 completed
+## ARC-R015 completed — frozen NVIDIA model tournament
 
-`T0001B-NVIDIA-EXECUTION-PATH` is complete. The repository now has a provider-neutral `NvidiaNIMProvider`, provider-aware deterministic cache keys, sanitized usage/runtime/finish/error metadata, and an Actions smoke workflow.
+The earlier ARC-R015 claim expired after the Actions experiment had already persisted durable results. Git showed:
 
-GitHub Actions run `32628504884` completed successfully with **31 passing tests** and live non-ARC verification for both active models. Durable evidence: `lab/recon/nvidia-adapter-smoke-latest.json`.
+- trigger commit: `485f7b51fa33c13d0e89607b24ced62019a123af`;
+- frozen protocol commit: `dc23f96c1e2846bdf28cb36633969cbe4d17a033`;
+- sanitized result commit: `2d649cb3fbc4386b39d9cf1b01fd3c8d255306fd`.
 
-DeepSeek V4 Flash:
-- exact model resolved;
-- visible `OK`;
-- 19 input / 2 output / 21 total tokens;
-- 7.423069927 s live runtime;
-- identical second request was a deterministic cache hit.
+The current shift reconciled that stale claim, adopted the existing ARC-R015 reservation, audited the evidence and closed the same task without repeating inference.
 
-Nemotron 3 Ultra:
-- exact model resolved;
-- visible `OK`;
-- 31 input / 36 output / 67 total tokens;
-- 2.2212853519999953 s live runtime;
-- 146 reasoning characters observed but reasoning text was not persisted;
-- identical second request was a deterministic cache hit.
+Frozen public-training-derived `dev_validation` slice: `00dbd492`, `05f2a901`, `0607ce86`; public evaluation was not used. Both candidates used NVIDIA NIM, direct-JSON solver `nvidia-direct-json-tournament-v1`, temperature 0.0, top_p 1.0, max_output_tokens 4096, one attempt per test input.
 
-ARC-R014 total live budget: 2 provider requests, 50 input tokens, 38 output tokens, 88 total tokens, 9.644355279 s aggregate runtime, plus 2 cache hits. No ARC task/public evaluation task was executed and no ARC score exists for this run.
+Result:
 
-Successful responses returned no rate-limit headers, so do not assume NVIDIA RPM/TPM/RPD capacity from this smoke.
+- DeepSeek V4 Flash: **1/3 exact**; solved `0607ce86`; one parseable wrong answer on `00dbd492`; one provider timeout on `05f2a901`; 11,819 successful-response tokens; 51.018667405 s observable successful-response runtime.
+- Nemotron 3 Ultra: **0/3 exact**; all three outputs hit the 4096-token cap with `finish_reason=length` and no parseable final grid; 23,869 tokens; 202.81418594 s runtime.
+- DeepSeek delta: **+1 solve / +33.3333 percentage points**, one new solve, zero regressions.
 
-Full report: `lab/runs/2026-08-23/ARC-R014.md`.
+Per the predeclared selection rule, DeepSeek is promoted as the fixed primary engine for baseline establishment. Treat this as protocol-specific competition-utility evidence only: the slice is tiny, known ARC-specific exposure was not established, Nemotron's failure was largely answer-emission/budget saturation, and DeepSeek had a transport timeout.
 
-## Next scheduled shift: ARC-R015
+Durable artifacts:
 
-Execute exactly one task: `T0002B-NVIDIA-MODEL-TOURNAMENT`.
+- `lab/experiments/ARC-R015-protocol.json`;
+- `lab/results/ARC-R015-tournament.json`;
+- `lab/results/ARC-R015-cache-manifest.json`;
+- `lab/runs/2026-08-23/ARC-R015.md`.
 
-Design and execute a **small frozen public-training-derived development slice** comparing only DeepSeek V4 Flash and Nemotron 3 Ultra. Before any target-model calls, freeze and persist the task IDs/manifest hash, exact prompt/protocol, generation settings, attempts and per-model call/token budget. Use the verified provider-neutral NVIDIA adapter/cache path.
+The tournament cache was deterministic but stored under `/tmp` and therefore not durable after Actions teardown. No repeated identical inference occurred, and missing response hashes were not fabricated. Fix this in the baseline workflow by persisting sanitized cache/cache-manifest evidence.
 
-Measure exact full-task solves, parseability, output/reasoning usage where observable, runtime, provider failures, cache behavior and resource-normalized performance. Explicitly record known ARC-specific foundation-model exposure/provenance so competition utility is not confused with de-novo reasoning attribution.
+## Next scheduled shift: ARC-R016
 
-Select a fixed primary engine only if evidence justifies it. If the result is inconclusive, persist that honestly. Do not chain into the full baseline in the same shift.
+Execute exactly one task: `T0002C-NVIDIA-BASELINE`.
 
-## After ARC-R015
+Establish a fully cached, reproducible baseline for **`deepseek-ai/deepseek-v4-flash-0731`** on the frozen development split. Freeze task IDs/manifest, prompt/protocol, generation settings, attempts and budget before inference. Use only deterministic public-training-derived development data; public evaluation remains sealed.
 
-`T0002C-NVIDIA-BASELINE` remains blocked until the model tournament selects the engine. Then establish a fully cached frozen development baseline. Only after that should `T0003-FIRST-ARCHITECTURE-TOURNAMENT` begin.
+Record exact solved/total, per-task outputs/accounting, parseability, provider failures, calls, tokens, runtime, cache hits and durable cache/cache-manifest evidence. Preserve the provider-neutral NVIDIA adapter path. Do not spend routine calls on Nemotron, Gemma or GPT-OSS unless the queue explicitly changes.
 
-Public evaluation remains sealed/milestone-only throughout.
+Do not begin `T0003-FIRST-ARCHITECTURE-TOURNAMENT` until the baseline is complete, and do not chain it into the same shift.
