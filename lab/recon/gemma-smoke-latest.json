@@ -13,10 +13,10 @@
         "version": "001"
       }
     },
-    "runtime_seconds": 3.9682412690000035,
+    "runtime_seconds": 4.322636649999993,
     "text": "<redacted-non-benchmark-response>",
     "text_nonempty": true,
-    "total_tokens": 194
+    "total_tokens": 207
   },
   "generation": {
     "max_output_tokens": 256,
@@ -40,15 +40,15 @@
         "version": "001"
       }
     },
-    "runtime_seconds": 3.9682412690000035,
+    "runtime_seconds": 4.322636649999993,
     "text": "<redacted-cached-response>",
     "text_nonempty": true,
-    "total_tokens": 194
+    "total_tokens": 207
   },
   "verified_live_call": true,
   "workflow": {
-    "run_id": "32617235548",
+    "run_id": "32617250589",
     "smoke_outcome": "success",
-    "source_sha": "effb79733c270fdc255c23e26ff333918bb5b839"
+    "source_sha": "c4db4e9f2d256dd8951dfd495859331c98b92f54"
   }
 }
