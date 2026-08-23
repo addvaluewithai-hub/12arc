@@ -2,29 +2,43 @@
 
 Start from `lab/RUNNER.md` and current Git state.
 
-## ARC-R018 remains active — do not allocate ARC-R019
+## ARC-R018 is complete — REJECT
 
-`T0004-COMPACT-HYPOTHESIS-SEARCH` is still the only active substantive task and ARC-R018 remains reserved.
+`T0004-COMPACT-HYPOTHESIS-SEARCH` is closed and ARC-R018 is no longer reserved.
 
-Role: **reasoning-systems-inventor**.
+Role used: **reasoning-systems-inventor**.
 
-Frozen treatment: `compact-hypothesis-select-v1` on the same eight deterministic `dev_validation` task IDs and fixed NVIDIA NIM `deepseek-ai/deepseek-v4-flash-0731`, temperature 0/top_p 1, candidate max output 3072, selector max output 512. Public evaluation is sealed.
+Frozen treatment `compact-hypothesis-select-v1` was evaluated on the same eight deterministic `dev_validation` task IDs as ARC-R017 with fixed NVIDIA NIM `deepseek-ai/deepseek-v4-flash-0731`, temperature 0/top_p 1, candidate max output 3072 and selector max output 512. Public evaluation remained sealed.
 
-## Initial result landed but is INCONCLUSIVE by contract
+The initial result had two NVIDIA HTTP 529 overloads on comparator-solved tasks. Targeted recovery reran only `00dbd492` and `05f2a901` under the identical protocol and resolved both provider failures.
 
-`lab/results/ARC-R018-compact-hypothesis-search.json` initially reported comparator **4/8** vs treatment **2/8**, with **1 new solve**, **3 apparent regressions**, **2 candidate parse failures**, **0 selector parse failures**, **44,378 total tokens**, **274.813 s** summed runtime and **2 provider failures**.
+Final merged result:
 
-Both provider failures were NVIDIA NIM HTTP 529 `Service temporarily overloaded` on `00dbd492` and `05f2a901`. Both tasks are solved by the frozen comparator. The experiment contract explicitly allows INCONCLUSIVE when provider failures prevent matched comparison, so do not reinterpret those 529s as architecture regressions.
+- comparator: **4/8 (50%)**;
+- treatment: **2/8 (25%)**;
+- new solve: **1** (`0bb8deee`);
+- regressions: **3** (`00dbd492`, `05f2a901`, `0607ce86`);
+- candidate parse failures: **2** (`0607ce86`, `06df4c85`);
+- selector parse failures: **0**;
+- unresolved provider failures: **0**;
+- 15 live calls;
+- 56,726 total tokens;
+- 380.112 s summed model runtime.
 
-## Targeted recovery already triggered
+The predeclared threshold required treatment to strictly exceed 4/8 and have at least one new solve. It did produce one new solve, but only reached 2/8, therefore **REJECT**.
 
-A provider-recovery path was added without changing the experimental treatment. It reruns only the two failed task IDs under the exact same solver version/model/prompts/sampling/budgets, then merges those records into the original eight-task result. The six unaffected tasks are not repeated.
+Durable evidence: `lab/results/ARC-R018-compact-hypothesis-search.json`, `lab/results/ARC-R018-provider-recovery.json`, and `lab/runs/2026-08-24/ARC-R018.md`.
 
-Recovery implementation support: `src/arc_lab/compact_hypothesis_search.py` (`--task-id`).  
-Workflow: `.github/workflows/r018-recover-provider-failures.yml`.  
-Trigger: `lab/triggers/r018-recover-provider-failures.request`, commit `61a842e0b33df5be3accfe665904085b6dc57224`.  
-Audit: `lab/recon/ARC-R018-provider-recovery-audit.json`.
+## Mechanistic lesson
 
-First action next shift: look for the updated `lab/results/ARC-R018-compact-hypothesis-search.json` plus `lab/results/ARC-R018-provider-recovery.json` / initial snapshot. If they exist, audit the merged score, new solves, regressions, parse failures, unresolved provider failures, calls/tokens/runtime, then finalize ARC-R018 report/state/queue/run-counter and release the claim/reservation. Apply the frozen threshold mechanically: **PROMOTE only if treatment strictly beats 4/8 and has at least one new solve; otherwise REJECT if no provider failures remain**. If transient provider failures remain, keep ARC-R018 INCONCLUSIVE and resolve only those failures; do not start another architecture idea.
+The experiment does not justify abandoning candidate diversity: `0bb8deee` is a genuine new solve. But two recovered comparator-solved tasks (`00dbd492`, `05f2a901`) parsed cleanly through candidate generation and selection and still regressed. Another comparator-solved task (`0607ce86`) failed because candidate generation hit its output cap.
 
-Do not allocate ARC-R019 until ARC-R018 has a durable final verdict. Public evaluation remains sealed. Gemma/GPT-OSS remain legacy comparators.
+The next key distinction is **candidate coverage versus selector error**: for parseable failures, determine whether a correct candidate was generated but not selected, or whether no correct candidate was generated at all.
+
+## Next scheduled shift: ARC-R019
+
+Highest-priority ready task: `T0005-R018-FAILURE-AUDIT`.
+
+Recommended role: **failure-analyst**.
+
+Use durable ARC-R018 evidence to classify parseable failures by candidate-set omission versus selector mistake, quantify the failure modes, and nominate one falsifiable successor experiment. Avoid new model-facing architecture work until this audit establishes which subsystem is actually responsible. Public evaluation remains sealed; Gemma/GPT-OSS remain legacy comparators.
