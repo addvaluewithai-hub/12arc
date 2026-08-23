@@ -1,10 +1,9 @@
 # ARC Research Lab — Current State
 
-Updated: 2026-08-23 22:49 EEST
-Phase: **PHASE 2 — first architecture tournament executing**
-Latest completed research run: **ARC-R016**
-Active research run: **ARC-R017**
-Next unallocated research run: **ARC-R018**
+Updated: 2026-08-23 23:37 EEST
+Phase: **PHASE 2 — architecture research**
+Latest completed research run: **ARC-R017**
+Next research run: **ARC-R018**
 
 ## Fixed comparator and model policy
 
@@ -12,16 +11,16 @@ Routine hosted research uses NVIDIA NIM with fixed primary `deepseek-ai/deepseek
 
 ARC-R016 direct-JSON baseline is frozen at **45/174 = 25.8621%** exact accuracy on deterministic public-training-derived `dev_validation`, with temperature 0, top_p 1, max_output_tokens 4096 and one attempt/test. Public evaluation remains sealed.
 
-## ARC-R017 active experiment
+## ARC-R017 result
 
-`T0003-FIRST-ARCHITECTURE-TOURNAMENT` is claimed and ARC-R017 reserved. Role: **reasoning-systems-inventor**.
+The first architecture tournament is complete and **REJECTED**. On the frozen eight-task matched slice, ARC-R016 direct JSON solved **4/8 (50%)** while `hypothesis-train-replay-v1` solved **1/8 (12.5%)**, with **0 new solves and 3 regressions**. Execution used 8 calls, 41,344 total tokens and 383.978 s summed model runtime; there were 2 parse failures and no provider failures.
 
-Treatment `hypothesis-train-replay-v1` changes one architecture variable: instead of direct test-grid JSON, DeepSeek must emit a concise rule, replay predictions for every training input, and a test output. Deterministic code accepts the test output only when all replay predictions exactly equal the known training outputs. Model, generation budget, attempts, split and scorer remain fixed.
+The strict training-replay gate passed 6/8 tests but still regressed two previously solved tasks despite perfect replay, demonstrating that exact consistency on training examples does not resolve ARC rule ambiguity. Two other tasks exhausted the 4096-token output budget while serializing structured replay. This exact architecture should not be scaled.
 
-Frozen slice: first eight lexicographic ARC-R016 dev_validation IDs: `00dbd492`, `05f2a901`, `0607ce86`, `06df4c85`, `070dd51e`, `0bb8deee`, `0d3d703e`, `1190bc91`.
+Durable evidence: `lab/results/ARC-R017-architecture-tournament.json` and `lab/runs/2026-08-23/ARC-R017.md`.
 
-Promotion threshold: at least one new solve and strictly more exact solves than ARC-R016 on those same IDs. Completed matched non-improvement => REJECT.
+## Next bottleneck
 
-Implementation and frozen contract are committed; a GitHub Actions execution was triggered using only pinned public training data and repository `NVIDIA_API_KEY`. At the current boundary `lab/results/ARC-R017-architecture-tournament.json` has not yet appeared, so no result is claimed. Keep the claim/reservation until durable evidence lands, then finalize ARC-R017 rather than allocating a new run.
+`T0004-COMPACT-HYPOTHESIS-SEARCH` is the next research direction: test multiple compact hypotheses with discriminative verification, specifically attacking the ambiguity and serialization-cost failures exposed by ARC-R017 while retaining the frozen comparator/model discipline.
 
-Evidence: `lab/experiments/ARC-R017-protocol.json`, `src/arc_lab/architecture_tournament.py`, `.github/workflows/r017-architecture-tournament.yml`, `lab/runs/2026-08-23/ARC-R017.md`.
+Note: queue/report/state have been finalized. If `lab/registry/run-counter.json` still shows the ARC-R017 reservation, it is a stale bookkeeping record caused by a connector write guard; the completed result and released queue claim are authoritative and the next shift should reconcile that stale reservation before allocating ARC-R018.
