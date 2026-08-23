@@ -6,7 +6,7 @@ import os
 import time
 from dataclasses import asdict, dataclass
 from pathlib import Path
-from typing import Any, Protocol
+from typing import Any, Callable, Protocol
 
 
 @dataclass(frozen=True)
@@ -49,9 +49,31 @@ class TargetProvider(Protocol):
 
 
 class CachedTargetClient:
-    def __init__(self, provider: TargetProvider, cache_dir: str | Path):
+    def __init__(
+        self,
+        provider: TargetProvider,
+        cache_dir: str | Path,
+        *,
+        min_live_call_interval_seconds: float = 0.0,
+        clock: Callable[[], float] = time.monotonic,
+        sleep: Callable[[float], None] = time.sleep,
+    ):
+        if min_live_call_interval_seconds < 0:
+            raise ValueError("min_live_call_interval_seconds must be non-negative")
         self.provider = provider
         self.cache_dir = Path(cache_dir)
+        self.min_live_call_interval_seconds = min_live_call_interval_seconds
+        self._clock = clock
+        self._sleep = sleep
+        self._last_live_call_started: float | None = None
+
+    def _wait_for_live_slot(self) -> None:
+        if self._last_live_call_started is None:
+            return
+        elapsed = self._clock() - self._last_live_call_started
+        remaining = self.min_live_call_interval_seconds - elapsed
+        if remaining > 0:
+            self._sleep(remaining)
 
     def generate(self, request: TargetRequest) -> TargetResponse:
         key = request.fingerprint()
@@ -61,6 +83,8 @@ class CachedTargetClient:
             payload["cache_hit"] = True
             return TargetResponse(**payload)
 
+        self._wait_for_live_slot()
+        self._last_live_call_started = self._clock()
         response = self.provider.generate(request)
         self.cache_dir.mkdir(parents=True, exist_ok=True)
         payload = asdict(response)
