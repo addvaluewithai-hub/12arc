@@ -19,6 +19,24 @@
         "prompt_tokens": 21,
         "total_tokens": 41
       }
+    },
+    {
+      "api_error": null,
+      "content_chars": 3,
+      "content_preview": "OK.",
+      "finish_reason": "stop",
+      "http_status": 200,
+      "latency_seconds": 0.667,
+      "model_requested": "deepseek-ai/deepseek-v4-flash-0731",
+      "reasoning_chars": 0,
+      "request_succeeded": true,
+      "response_model": "deepseek-ai/deepseek-v4-flash-0731",
+      "transport_error": null,
+      "usage": {
+        "completion_tokens": 3,
+        "prompt_tokens": 9,
+        "total_tokens": 12
+      }
     }
   ],
   "purpose": "NVIDIA API key / hosted-model availability smoke test; non-ARC",
