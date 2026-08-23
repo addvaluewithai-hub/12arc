@@ -1,0 +1,279 @@
+{
+  "adversarial_interpretation": "The second stage may simply re-ask the same model to prefer its own wording, and repeating training pairs increases input cost. Eight tasks are directional, not a full-split estimate.",
+  "baseline_accuracy": 0.5,
+  "baseline_solved": 4,
+  "cache_hits": 0,
+  "calls": 11,
+  "candidate_parse_failures": 2,
+  "input_tokens": 31204,
+  "new_solves": 1,
+  "output_tokens": 13174,
+  "protocol": {
+    "attempts_per_test": 1,
+    "candidate_generation": {
+      "max_output_tokens": 3072,
+      "temperature": 0.0,
+      "top_k": null,
+      "top_p": 1.0
+    },
+    "exposure_note": "Known ARC-specific foundation-model exposure is not independently established; interpret as competition utility.",
+    "falsification": "REJECT if treatment does not strictly beat comparator; INCONCLUSIVE only if provider failures prevent matched comparison",
+    "frozen_comparator": "ARC-R016 nvidia-direct-json-baseline-v1",
+    "hypothesis": "Generating three compact competing rules and selecting among them using a separate training-only discriminator will improve exact accuracy over the frozen ARC-R016 direct-JSON comparator on the same eight deterministic dev_validation tasks, while avoiding ARC-R017 full-grid replay serialization failures.",
+    "manifest_sha256": "a32180eed33deb69327c4d63efabfdc5c3841a2cfe7a14dddb3bb8951bb63797",
+    "max_total_output_tokens_per_test": 3584,
+    "model": "deepseek-ai/deepseek-v4-flash-0731",
+    "primary_metric": "exact task accuracy versus ARC-R016 on identical IDs",
+    "primary_variable": "two-stage compact multi-hypothesis generation plus training-only discriminative selection",
+    "provider": "nvidia-nim",
+    "public_evaluation_used": false,
+    "role": "reasoning-systems-inventor",
+    "run": "ARC-R018",
+    "schema_version": 1,
+    "secondary": [
+      "new solves",
+      "regressions",
+      "candidate parse failures",
+      "selector parse failures",
+      "provider failures",
+      "tokens",
+      "runtime"
+    ],
+    "selection_rule": "same eight IDs used by ARC-R017",
+    "selector_generation": {
+      "max_output_tokens": 512,
+      "temperature": 0.0,
+      "top_k": null,
+      "top_p": 1.0
+    },
+    "solver_version": "compact-hypothesis-select-v1",
+    "split": "dev_validation",
+    "success_threshold": "PROMOTE only if treatment has at least one new solve and strictly more solved tasks than comparator",
+    "task_ids": [
+      "00dbd492",
+      "05f2a901",
+      "0607ce86",
+      "06df4c85",
+      "070dd51e",
+      "0bb8deee",
+      "0d3d703e",
+      "1190bc91"
+    ]
+  },
+  "provider_failures": 2,
+  "records": [
+    {
+      "baseline_solved": true,
+      "new_solve": false,
+      "regression": true,
+      "task_id": "00dbd492",
+      "tests": [
+        {
+          "candidate_stage": {
+            "cache_hit": false,
+            "finish_reason": "stop",
+            "input_tokens": 3012,
+            "output_tokens": 2741,
+            "parsed": true,
+            "runtime_seconds": 54.87983408599996,
+            "total_tokens": 5753
+          },
+          "error": "NVIDIA NIM HTTP 529: {'message': '{\"message\":\"Service temporarily overloaded\",\"type\":\"Overloaded\",\"code\":529}'}",
+          "error_type": "RuntimeError",
+          "test_index": 0
+        }
+      ],
+      "treatment_solved": false
+    },
+    {
+      "baseline_solved": true,
+      "new_solve": false,
+      "regression": true,
+      "task_id": "05f2a901",
+      "tests": [
+        {
+          "error": "NVIDIA NIM HTTP 529: {'message': '{\"message\":\"Service temporarily overloaded\",\"type\":\"Overloaded\",\"code\":529}'}",
+          "error_type": "RuntimeError",
+          "test_index": 0
+        }
+      ],
+      "treatment_solved": false
+    },
+    {
+      "baseline_solved": true,
+      "new_solve": false,
+      "regression": true,
+      "task_id": "0607ce86",
+      "tests": [
+        {
+          "candidate_stage": {
+            "cache_hit": false,
+            "finish_reason": "length",
+            "input_tokens": 6972,
+            "output_tokens": 3072,
+            "parsed": false,
+            "runtime_seconds": 54.23101679399997,
+            "total_tokens": 10044
+          },
+          "test_index": 0
+        }
+      ],
+      "treatment_solved": false
+    },
+    {
+      "baseline_solved": false,
+      "new_solve": false,
+      "regression": false,
+      "task_id": "06df4c85",
+      "tests": [
+        {
+          "candidate_stage": {
+            "cache_hit": false,
+            "finish_reason": "length",
+            "input_tokens": 7292,
+            "output_tokens": 3072,
+            "parsed": false,
+            "runtime_seconds": 43.46822046200009,
+            "total_tokens": 10364
+          },
+          "test_index": 0
+        }
+      ],
+      "treatment_solved": false
+    },
+    {
+      "baseline_solved": false,
+      "new_solve": false,
+      "regression": false,
+      "task_id": "070dd51e",
+      "tests": [
+        {
+          "candidate_stage": {
+            "cache_hit": false,
+            "finish_reason": "stop",
+            "input_tokens": 4100,
+            "output_tokens": 2714,
+            "parsed": true,
+            "runtime_seconds": 27.256490782000014,
+            "total_tokens": 6814
+          },
+          "selector_stage": {
+            "cache_hit": false,
+            "finish_reason": "stop",
+            "input_tokens": 3448,
+            "output_tokens": 61,
+            "parsed": true,
+            "runtime_seconds": 3.3284090619999915,
+            "selected_index": 0,
+            "total_tokens": 3509
+          },
+          "test_index": 0
+        }
+      ],
+      "treatment_solved": false
+    },
+    {
+      "baseline_solved": false,
+      "new_solve": true,
+      "regression": false,
+      "task_id": "0bb8deee",
+      "tests": [
+        {
+          "candidate_stage": {
+            "cache_hit": false,
+            "finish_reason": "stop",
+            "input_tokens": 1774,
+            "output_tokens": 423,
+            "parsed": true,
+            "runtime_seconds": 31.241510664999964,
+            "total_tokens": 2197
+          },
+          "selector_stage": {
+            "cache_hit": false,
+            "finish_reason": "stop",
+            "input_tokens": 1577,
+            "output_tokens": 44,
+            "parsed": true,
+            "runtime_seconds": 1.9706203360000245,
+            "selected_index": 2,
+            "total_tokens": 1621
+          },
+          "test_index": 0
+        }
+      ],
+      "treatment_solved": true
+    },
+    {
+      "baseline_solved": true,
+      "new_solve": false,
+      "regression": false,
+      "task_id": "0d3d703e",
+      "tests": [
+        {
+          "candidate_stage": {
+            "cache_hit": false,
+            "finish_reason": "stop",
+            "input_tokens": 278,
+            "output_tokens": 334,
+            "parsed": true,
+            "runtime_seconds": 20.811295236999968,
+            "total_tokens": 612
+          },
+          "selector_stage": {
+            "cache_hit": false,
+            "finish_reason": "stop",
+            "input_tokens": 500,
+            "output_tokens": 48,
+            "parsed": true,
+            "runtime_seconds": 7.79076524900006,
+            "selected_index": 0,
+            "total_tokens": 548
+          },
+          "test_index": 0
+        }
+      ],
+      "treatment_solved": true
+    },
+    {
+      "baseline_solved": false,
+      "new_solve": false,
+      "regression": false,
+      "task_id": "1190bc91",
+      "tests": [
+        {
+          "candidate_stage": {
+            "cache_hit": false,
+            "finish_reason": "stop",
+            "input_tokens": 1100,
+            "output_tokens": 603,
+            "parsed": true,
+            "runtime_seconds": 23.461465909000026,
+            "total_tokens": 1703
+          },
+          "selector_stage": {
+            "cache_hit": false,
+            "finish_reason": "stop",
+            "input_tokens": 1151,
+            "output_tokens": 62,
+            "parsed": true,
+            "runtime_seconds": 6.373535825999966,
+            "selected_index": 0,
+            "total_tokens": 1213
+          },
+          "test_index": 0
+        }
+      ],
+      "treatment_solved": false
+    }
+  ],
+  "regressions": 3,
+  "run": "ARC-R018",
+  "runtime_seconds": 274.81316440800003,
+  "schema_version": 1,
+  "selector_parse_failures": 0,
+  "task_count": 8,
+  "total_tokens": 44378,
+  "treatment_accuracy": 0.25,
+  "treatment_solved": 2,
+  "verdict": "INCONCLUSIVE"
+}
