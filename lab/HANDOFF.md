@@ -1,53 +1,32 @@
 # Handoff
 
-Start from `lab/RUNNER.md` and current Git state. Do not continue the old Gemma plan from historical reports.
+Start from `lab/RUNNER.md` and current Git state. Do not continue the old Gemma plan.
 
-## Active operator direction
+## Active model policy
 
-Routine research uses **NVIDIA NIM** through repository Actions secret `NVIDIA_API_KEY`; never expose or persist its value.
+Routine research uses NVIDIA NIM. Primary baseline model: `deepseek-ai/deepseek-v4-flash-0731`. Nemotron remains escalation/research only. Gemma and GPT-OSS are legacy comparators unless explicitly queued.
 
-ARC-R015 selected:
+## ARC-R016 is reserved and incomplete
 
-- **primary:** `deepseek-ai/deepseek-v4-flash-0731`;
-- escalation/research candidate: `nvidia/nemotron-3-ultra-550b-a55b`.
+Do **not** allocate ARC-R017 while `T0002C-NVIDIA-BASELINE` is incomplete. Adopt the existing ARC-R016 reservation.
 
-Gemma and GPT-OSS remain legacy comparators only unless an explicit future task requires them.
+Frozen protocol: `lab/experiments/ARC-R016-protocol.json`.
+Manifest SHA-256: `97102661ae8ae093dcc4afe3fb0122fbca7b0480893302d5b7a7a1044cb88433`.
+Task set: all 174 deterministic `dev_validation` IDs.
+Settings: DeepSeek V4 Flash on NVIDIA NIM, direct JSON, temperature 0.0, top_p 1.0, max_output_tokens 4096, one attempt per test input, no hidden provider retries. Public evaluation remains sealed.
 
-## ARC-R015 completed — frozen NVIDIA model tournament
+Initial workflow run `32649224421` completed and uploaded durable artifacts for chunks 0, 1, 2, 4 and 5. Original chunk-3 job `97218147036` was cancelled at the 45-minute Actions timeout while still inside model execution, before artifact upload. Aggregate therefore did not run and no complete baseline score exists.
 
-The earlier ARC-R015 claim expired after the Actions experiment had already persisted durable results. Git showed:
+Durable audit: `lab/recon/ARC-R016-workflow-audit.json`.
+Current run report: `lab/runs/2026-08-23/ARC-R016.md`.
 
-- trigger commit: `485f7b51fa33c13d0e89607b24ced62019a123af`;
-- frozen protocol commit: `dc23f96c1e2846bdf28cb36633969cbe4d17a033`;
-- sanitized result commit: `2d649cb3fbc4386b39d9cf1b01fd3c8d255306fd`.
+This shift reconciled the expired claim, re-adopted ARC-R016, audited the failed run, and deliberately avoided repeating the five successful chunks. It issued a job-level rerun only for failed chunk 3. Recovery job: `97234116594` in workflow run `32649224421`; at handoff it is still executing `Execute frozen DeepSeek baseline chunk`.
 
-The current shift reconciled that stale claim, adopted the existing ARC-R015 reservation, audited the evidence and closed the same task without repeating inference.
+## Next shift procedure
 
-Frozen public-training-derived `dev_validation` slice: `00dbd492`, `05f2a901`, `0607ce86`; public evaluation was not used. Both candidates used NVIDIA NIM, direct-JSON solver `nvidia-direct-json-tournament-v1`, temperature 0.0, top_p 1.0, max_output_tokens 4096, one attempt per test input.
+1. Read workflow run `32649224421` before any new model call.
+2. If recovery job `97234116594` succeeded and aggregate persisted `lab/results/ARC-R016-baseline.json`, `lab/results/ARC-R016-cache-manifest.json`, and cache archives, audit exact coverage/hashes/metrics, close `T0002C`, update state/handoff/config as needed, release ARC-R016, and stop.
+3. If the targeted rerun hit the same 45-minute timeout, do not rerun all six chunks. Reuse the five existing chunk artifacts and recover only chunk 3 in smaller execution units while holding the original ARC-R016 model/prompt/task/settings contract fixed. Aggregate only after all 174 task IDs have durable evidence.
+4. Do not begin `T0003-FIRST-ARCHITECTURE-TOURNAMENT` in the same shift.
 
-Result:
-
-- DeepSeek V4 Flash: **1/3 exact**; solved `0607ce86`; one parseable wrong answer on `00dbd492`; one provider timeout on `05f2a901`; 11,819 successful-response tokens; 51.018667405 s observable successful-response runtime.
-- Nemotron 3 Ultra: **0/3 exact**; all three outputs hit the 4096-token cap with `finish_reason=length` and no parseable final grid; 23,869 tokens; 202.81418594 s runtime.
-- DeepSeek delta: **+1 solve / +33.3333 percentage points**, one new solve, zero regressions.
-
-Per the predeclared selection rule, DeepSeek is promoted as the fixed primary engine for baseline establishment. Treat this as protocol-specific competition-utility evidence only: the slice is tiny, known ARC-specific exposure was not established, Nemotron's failure was largely answer-emission/budget saturation, and DeepSeek had a transport timeout.
-
-Durable artifacts:
-
-- `lab/experiments/ARC-R015-protocol.json`;
-- `lab/results/ARC-R015-tournament.json`;
-- `lab/results/ARC-R015-cache-manifest.json`;
-- `lab/runs/2026-08-23/ARC-R015.md`.
-
-The tournament cache was deterministic but stored under `/tmp` and therefore not durable after Actions teardown. No repeated identical inference occurred, and missing response hashes were not fabricated. Fix this in the baseline workflow by persisting sanitized cache/cache-manifest evidence.
-
-## Next scheduled shift: ARC-R016
-
-Execute exactly one task: `T0002C-NVIDIA-BASELINE`.
-
-Establish a fully cached, reproducible baseline for **`deepseek-ai/deepseek-v4-flash-0731`** on the frozen development split. Freeze task IDs/manifest, prompt/protocol, generation settings, attempts and budget before inference. Use only deterministic public-training-derived development data; public evaluation remains sealed.
-
-Record exact solved/total, per-task outputs/accounting, parseability, provider failures, calls, tokens, runtime, cache hits and durable cache/cache-manifest evidence. Preserve the provider-neutral NVIDIA adapter path. Do not spend routine calls on Nemotron, Gemma or GPT-OSS unless the queue explicitly changes.
-
-Do not begin `T0003-FIRST-ARCHITECTURE-TOURNAMENT` until the baseline is complete, and do not chain it into the same shift.
+Important: the first cancelled chunk-3 job's `/tmp` cache was lost, so some chunk-3 requests may necessarily be repeated. There is no justification for repeating chunks 0,1,2,4,5.
