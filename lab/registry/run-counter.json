@@ -1,8 +1,6 @@
 {
   "schema_version": 1,
   "next_run_number": 16,
-  "last_completed_run": "ARC-R014",
-  "active_reservations": [
-    {"run":"ARC-R015","task_id":"T0002B-NVIDIA-MODEL-TOURNAMENT","shift_id":"arc-shift-20260823T150943+0300","reserved_at":"2026-08-23T15:09:43+03:00","lease_expires_at":"2026-08-23T17:09:43+03:00","note":"Reconciled expired prior claim after durable ARC-R015 tournament result was found at commit 2d649cb3fbc4386b39d9cf1b01fd3c8d255306fd; reservation adopted to finish audit/report without repeating inference."}
-  ]
+  "last_completed_run": "ARC-R015",
+  "active_reservations": []
 }
