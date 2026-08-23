@@ -1,0 +1,127 @@
+name: nvidia-baseline
+on:
+  push:
+    paths: ['lab/triggers/nvidia-baseline.request']
+permissions:
+  contents: write
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    outputs:
+      manifest_sha: ${{ steps.manifest.outputs.manifest_sha }}
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install -e '.[dev]'
+      - run: pytest -q
+      - id: manifest
+        name: Freeze ARC-R016 protocol before inference
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from arc_lab.nvidia_baseline import protocol_manifest
+          p=Path('lab/experiments/ARC-R016-protocol.json')
+          p.parent.mkdir(parents=True,exist_ok=True)
+          manifest=protocol_manifest(Path('lab/benchmarks/arc-agi-2-training-ids.txt'))
+          p.write_text(json.dumps(manifest,indent=2,sort_keys=True)+'\n')
+          with open('$GITHUB_OUTPUT','a') as f:
+              f.write('manifest_sha='+manifest['manifest_sha256']+'\n')
+          PY
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add lab/experiments/ARC-R016-protocol.json
+          git commit -m 'ARC-R016: freeze DeepSeek baseline protocol'
+          git pull --rebase origin "$GITHUB_REF_NAME"
+          git push origin HEAD:"$GITHUB_REF_NAME"
+
+  chunk:
+    needs: prepare
+    strategy:
+      fail-fast: false
+      matrix:
+        chunk: [0,1,2,3,4,5]
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - run: git pull --rebase origin "$GITHUB_REF_NAME"
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install -e '.[dev]'
+      - name: Fetch pinned public training only
+        run: |
+          git init /tmp/arc-agi-2
+          git -C /tmp/arc-agi-2 remote add origin https://github.com/arcprize/ARC-AGI-2.git
+          git -C /tmp/arc-agi-2 sparse-checkout init --cone
+          git -C /tmp/arc-agi-2 sparse-checkout set data/training
+          git -C /tmp/arc-agi-2 fetch --depth=1 origin f3283f727488ad98fe575ea6a5ac981e4a188e49
+          git -C /tmp/arc-agi-2 checkout FETCH_HEAD
+          test ! -e /tmp/arc-agi-2/data/evaluation
+      - name: Execute frozen DeepSeek baseline chunk
+        run: |
+          test -n "$NVIDIA_API_KEY"
+          mkdir -p /tmp/arc-r016-cache /tmp/arc-r016-out
+          python -m arc_lab.nvidia_baseline run-chunk \
+            /tmp/arc-agi-2/data/training \
+            lab/benchmarks/arc-agi-2-training-ids.txt \
+            --cache-dir /tmp/arc-r016-cache \
+            --output /tmp/arc-r016-out/chunk-${{ matrix.chunk }}.json \
+            --chunk-index ${{ matrix.chunk }} \
+            --chunk-count 6
+          tar -czf /tmp/arc-r016-out/cache-${{ matrix.chunk }}.tar.gz -C /tmp/arc-r016-cache .
+      - uses: actions/upload-artifact@v4
+        with:
+          name: arc-r016-chunk-${{ matrix.chunk }}
+          path: /tmp/arc-r016-out/*
+          if-no-files-found: error
+
+  aggregate:
+    needs: [prepare, chunk]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - run: git pull --rebase origin "$GITHUB_REF_NAME"
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install -e '.[dev]'
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: arc-r016-chunk-*
+          path: /tmp/arc-r016-parts
+          merge-multiple: true
+      - name: Aggregate and validate complete baseline
+        run: |
+          mkdir -p /tmp/arc-r016-chunks lab/results/ARC-R016-cache-archives
+          cp /tmp/arc-r016-parts/chunk-*.json /tmp/arc-r016-chunks/
+          cp /tmp/arc-r016-parts/cache-*.tar.gz lab/results/ARC-R016-cache-archives/
+          python -m arc_lab.nvidia_baseline aggregate \
+            --protocol lab/experiments/ARC-R016-protocol.json \
+            --chunks-dir /tmp/arc-r016-chunks \
+            --output lab/results/ARC-R016-baseline.json \
+            --cache-manifest-output lab/results/ARC-R016-cache-manifest.json
+          python - <<'PY'
+          import hashlib, json
+          from pathlib import Path
+          p=Path('lab/results/ARC-R016-cache-manifest.json')
+          data=json.loads(p.read_text())
+          data['cache_archives']=[
+              {'file':q.name,'sha256':hashlib.sha256(q.read_bytes()).hexdigest(),'bytes':q.stat().st_size}
+              for q in sorted(Path('lab/results/ARC-R016-cache-archives').glob('cache-*.tar.gz'))
+          ]
+          p.write_text(json.dumps(data,indent=2,sort_keys=True)+'\n')
+          PY
+      - name: Persist durable baseline evidence
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add lab/results/ARC-R016-baseline.json lab/results/ARC-R016-cache-manifest.json lab/results/ARC-R016-cache-archives
+          git commit -m 'ARC-R016: persist DeepSeek baseline evidence'
+          git pull --rebase origin "$GITHUB_REF_NAME"
+          git push origin HEAD:"$GITHUB_REF_NAME"
