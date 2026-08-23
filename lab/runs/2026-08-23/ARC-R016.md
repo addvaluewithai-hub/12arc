@@ -1,6 +1,6 @@
 # ARC-R016 — DeepSeek frozen dev_validation baseline
 
-Status: **INCOMPLETE / RECOVERY IN PROGRESS**
+Status: **COMPLETE / PROMOTE AS FROZEN COMPARATOR**
 Task: `T0002C-NVIDIA-BASELINE`
 Role: `llm-experimenter`
 Provider/model: NVIDIA NIM / `deepseek-ai/deepseek-v4-flash-0731`
@@ -19,55 +19,61 @@ Hypothesis: the ARC-R015-selected DeepSeek engine can establish a reproducible d
 
 Success threshold: all frozen task IDs attempted with durable sanitized result/cache evidence. Missing task IDs, duplicate task IDs, non-durable successful responses, or public-evaluation use falsifies baseline establishment.
 
-## Initial execution and failure
+## Execution and recovery
 
 Workflow run: `32649224421` (`nvidia-baseline`).
 Trigger commit: `441d0ad154a358b95bd61a0525a419bfa4b856ec`.
 Protocol freeze commit: `1c2500b3267d3254286166d38b0eff9b6062a051`.
+Durable result commit from aggregate: `8143324` (`ARC-R016: persist DeepSeek baseline evidence`).
 
-The initial six-way chunk execution did **not** establish a complete baseline. Five chunks completed successfully and uploaded artifacts; chunk 3 was cancelled by the GitHub Actions 45-minute job timeout while still inside `Execute frozen DeepSeek baseline chunk`. Aggregate therefore did not run.
+The initial six-way execution completed chunks 0, 1, 2, 4 and 5 and uploaded durable artifacts. Original chunk 3 job `97218147036` was cancelled at the GitHub Actions 45-minute job timeout while still executing requests, before artifact upload. Its ephemeral cache was lost.
 
-Successful original chunk artifacts retained by GitHub Actions:
+The prior recovery shift reconciled the stale claim, adopted the existing ARC-R016 reservation instead of allocating ARC-R017, audited the workflow, and invoked a job-level rerun for only the failed chunk-3 job. Recovery job `97234116594` succeeded. Aggregate job `97237369824` then succeeded.
 
-- chunk 0 — artifact `9495866152`, digest `sha256:e5d356751d4797606f88f824e668660c4454fd8b62eb9453fa3c0eeb80ce63e0`;
-- chunk 1 — artifact `9495936544`, digest `sha256:745470099520a37cf3f88578b867a2ea6889bc74d8019453aabdc681c596c680`;
-- chunk 2 — artifact `9495889735`, digest `sha256:cad1d55cca56b6ee744779842678cd2c41345407e1ee7fed226fc4243c217e37`;
-- chunk 4 — artifact `9495906567`, digest `sha256:3ecbc96ce1a1b33c3002bccd4892df1a28659163442f4ad6a43ee8958e6cc043`;
-- chunk 5 — artifact `9495898843`, digest `sha256:a456888807035b596e478dbd3674696a340ef630de1faff1c47171bc63c90bde`.
+The aggregate log proves it downloaded exactly six artifacts: the five original successful artifacts plus recovered chunk 3 (`arc-r016-chunk-3`, artifact `9497708518`, digest `sha256:99fc7e577dffef3c0a367bcadebe4bd36ecb17e21f8664951bb0c77e7c27dfde`). The original successful artifacts were reused rather than intentionally recomputed.
 
-Failed original job: `chunk (3)`, job `97218147036`. Its log shows setup, pinned public-training fetch, and execution start succeeded; at `2026-08-23T16:24:47Z` GitHub cancelled the operation at the 45-minute job limit before artifact upload. The ephemeral chunk-3 cache was therefore lost and cannot be claimed as durable evidence.
+Durable evidence:
 
-Durable workflow audit: `lab/recon/ARC-R016-workflow-audit.json`.
+- `lab/results/ARC-R016-baseline.json`
+- `lab/results/ARC-R016-cache-manifest.json`
+- `lab/results/ARC-R016-cache-archives/cache-0.tar.gz` through `cache-5.tar.gz`
+- `lab/recon/ARC-R016-workflow-audit.json`
 
-## Recovery action in this shift
+The cache manifest contains 179 request records and six archive hashes. It explicitly records that cache JSON contains visible model output and sanitized provider metadata only; `NVIDIA_API_KEY` and reasoning text are not persisted.
 
-The stale claim from the prior shift expired at 20:35 EEST. This shift reconciled and re-adopted the existing **ARC-R016** reservation instead of allocating ARC-R017.
+## Final baseline metrics
 
-To avoid blindly repeating all 174 tasks, a repository-side audit workflow was added and used to identify exactly which chunk failed. Based on that audit, only the cancelled chunk-3 job was re-run using GitHub's job-level rerun action. The five successful chunk artifacts were not intentionally reissued.
+- exact solved tasks: **45 / 174**
+- exact task accuracy: **0.25862068965517243 (25.8621%)**
+- provider requests/calls represented in the retained baseline: **179**
+- input tokens: **458,626**
+- output tokens: **175,994**
+- total tokens: **634,620**
+- model-runtime sum: **4,625.097828976 s**
+- cache hits during retained baseline execution: **0**
+- cache records persisted: **179**
+- parse failures recorded: **13**
+- provider failures recorded: **10**
+- wrong-but-parseable tasks recorded: **108**
 
-Targeted rerun job: `97234116594` in workflow run `32649224421`.
-At handoff time the job is `in_progress` in `Execute frozen DeepSeek baseline chunk`; aggregate has not yet produced final baseline artifacts.
-
-Because the original chunk-3 ephemeral cache was lost on timeout, any successfully completed requests from that cancelled job cannot be recovered and some chunk-3 inference may necessarily be repeated. No evidence supports repeating the five successful chunks.
-
-## Current metrics
-
-A complete baseline score is **not yet available** and must not be invented. Exact solved/total, parse failures, tokens, runtime and cache counts remain pending successful chunk-3 completion plus aggregate validation.
+The aggregate validator returned `PROMOTE`, meaning the baseline is promoted as the frozen comparator for subsequent architecture experiments; it does **not** mean direct JSON is claimed to be an optimal solver.
 
 ## Failure analysis
 
-Primary execution failure: workflow wall-clock timeout, not a benchmark scoring failure. The provider client itself has a 120-second request timeout, but a chunk contains many sequential requests; enough slow/timeout responses can exceed the 45-minute job budget even when each individual request is bounded.
+Two distinct failure layers matter.
 
-The six-way partition was therefore operationally imbalanced for the observed latency distribution. This does not change the frozen model/prompt/generation protocol; it only affects execution packaging.
+First, execution packaging: one 29-task-ish chunk exceeded a 45-minute GitHub job budget because sequential requests can accumulate long latency even when individual provider requests are bounded. The recovery preserved five durable chunks and recovered only the missing chunk. Future large experiments should avoid coupling evidence durability to a single long chunk and should prefer smaller resumable units or periodic durable checkpoints.
+
+Second, solver/model failures: the final retained baseline records 13 parse failures and 10 provider failures, alongside 108 wrong-but-parseable task records. These are baseline failures, not grounds to silently retry or alter the frozen comparator. Subsequent architecture work should compare against these exact retained outcomes and account for whether gains come from better reasoning, better output validity, or merely fewer provider/parse failures.
 
 ## Adversarial interpretation
 
-The existing five chunks cannot be treated as a baseline because the frozen contract requires all 174 task IDs and durable cache evidence. Conversely, re-running all six chunks would waste inference and introduce avoidable repeated requests. The defensible recovery is to preserve the five successful artifacts and recover only chunk 3, then aggregate against the original frozen manifest.
+This is a baseline measurement, not evidence that direct JSON is optimal. The 25.86% score mixes model reasoning quality, prompt/protocol limitations, parseability, and provider reliability. Known ARC-specific pretraining/exposure for the foundation model was not independently established by this run, so the score should be interpreted as competition-utility evidence rather than a clean measure of de-novo ARC reasoning.
+
+The recovery also necessarily repeated any chunk-3 requests that may have completed before the first cancelled job lost its ephemeral cache; those unrecoverable calls are execution overhead and must not be confused with the retained baseline's 179 durable request records. Public evaluation was never used.
 
 ## Verdict
 
-`INCONCLUSIVE` — baseline not established yet.
+`PROMOTE` — **baseline established and frozen as comparator**.
 
-## Required continuation
-
-Adopt the existing ARC-R016 reservation; do **not** allocate ARC-R017 while this baseline is incomplete. Inspect workflow run `32649224421` first. If targeted rerun job `97234116594` completed and aggregate persisted `lab/results/ARC-R016-baseline.json` plus cache manifest/archives, audit and close T0002C without duplicate inference. If it hits the same 45-minute timeout, recover chunk 3 in smaller execution units while holding the original ARC-R016 protocol/model/settings/task set fixed, reuse the five retained chunk artifacts, aggregate once all 174 IDs have durable evidence, then close the task.
+`T0002C-NVIDIA-BASELINE` is complete. Release ARC-R016 and unblock `T0003-FIRST-ARCHITECTURE-TOURNAMENT`, but do not begin that second substantive task in ARC-R016.
