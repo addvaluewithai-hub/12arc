@@ -3,11 +3,11 @@
   "baseline_accuracy": 0.5,
   "baseline_solved": 4,
   "cache_hits": 0,
-  "calls": 15,
+  "calls": 11,
   "candidate_parse_failures": 2,
-  "input_tokens": 39778,
+  "input_tokens": 31204,
   "new_solves": 1,
-  "output_tokens": 16948,
+  "output_tokens": 13174,
   "protocol": {
     "attempts_per_test": 1,
     "candidate_generation": {
@@ -60,7 +60,7 @@
       "1190bc91"
     ]
   },
-  "provider_failures": 0,
+  "provider_failures": 2,
   "records": [
     {
       "baseline_solved": true,
@@ -73,21 +73,13 @@
             "cache_hit": false,
             "finish_reason": "stop",
             "input_tokens": 3012,
-            "output_tokens": 2740,
+            "output_tokens": 2741,
             "parsed": true,
-            "runtime_seconds": 84.37174048399999,
-            "total_tokens": 5752
+            "runtime_seconds": 54.87983408599996,
+            "total_tokens": 5753
           },
-          "selector_stage": {
-            "cache_hit": false,
-            "finish_reason": "stop",
-            "input_tokens": 2386,
-            "output_tokens": 71,
-            "parsed": true,
-            "runtime_seconds": 1.4403620260000025,
-            "selected_index": 0,
-            "total_tokens": 2457
-          },
+          "error": "NVIDIA NIM HTTP 529: {'message': '{\"message\":\"Service temporarily overloaded\",\"type\":\"Overloaded\",\"code\":529}'}",
+          "error_type": "RuntimeError",
           "test_index": 0
         }
       ],
@@ -100,25 +92,8 @@
       "task_id": "05f2a901",
       "tests": [
         {
-          "candidate_stage": {
-            "cache_hit": false,
-            "finish_reason": "stop",
-            "input_tokens": 1632,
-            "output_tokens": 904,
-            "parsed": true,
-            "runtime_seconds": 18.141487192,
-            "total_tokens": 2536
-          },
-          "selector_stage": {
-            "cache_hit": false,
-            "finish_reason": "stop",
-            "input_tokens": 1544,
-            "output_tokens": 59,
-            "parsed": true,
-            "runtime_seconds": 1.345034840999972,
-            "selected_index": 1,
-            "total_tokens": 1603
-          },
+          "error": "NVIDIA NIM HTTP 529: {'message': '{\"message\":\"Service temporarily overloaded\",\"type\":\"Overloaded\",\"code\":529}'}",
+          "error_type": "RuntimeError",
           "test_index": 0
         }
       ],
@@ -291,27 +266,14 @@
       "treatment_solved": false
     }
   ],
-  "recovery": {
-    "protocol_changed": false,
-    "public_evaluation_used": false,
-    "reason": "targeted rerun of only two NVIDIA HTTP 529 transient provider failures",
-    "recovery_calls": 4,
-    "recovery_runtime_seconds": 105.29862454299996,
-    "recovery_tokens": 12348,
-    "task_ids": [
-      "00dbd492",
-      "05f2a901"
-    ]
-  },
   "regressions": 3,
   "run": "ARC-R018",
-  "runtime_seconds": 380.111788951,
+  "runtime_seconds": 274.81316440800003,
   "schema_version": 1,
   "selector_parse_failures": 0,
   "task_count": 8,
-  "total_tokens": 56726,
-  "transient_provider_failures_recovered": 2,
+  "total_tokens": 44378,
   "treatment_accuracy": 0.25,
   "treatment_solved": 2,
-  "verdict": "REJECT"
+  "verdict": "INCONCLUSIVE"
 }

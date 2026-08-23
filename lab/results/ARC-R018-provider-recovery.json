@@ -1,0 +1,132 @@
+{
+  "adversarial_interpretation": "The second stage may simply re-ask the same model to prefer its own wording, and repeating training pairs increases input cost. Eight tasks are directional, not a full-split estimate.",
+  "baseline_accuracy": 1.0,
+  "baseline_solved": 2,
+  "cache_hits": 0,
+  "calls": 4,
+  "candidate_parse_failures": 0,
+  "input_tokens": 8574,
+  "new_solves": 0,
+  "output_tokens": 3774,
+  "protocol": {
+    "attempts_per_test": 1,
+    "candidate_generation": {
+      "max_output_tokens": 3072,
+      "temperature": 0.0,
+      "top_k": null,
+      "top_p": 1.0
+    },
+    "exposure_note": "Known ARC-specific foundation-model exposure is not independently established; interpret as competition utility.",
+    "falsification": "REJECT if treatment does not strictly beat comparator; INCONCLUSIVE only if provider failures prevent matched comparison",
+    "frozen_comparator": "ARC-R016 nvidia-direct-json-baseline-v1",
+    "hypothesis": "Generating three compact competing rules and selecting among them using a separate training-only discriminator will improve exact accuracy over the frozen ARC-R016 direct-JSON comparator on the same eight deterministic dev_validation tasks, while avoiding ARC-R017 full-grid replay serialization failures.",
+    "manifest_sha256": "1610986eab55666ddac5abb7481cdc7b8f63bf8549e55a57c9c7b9301dd55817",
+    "max_total_output_tokens_per_test": 3584,
+    "model": "deepseek-ai/deepseek-v4-flash-0731",
+    "primary_metric": "exact task accuracy versus ARC-R016 on identical IDs",
+    "primary_variable": "two-stage compact multi-hypothesis generation plus training-only discriminative selection",
+    "provider": "nvidia-nim",
+    "public_evaluation_used": false,
+    "role": "reasoning-systems-inventor",
+    "run": "ARC-R018",
+    "schema_version": 1,
+    "secondary": [
+      "new solves",
+      "regressions",
+      "candidate parse failures",
+      "selector parse failures",
+      "provider failures",
+      "tokens",
+      "runtime"
+    ],
+    "selection_rule": "same eight IDs used by ARC-R017",
+    "selector_generation": {
+      "max_output_tokens": 512,
+      "temperature": 0.0,
+      "top_k": null,
+      "top_p": 1.0
+    },
+    "solver_version": "compact-hypothesis-select-v1",
+    "split": "dev_validation",
+    "success_threshold": "PROMOTE only if treatment has at least one new solve and strictly more solved tasks than comparator",
+    "task_ids": [
+      "00dbd492",
+      "05f2a901"
+    ]
+  },
+  "provider_failures": 0,
+  "records": [
+    {
+      "baseline_solved": true,
+      "new_solve": false,
+      "regression": true,
+      "task_id": "00dbd492",
+      "tests": [
+        {
+          "candidate_stage": {
+            "cache_hit": false,
+            "finish_reason": "stop",
+            "input_tokens": 3012,
+            "output_tokens": 2740,
+            "parsed": true,
+            "runtime_seconds": 84.37174048399999,
+            "total_tokens": 5752
+          },
+          "selector_stage": {
+            "cache_hit": false,
+            "finish_reason": "stop",
+            "input_tokens": 2386,
+            "output_tokens": 71,
+            "parsed": true,
+            "runtime_seconds": 1.4403620260000025,
+            "selected_index": 0,
+            "total_tokens": 2457
+          },
+          "test_index": 0
+        }
+      ],
+      "treatment_solved": false
+    },
+    {
+      "baseline_solved": true,
+      "new_solve": false,
+      "regression": true,
+      "task_id": "05f2a901",
+      "tests": [
+        {
+          "candidate_stage": {
+            "cache_hit": false,
+            "finish_reason": "stop",
+            "input_tokens": 1632,
+            "output_tokens": 904,
+            "parsed": true,
+            "runtime_seconds": 18.141487192,
+            "total_tokens": 2536
+          },
+          "selector_stage": {
+            "cache_hit": false,
+            "finish_reason": "stop",
+            "input_tokens": 1544,
+            "output_tokens": 59,
+            "parsed": true,
+            "runtime_seconds": 1.345034840999972,
+            "selected_index": 1,
+            "total_tokens": 1603
+          },
+          "test_index": 0
+        }
+      ],
+      "treatment_solved": false
+    }
+  ],
+  "regressions": 2,
+  "run": "ARC-R018",
+  "runtime_seconds": 105.29862454299996,
+  "schema_version": 1,
+  "selector_parse_failures": 0,
+  "task_count": 2,
+  "total_tokens": 12348,
+  "treatment_accuracy": 0.0,
+  "treatment_solved": 0,
+  "verdict": "REJECT"
+}
