@@ -1,6 +1,8 @@
 {
   "schema_version": 1,
-  "next_run_number": 15,
+  "next_run_number": 16,
   "last_completed_run": "ARC-R014",
-  "active_reservations": []
+  "active_reservations": [
+    {"run":"ARC-R015","task_id":"T0002B-NVIDIA-MODEL-TOURNAMENT","shift_id":"arc-shift-20260823T120830+0300","reserved_at":"2026-08-23T12:08:30+03:00","lease_expires_at":"2026-08-23T14:08:30+03:00"}
+  ]
 }
