@@ -1,0 +1,66 @@
+name: gemma-empty-output-diagnostic
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'lab/triggers/gemma-empty-output-diagnostic.request'
+
+permissions:
+  contents: write
+
+env:
+  GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install lab
+        run: python -m pip install -e '.[dev,gemma]'
+      - name: Unit tests
+        run: pytest -q
+      - name: Fetch pinned public-training corpus only
+        run: |
+          git init /tmp/arc-agi-2
+          git -C /tmp/arc-agi-2 remote add origin https://github.com/arcprize/ARC-AGI-2.git
+          git -C /tmp/arc-agi-2 sparse-checkout init --cone
+          git -C /tmp/arc-agi-2 sparse-checkout set data/training
+          git -C /tmp/arc-agi-2 fetch --depth=1 origin f3283f727488ad98fe575ea6a5ac981e4a188e49
+          git -C /tmp/arc-agi-2 checkout FETCH_HEAD
+          test ! -e /tmp/arc-agi-2/data/evaluation
+      - name: Run one frozen-settings response diagnostic
+        run: |
+          test -n "$GEMINI_API_KEY"
+          python -m arc_lab.empty_output_diagnostic \
+            /tmp/arc-agi-2/data/training \
+            lab/benchmarks/arc-agi-2-training-ids.txt \
+            --cache-dir /tmp/arc-r011-diagnostic-cache \
+            --output /tmp/arc-r011-empty-output.json
+      - name: Persist sanitized diagnostic evidence
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          for attempt in 1 2 3; do
+            git fetch origin "$GITHUB_REF_NAME"
+            git checkout -B arc-r011-persist "origin/$GITHUB_REF_NAME"
+            mkdir -p lab/recon
+            cp /tmp/arc-r011-empty-output.json lab/recon/gemma-empty-output-latest.json
+            git add lab/recon/gemma-empty-output-latest.json
+            git commit -m "Record ARC-R011 Gemma empty-output diagnostic" || exit 0
+            if git push origin HEAD:"$GITHUB_REF_NAME"; then exit 0; fi
+          done
+          exit 1
+      - name: Upload diagnostic cache
+        uses: actions/upload-artifact@v4
+        with:
+          name: arc-r011-empty-output-diagnostic-${{ github.run_id }}
+          path: |
+            /tmp/arc-r011-empty-output.json
+            /tmp/arc-r011-diagnostic-cache
+          if-no-files-found: error
