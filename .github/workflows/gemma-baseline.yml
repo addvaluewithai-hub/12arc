@@ -25,6 +25,32 @@ jobs:
         run: python -m pip install -e '.[dev,gemma]'
       - name: Unit tests
         run: pytest -q
+      - name: Persist execution-start breadcrumb
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git fetch origin "$GITHUB_REF_NAME"
+          git checkout -B arc-baseline-observe "origin/$GITHUB_REF_NAME"
+          mkdir -p lab/recon
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          payload = {
+              "schema_version": 1,
+              "protocol": "direct-json-v1",
+              "model": "gemma-4-26b-a4b-it",
+              "split": "dev_validation",
+              "task_count": 174,
+              "status": "running",
+              "github_run_id": os.environ["GITHUB_RUN_ID"],
+              "github_run_attempt": os.environ["GITHUB_RUN_ATTEMPT"],
+              "trigger_sha": os.environ["GITHUB_SHA"],
+          }
+          Path("lab/recon/gemma-baseline-latest.json").write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n")
+          PY
+          git add lab/recon/gemma-baseline-latest.json
+          git commit -m "Record Gemma baseline execution start" || true
+          git push origin HEAD:"$GITHUB_REF_NAME"
       - name: Fetch pinned public-training corpus only
         run: |
           git init /tmp/arc-agi-2
@@ -45,18 +71,42 @@ jobs:
             --split dev_validation \
             --cache-dir /tmp/arc-baseline-cache \
             --output /tmp/arc-r004-baseline.json
-      - name: Persist baseline result from latest remote branch
-        if: steps.baseline.outcome == 'success'
+      - name: Persist baseline outcome from latest remote branch
+        if: always()
+        env:
+          BASELINE_OUTCOME: ${{ steps.baseline.outcome }}
         run: |
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
           for attempt in 1 2 3; do
             git fetch origin "$GITHUB_REF_NAME"
             git checkout -B arc-baseline-persist "origin/$GITHUB_REF_NAME"
-            mkdir -p lab/results
-            cp /tmp/arc-r004-baseline.json lab/results/ARC-R004-baseline.json
-            git add lab/results/ARC-R004-baseline.json
-            git commit -m "Record ARC-R004 Gemma baseline" || exit 0
+            mkdir -p lab/recon lab/results
+            python - <<'PY'
+          import json, os
+          from pathlib import Path
+          result_path = Path("/tmp/arc-r004-baseline.json")
+          payload = {
+              "schema_version": 1,
+              "protocol": "direct-json-v1",
+              "model": "gemma-4-26b-a4b-it",
+              "split": "dev_validation",
+              "task_count": 174,
+              "status": "success" if os.environ["BASELINE_OUTCOME"] == "success" else "failure",
+              "baseline_step_outcome": os.environ["BASELINE_OUTCOME"],
+              "github_run_id": os.environ["GITHUB_RUN_ID"],
+              "github_run_attempt": os.environ["GITHUB_RUN_ATTEMPT"],
+              "trigger_sha": os.environ["GITHUB_SHA"],
+              "result_present": result_path.exists(),
+          }
+          Path("lab/recon/gemma-baseline-latest.json").write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n")
+          PY
+            if test "$BASELINE_OUTCOME" = success; then
+              cp /tmp/arc-r004-baseline.json lab/results/ARC-R004-baseline.json
+              git add lab/results/ARC-R004-baseline.json
+            fi
+            git add lab/recon/gemma-baseline-latest.json
+            git commit -m "Record Gemma baseline execution outcome" || exit 0
             if git push origin HEAD:"$GITHUB_REF_NAME"; then exit 0; fi
           done
           exit 1
@@ -73,4 +123,4 @@ jobs:
           OUTCOME: ${{ steps.baseline.outcome }}
         run: test "$OUTCOME" = success
 
-# ARC-R006 orchestration repair: a dedicated request file can trigger the frozen baseline without touching solver protocol or result paths.
+# ARC-R007 observability repair: persist a start/outcome breadcrumb so absence of the final result no longer conflates scheduling with execution failure.
