@@ -4,7 +4,7 @@
 
 Discover a reproducible inference-time reasoning architecture that makes a fixed open-weight target model materially better on novel ARC-AGI-2 tasks.
 
-The research team is the inventor. Gemma is the controlled experimental engine. ARC exact-match scoring is the judge.
+The research team is the inventor. The currently approved open-weight target model is the controlled experimental engine. ARC exact-match scoring is the judge.
 
 ## What may change
 
