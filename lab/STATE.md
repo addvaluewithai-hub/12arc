@@ -1,9 +1,9 @@
 # ARC Research Lab — Current State
 
-Updated: 2026-08-23 05:12 EEST
+Updated: 2026-08-23 06:17 EEST
 Phase: **PHASE 1 — fixed-model baseline establishment**
-Latest completed research run: **ARC-R007**
-Next research run: **ARC-R008**
+Latest completed research run: **ARC-R008**
+Next research run: **ARC-R009**
 
 ## Target model policy
 
@@ -17,26 +17,26 @@ The research team invents the solver; Gemma executes controlled target-model exp
 
 ## Frozen baseline
 
-The baseline protocol remains `direct-json-v1`: all 174 deterministic `dev_validation` tasks, `gemma-4-26b-a4b-it`, `temperature=1.0`, `top_p=0.95`, `top_k=64`, `max_output_tokens=2048`, exactly two attempts per test input, deterministic cache/fingerprints and exact full-task scoring. ARC-R007 did not change this protocol.
+The baseline protocol remains `direct-json-v1`: all 174 deterministic `dev_validation` tasks, `gemma-4-26b-a4b-it`, `temperature=1.0`, `top_p=0.95`, `top_k=64`, `max_output_tokens=2048`, exactly two attempts per test input, deterministic request fingerprints/cache and exact full-task scoring. ARC-R008 did not change solver-facing behavior.
 
-## ARC-R007
+## ARC-R008 findings
 
-ARC-R007 changed only orchestration observability. `.github/workflows/gemma-baseline.yml` now persists `lab/recon/gemma-baseline-latest.json` at execution start and baseline outcome, independently of whether the final benchmark succeeds.
+ARC-R008 audited both ARC-R007 baseline runs to completion. Runs `32612153608` and `32612165079` both failed after reaching the frozen baseline. Run `32612165079` ended on Gemini API `429 RESOURCE_EXHAUSTED` for the free-tier 16,000 input-token/minute quota.
 
-This resolved the prior ambiguity: GitHub Actions scheduling is functional. Run `32612153608` passed checkout, Python setup, installation, unit tests, breadcrumb persistence and the pinned public-training-only fetch, then entered the frozen baseline step. Run `32612165079` also reached the frozen baseline step.
+The best prior cache artifact contains 57 unique response fingerprints with 171,674 recorded input tokens, 288,239 total tokens and 2,471.675 seconds aggregate provider runtime. The smaller duplicate-run artifact contains six responses, all already included in those 57. All 57 cached responses have empty visible text; this is a failure cluster requiring later controlled diagnosis, not an ARC score.
 
-The second run was an accidental duplicate caused by both the workflow-file treatment commit and an explicit request commit matching push triggers. This is recorded as a negative orchestration result and potential duplicate API-spend confound. No cancellation action was available through the connected GitHub surface.
+ARC-R008 changed only execution orchestration: workflow-source pushes no longer trigger baselines, one concurrency group prevents duplicate live runs, the latest cumulative request cache is restored across runs, the 57-response prior artifact seeds the first resumable run, updated cumulative cache is saved under run-unique keys, and breadcrumbs record cache-file count.
 
-At ARC-R007 evidence cutoff both runs were still in progress. Therefore no ARC score, target-model calls/tokens/runtime, solves, parse failures, new solves or regressions are claimed.
+A single ARC-R008 request launched run `32614602241`. At shift cutoff it had passed checkout, setup, installation, 23 unit tests, start breadcrumb, pinned training-only fetch, cache restore and prior-artifact seed; the frozen baseline step remained in progress. No second concurrent ARC-R008 run was observed.
 
-Verdict: **INCONCLUSIVE** for T0002 completion, but the scheduling uncertainty is resolved.
+Verdict: **INCONCLUSIVE** for T0002 completion. The restore/seed half of quota-resumable execution is verified; cache growth, final score and complete resource accounting are not yet available.
 
 ## Current bottleneck
 
-Obtain and audit durable completion evidence from the already-running frozen baseline jobs. Do not issue another baseline trigger while either run remains active. If they complete, audit the result for all 174 tasks, two-attempt policy, exact scoring, parsing failures, cache accounting, calls/tokens/runtime and per-attempt records. If they fail, use the new durable outcome evidence/logs to isolate the remaining failure.
+Wait only on durable evidence from already-running run `32614602241`; do not issue another baseline request while it is active. When it completes, inspect `lab/recon/gemma-baseline-latest.json`, the run jobs/logs and the run-namespaced cache artifact. The immediate falsifiable question is whether cumulative cache grows beyond 57 files. If yes, continue the exact same frozen protocol in a later shift; if no, isolate cache-save or quota behavior as the next single orchestration variable.
 
-Before any later trigger, add duplicate-run protection (for example workflow concurrency and/or removal of workflow-source push triggering) without changing `direct-json-v1`.
+The 57/57 empty visible-response cluster remains secondary. Do not change output budget, prompt or response handling in the same shift as quota-resume debugging.
 
 ## Next task
 
-`T0002-GEMMA-BASELINE` remains `ready` for ARC-R008. `T0003-FIRST-ARCHITECTURE-TOURNAMENT` remains blocked until T0002 has durable complete evidence.
+`T0002-GEMMA-BASELINE` remains `ready` for ARC-R009. `T0003-FIRST-ARCHITECTURE-TOURNAMENT` remains blocked until T0002 has a durable complete result.
