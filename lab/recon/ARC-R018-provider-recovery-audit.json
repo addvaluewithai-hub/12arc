@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "run": "ARC-R018",
+  "task": "T0004-COMPACT-HYPOTHESIS-SEARCH",
+  "initial_result_sha": "af9653a4a80fb466f374ef5d288df84ce8a0338b",
+  "initial_verdict": "INCONCLUSIVE",
+  "initial_baseline_solved": 4,
+  "initial_treatment_solved": 2,
+  "initial_new_solves": 1,
+  "initial_regressions": 3,
+  "initial_provider_failures": 2,
+  "failure_class": "NVIDIA NIM HTTP 529 Service temporarily overloaded",
+  "failed_task_ids": ["00dbd492", "05f2a901"],
+  "recovery_policy": "rerun only the two transient provider-failure task IDs under the exact frozen ARC-R018 model, prompts, sampling, budgets and solver version; do not rerun unaffected task IDs",
+  "recovery_trigger_commit": "61a842e0b33df5be3accfe665904085b6dc57224",
+  "protocol_changed": false,
+  "public_evaluation_used": false
+}
