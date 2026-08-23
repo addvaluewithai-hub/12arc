@@ -19,7 +19,8 @@ GENERATION_SELECTOR = GenerationConfig(temperature=0.0, top_p=1.0, top_k=None, m
 TASK_IDS = ["00dbd492", "05f2a901", "0607ce86", "06df4c85", "070dd51e", "0bb8deee", "0d3d703e", "1190bc91"]
 
 
-def protocol_manifest() -> dict[str, Any]:
+def protocol_manifest(task_ids: list[str] | None = None) -> dict[str, Any]:
+    selected = TASK_IDS if task_ids is None else task_ids
     p: dict[str, Any] = {
         "schema_version": 1,
         "run": "ARC-R018",
@@ -36,7 +37,7 @@ def protocol_manifest() -> dict[str, Any]:
         "attempts_per_test": 1,
         "split": "dev_validation",
         "selection_rule": "same eight IDs used by ARC-R017",
-        "task_ids": TASK_IDS,
+        "task_ids": selected,
         "primary_metric": "exact task accuracy versus ARC-R016 on identical IDs",
         "secondary": ["new solves", "regressions", "candidate parse failures", "selector parse failures", "provider failures", "tokens", "runtime"],
         "success_threshold": "PROMOTE only if treatment has at least one new solve and strictly more solved tasks than comparator",
@@ -106,7 +107,8 @@ def parse_selector(text: str) -> int | None:
     return idx if isinstance(idx, int) and idx in (0, 1, 2) else None
 
 
-def run(training_dir: Path, baseline_path: Path, cache_dir: Path, output: Path) -> dict[str, Any]:
+def run(training_dir: Path, baseline_path: Path, cache_dir: Path, output: Path, task_ids: list[str] | None = None) -> dict[str, Any]:
+    selected_ids = TASK_IDS if task_ids is None else task_ids
     baseline = json.loads(baseline_path.read_text())
     base_by = {r["task_id"]: r for r in baseline["records"]}
     client = CachedTargetClient(NvidiaNIMProvider(), cache_dir)
@@ -116,7 +118,7 @@ def run(training_dir: Path, baseline_path: Path, cache_dir: Path, output: Path) 
     candidate_parse_failures = selector_parse_failures = 0
     runtime_seconds = 0.0
 
-    for tid in TASK_IDS:
+    for tid in selected_ids:
         task = load_task(training_dir / f"{tid}.json", require_test_outputs=True)
         predictions: list[list[list[list[int]]]] = []
         test_records: list[dict[str, Any]] = []
@@ -124,14 +126,7 @@ def run(training_dir: Path, baseline_path: Path, cache_dir: Path, output: Path) 
         for i, pair in enumerate(task["test"]):
             test_record: dict[str, Any] = {"test_index": i}
             try:
-                candidate_req = TargetRequest(
-                    model=MODEL,
-                    prompt=candidate_prompt(task, pair["input"]),
-                    solver_version=SOLVER_VERSION + ":candidates",
-                    task_id=f"{tid}:test{i}",
-                    attempt_index=0,
-                    generation=GENERATION_CANDIDATES,
-                )
+                candidate_req = TargetRequest(model=MODEL, prompt=candidate_prompt(task, pair["input"]), solver_version=SOLVER_VERSION + ":candidates", task_id=f"{tid}:test{i}", attempt_index=0, generation=GENERATION_CANDIDATES)
                 candidate_resp = client.generate(candidate_req)
                 calls += 0 if candidate_resp.cache_hit else 1
                 cache_hits += int(candidate_resp.cache_hit)
@@ -141,30 +136,14 @@ def run(training_dir: Path, baseline_path: Path, cache_dir: Path, output: Path) 
                 runtime_seconds += candidate_resp.runtime_seconds
                 hypotheses = parse_hypotheses(candidate_resp.text)
                 candidate_parse_failures += int(hypotheses is None)
-                test_record["candidate_stage"] = {
-                    "parsed": hypotheses is not None,
-                    "cache_hit": candidate_resp.cache_hit,
-                    "input_tokens": candidate_resp.input_tokens,
-                    "output_tokens": candidate_resp.output_tokens,
-                    "total_tokens": candidate_resp.total_tokens,
-                    "runtime_seconds": candidate_resp.runtime_seconds,
-                    "finish_reason": (candidate_resp.provider_metadata or {}).get("finish_reason"),
-                }
-
+                test_record["candidate_stage"] = {"parsed": hypotheses is not None, "cache_hit": candidate_resp.cache_hit, "input_tokens": candidate_resp.input_tokens, "output_tokens": candidate_resp.output_tokens, "total_tokens": candidate_resp.total_tokens, "runtime_seconds": candidate_resp.runtime_seconds, "finish_reason": (candidate_resp.provider_metadata or {}).get("finish_reason")}
                 if hypotheses is None:
                     predictions.append([])
                     test_records.append(test_record)
                     continue
 
                 rules = [h["rule"] for h in hypotheses]
-                selector_req = TargetRequest(
-                    model=MODEL,
-                    prompt=selector_prompt(task, rules),
-                    solver_version=SOLVER_VERSION + ":selector",
-                    task_id=f"{tid}:test{i}",
-                    attempt_index=0,
-                    generation=GENERATION_SELECTOR,
-                )
+                selector_req = TargetRequest(model=MODEL, prompt=selector_prompt(task, rules), solver_version=SOLVER_VERSION + ":selector", task_id=f"{tid}:test{i}", attempt_index=0, generation=GENERATION_SELECTOR)
                 selector_resp = client.generate(selector_req)
                 calls += 0 if selector_resp.cache_hit else 1
                 cache_hits += int(selector_resp.cache_hit)
@@ -174,16 +153,7 @@ def run(training_dir: Path, baseline_path: Path, cache_dir: Path, output: Path) 
                 runtime_seconds += selector_resp.runtime_seconds
                 selected = parse_selector(selector_resp.text)
                 selector_parse_failures += int(selected is None)
-                test_record["selector_stage"] = {
-                    "parsed": selected is not None,
-                    "selected_index": selected,
-                    "cache_hit": selector_resp.cache_hit,
-                    "input_tokens": selector_resp.input_tokens,
-                    "output_tokens": selector_resp.output_tokens,
-                    "total_tokens": selector_resp.total_tokens,
-                    "runtime_seconds": selector_resp.runtime_seconds,
-                    "finish_reason": (selector_resp.provider_metadata or {}).get("finish_reason"),
-                }
+                test_record["selector_stage"] = {"parsed": selected is not None, "selected_index": selected, "cache_hit": selector_resp.cache_hit, "input_tokens": selector_resp.input_tokens, "output_tokens": selector_resp.output_tokens, "total_tokens": selector_resp.total_tokens, "runtime_seconds": selector_resp.runtime_seconds, "finish_reason": (selector_resp.provider_metadata or {}).get("finish_reason")}
                 predictions.append([] if selected is None else [hypotheses[selected]["test_output"]])
                 test_records.append(test_record)
             except Exception as exc:
@@ -196,45 +166,14 @@ def run(training_dir: Path, baseline_path: Path, cache_dir: Path, output: Path) 
         expected = [x["output"] for x in task["test"]]
         solved = len(predictions) == len(expected) and all(predictions) and task_solved(predictions, expected)
         baseline_solved = bool(base_by[tid]["solved"])
-        records.append({
-            "task_id": tid,
-            "baseline_solved": baseline_solved,
-            "treatment_solved": solved,
-            "new_solve": solved and not baseline_solved,
-            "regression": baseline_solved and not solved,
-            "tests": test_records,
-        })
+        records.append({"task_id": tid, "baseline_solved": baseline_solved, "treatment_solved": solved, "new_solve": solved and not baseline_solved, "regression": baseline_solved and not solved, "tests": test_records})
 
     baseline_solved = sum(r["baseline_solved"] for r in records)
     treatment_solved = sum(r["treatment_solved"] for r in records)
     new_solves = sum(r["new_solve"] for r in records)
     regressions = sum(r["regression"] for r in records)
     verdict = "PROMOTE" if treatment_solved > baseline_solved and new_solves >= 1 else ("INCONCLUSIVE" if provider_failures else "REJECT")
-
-    report = {
-        "schema_version": 1,
-        "run": "ARC-R018",
-        "protocol": protocol_manifest(),
-        "baseline_solved": baseline_solved,
-        "treatment_solved": treatment_solved,
-        "task_count": len(TASK_IDS),
-        "baseline_accuracy": baseline_solved / len(TASK_IDS),
-        "treatment_accuracy": treatment_solved / len(TASK_IDS),
-        "new_solves": new_solves,
-        "regressions": regressions,
-        "candidate_parse_failures": candidate_parse_failures,
-        "selector_parse_failures": selector_parse_failures,
-        "provider_failures": provider_failures,
-        "calls": calls,
-        "cache_hits": cache_hits,
-        "input_tokens": input_tokens,
-        "output_tokens": output_tokens,
-        "total_tokens": total_tokens,
-        "runtime_seconds": runtime_seconds,
-        "records": records,
-        "verdict": verdict,
-        "adversarial_interpretation": "The second stage may simply re-ask the same model to prefer its own wording, and repeating training pairs increases input cost. Eight tasks are directional, not a full-split estimate.",
-    }
+    report = {"schema_version": 1, "run": "ARC-R018", "protocol": protocol_manifest(selected_ids), "baseline_solved": baseline_solved, "treatment_solved": treatment_solved, "task_count": len(selected_ids), "baseline_accuracy": baseline_solved / len(selected_ids), "treatment_accuracy": treatment_solved / len(selected_ids), "new_solves": new_solves, "regressions": regressions, "candidate_parse_failures": candidate_parse_failures, "selector_parse_failures": selector_parse_failures, "provider_failures": provider_failures, "calls": calls, "cache_hits": cache_hits, "input_tokens": input_tokens, "output_tokens": output_tokens, "total_tokens": total_tokens, "runtime_seconds": runtime_seconds, "records": records, "verdict": verdict, "adversarial_interpretation": "The second stage may simply re-ask the same model to prefer its own wording, and repeating training pairs increases input cost. Eight tasks are directional, not a full-split estimate."}
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n")
     return report
@@ -246,8 +185,9 @@ def main() -> None:
     p.add_argument("--baseline", type=Path, required=True)
     p.add_argument("--cache-dir", type=Path, required=True)
     p.add_argument("--output", type=Path, required=True)
+    p.add_argument("--task-id", action="append", choices=TASK_IDS)
     a = p.parse_args()
-    r = run(a.training_dir, a.baseline, a.cache_dir, a.output)
+    r = run(a.training_dir, a.baseline, a.cache_dir, a.output, task_ids=a.task_id)
     print(json.dumps({k: r[k] for k in ["baseline_solved", "treatment_solved", "new_solves", "regressions", "candidate_parse_failures", "selector_parse_failures", "provider_failures", "calls", "total_tokens", "runtime_seconds", "verdict"]}, sort_keys=True))
 
 
