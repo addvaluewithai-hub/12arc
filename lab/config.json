@@ -8,7 +8,7 @@
   "primary_hosted_provider": "nvidia-nim",
   "primary_target_model": "deepseek-ai/deepseek-v4-flash-0731",
   "escalation_target_model": "nvidia/nemotron-3-ultra-550b-a55b",
-  "target_model_policy_status": "provisional pending frozen development tournament",
+  "target_model_policy_status": "DeepSeek selected by ARC-R015 frozen 3-task dev_validation tournament; fixed primary for baseline establishment",
   "active_target_models": [
     "deepseek-ai/deepseek-v4-flash-0731",
     "nvidia/nemotron-3-ultra-550b-a55b"
@@ -18,7 +18,7 @@
     "gemma-4-31b-it",
     "openai/gpt-oss-120b"
   ],
-  "operator_direction": "Do not spend routine research budget on Gemma or GPT-OSS. Use them only when an explicit comparator/parity question justifies the call.",
+  "operator_direction": "Use DeepSeek V4 Flash as the routine NVIDIA baseline/research engine after ARC-R015. Nemotron remains an escalation/research candidate. Do not spend routine research budget on Gemma or GPT-OSS; use them only when an explicit comparator/parity question justifies the call.",
   "research_team_role": "invent algorithms, prompts, representations and experiments; do not substitute itself for target-model benchmark execution",
   "development_feedback": "public-training-derived deterministic splits only",
   "public_eval_policy": "milestone-only sealed evaluation; never use repeated public-eval feedback to tune the solver",
