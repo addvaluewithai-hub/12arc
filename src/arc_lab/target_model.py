@@ -113,6 +113,51 @@ class GoogleGenAIProvider:
             return value.get(name)
         return getattr(value, name, None)
 
+    @staticmethod
+    def _enum_value(value: Any) -> Any:
+        if value is None:
+            return None
+        return getattr(value, "value", value if isinstance(value, (str, int, float, bool)) else str(value))
+
+    @classmethod
+    def response_diagnostics(cls, response: Any) -> dict[str, Any]:
+        """Return sanitized response structure without persisting thought text/signatures."""
+        usage = cls._get(response, "usage_metadata")
+        candidates = cls._get(response, "candidates") or []
+        candidate_records: list[dict[str, Any]] = []
+        for candidate in candidates:
+            content = cls._get(candidate, "content")
+            parts = cls._get(content, "parts") or []
+            part_records: list[dict[str, Any]] = []
+            for part in parts:
+                text = cls._get(part, "text")
+                signature = cls._get(part, "thought_signature")
+                part_records.append(
+                    {
+                        "thought": cls._get(part, "thought"),
+                        "has_text": isinstance(text, str) and bool(text),
+                        "text_chars": len(text) if isinstance(text, str) else 0,
+                        "has_thought_signature": bool(signature),
+                    }
+                )
+            candidate_records.append(
+                {
+                    "finish_reason": cls._enum_value(cls._get(candidate, "finish_reason")),
+                    "finish_message": cls._get(candidate, "finish_message"),
+                    "token_count": cls._get(candidate, "token_count"),
+                    "parts": part_records,
+                }
+            )
+        return {
+            "usage": {
+                "prompt_token_count": cls._get(usage, "prompt_token_count"),
+                "candidates_token_count": cls._get(usage, "candidates_token_count"),
+                "thoughts_token_count": cls._get(usage, "thoughts_token_count"),
+                "total_token_count": cls._get(usage, "total_token_count"),
+            },
+            "candidates": candidate_records,
+        }
+
     def resolve_model(self, model: str) -> dict[str, Any]:
         info = self._client.models.get(model=model)
         return {
@@ -139,13 +184,20 @@ class GoogleGenAIProvider:
         runtime = time.perf_counter() - started
         usage = self._get(response, "usage_metadata")
         resolved = self._get(response, "model_version") or model_info.get("name")
+        try:
+            text = response.text or ""
+        except (AttributeError, ValueError):
+            text = ""
         return TargetResponse(
             model_requested=request.model,
             model_resolved=resolved,
-            text=response.text or "",
+            text=text,
             input_tokens=self._get(usage, "prompt_token_count"),
             output_tokens=self._get(usage, "candidates_token_count"),
             total_tokens=self._get(usage, "total_token_count"),
             runtime_seconds=runtime,
-            provider_metadata={"model": model_info},
+            provider_metadata={
+                "model": model_info,
+                "response_diagnostics": self.response_diagnostics(response),
+            },
         )
