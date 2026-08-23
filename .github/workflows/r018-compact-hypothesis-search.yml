@@ -1,0 +1,40 @@
+name: r018-compact-hypothesis-search
+on:
+  push:
+    paths: ['lab/triggers/r018-compact-hypothesis-search.request']
+permissions:
+  contents: write
+jobs:
+  experiment:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install -e '.[dev]'
+      - run: pytest -q
+      - name: Fetch pinned public training only
+        run: |
+          git init /tmp/arc-agi-2
+          git -C /tmp/arc-agi-2 remote add origin https://github.com/arcprize/ARC-AGI-2.git
+          git -C /tmp/arc-agi-2 sparse-checkout init --cone
+          git -C /tmp/arc-agi-2 sparse-checkout set data/training
+          git -C /tmp/arc-agi-2 fetch --depth=1 origin f3283f727488ad98fe575ea6a5ac981e4a188e49
+          git -C /tmp/arc-agi-2 checkout FETCH_HEAD
+          test ! -e /tmp/arc-agi-2/data/evaluation
+      - name: Execute compact matched architecture experiment
+        run: |
+          test -n "$NVIDIA_API_KEY"
+          python -m arc_lab.compact_hypothesis_search /tmp/arc-agi-2/data/training --baseline lab/results/ARC-R016-baseline.json --cache-dir /tmp/arc-r018-cache --output /tmp/ARC-R018-result.json
+      - name: Persist sanitized result
+        run: |
+          git pull --rebase origin "$GITHUB_REF_NAME"
+          cp /tmp/ARC-R018-result.json lab/results/ARC-R018-compact-hypothesis-search.json
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add lab/results/ARC-R018-compact-hypothesis-search.json
+          git commit -m 'ARC-R018: persist compact hypothesis search result'
+          git push origin HEAD:"$GITHUB_REF_NAME"
