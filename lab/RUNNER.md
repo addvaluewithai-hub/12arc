@@ -31,17 +31,25 @@ Every research run must have:
 - a failure analysis, not just an aggregate score;
 - an adversarial review asking what else could explain the delta.
 
-The research team may invent prompts, algorithms, code and representations. It must not silently solve benchmark tasks itself and credit those answers to Gemma.
+The research team may invent prompts, algorithms, code and representations. It must not silently solve benchmark tasks itself and credit those answers to the target model.
 
 ## 4. Leakage discipline
 
 Development feedback comes only from deterministic splits derived from the public training set. Public evaluation is milestone-only and must never become a repeated tuning signal. Follow `lab/protocols/LEAKAGE.md`.
 
+ARC-specific pretraining on public/permitted data is not automatically disqualifying. When a foundation model has known ARC-specific exposure, label that exposure in reports so development scores are interpreted as competition utility rather than a clean measure of de-novo ARC reasoning. Never use private/sealed evaluation data or repeated public-evaluation feedback.
+
 ## 5. Model discipline
 
-Treat `gemma-4-26b-a4b-it` as the initial fixed primary engine. Use `gemma-4-31b-it` only when the experiment explicitly studies routing/escalation or the queue says to do so. Hosted API inference is an R&D convenience, not a final dependency. Follow `lab/protocols/MODEL-PARITY.md` and `lab/protocols/QUOTA.md`.
+Current hosted research provider is NVIDIA NIM using repository secret `NVIDIA_API_KEY`; never print, persist or expose the secret.
 
-If the Gemma API/connector is unavailable, do not fabricate calls. Work only on eligible infrastructure/research tasks that do not require target-model outputs, otherwise mark the blocker and stop.
+The provisional primary target model is `deepseek-ai/deepseek-v4-flash-0731`. The provisional escalation/second candidate is `nvidia/nemotron-3-ultra-550b-a55b`. These choices must be validated by a small frozen development model tournament before a new full baseline is established.
+
+Gemma (`gemma-4-26b-a4b-it`, `gemma-4-31b-it`) and `openai/gpt-oss-120b` are legacy comparators, not routine research targets. Do not spend calls debugging or benchmarking them unless a queued experiment explicitly needs them for a controlled comparator/parity question.
+
+Hosted API inference is an R&D convenience, not a final dependency. Keep the model-facing interface provider-neutral and preserve an open-weight/offline path. Follow `lab/protocols/MODEL-PARITY.md` and `lab/protocols/QUOTA.md`.
+
+If the authorized target-model API is unavailable, do not fabricate calls. Work only on eligible infrastructure/research tasks that do not require target-model outputs, otherwise persist the blocker and stop.
 
 ## 6. Persist before claiming success
 
