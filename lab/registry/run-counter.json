@@ -1,6 +1,13 @@
 {
   "schema_version": 1,
-  "next_run_number": 13,
+  "next_run_number": 14,
   "last_completed_run": "ARC-R012",
-  "active_reservations": []
+  "active_reservations": [
+    {
+      "run_id": "ARC-R013",
+      "shift_id": "arc-r013-20260823t0806z",
+      "reserved_at": "2026-08-23T08:06:37Z",
+      "lease_expires_at": "2026-08-23T10:06:37Z"
+    }
+  ]
 }
