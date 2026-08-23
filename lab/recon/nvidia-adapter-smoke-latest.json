@@ -1,0 +1,49 @@
+{
+  "cache_hits_total": 2,
+  "models": [
+    {
+      "cache_sha256": "43ccd32860462a45ffbf4d60362dbe2f32a3806612fd93a058a89e5fbe4c7c1d",
+      "finish_reason": "stop",
+      "input_tokens": 19,
+      "live_cache_hit": false,
+      "model_requested": "deepseek-ai/deepseek-v4-flash-0731",
+      "model_resolved": "deepseek-ai/deepseek-v4-flash-0731",
+      "output_tokens": 2,
+      "provider": "nvidia-nim",
+      "provider_requests_required": 1,
+      "rate_limit_headers": {},
+      "reasoning_chars": 0,
+      "repeat_cache_hit": true,
+      "request_fingerprint": "580afba15128fe28de3a4af5b36662ae2305ce99a925e16dbb105df8925e8871",
+      "runtime_seconds": 1.0900935509999954,
+      "total_tokens": 21,
+      "visible_text_chars": 2,
+      "visible_text_preview": "OK"
+    },
+    {
+      "cache_sha256": "6abe9356f3f1674bafe2d151466c6e81c233e2594628708679a4ef7e0216bd18",
+      "finish_reason": "stop",
+      "input_tokens": 31,
+      "live_cache_hit": false,
+      "model_requested": "nvidia/nemotron-3-ultra-550b-a55b",
+      "model_resolved": "nvidia/nemotron-3-ultra-550b-a55b",
+      "output_tokens": 35,
+      "provider": "nvidia-nim",
+      "provider_requests_required": 1,
+      "rate_limit_headers": {},
+      "reasoning_chars": 145,
+      "repeat_cache_hit": true,
+      "request_fingerprint": "05fed2bd9ee3c71ef0504a65446a9fed1b07230bbed6c49b8d1e6fdf5542676f",
+      "runtime_seconds": 19.827997153,
+      "total_tokens": 66,
+      "visible_text_chars": 2,
+      "visible_text_preview": "OK"
+    }
+  ],
+  "provider": "nvidia-nim",
+  "provider_requests_total": 2,
+  "purpose": "provider-neutral NVIDIA NIM adapter/cache smoke; non-ARC",
+  "schema_version": 1,
+  "secret_persisted": false,
+  "verified": true
+}
