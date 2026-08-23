@@ -1,12 +1,16 @@
 {
+  "baseline_exit_code": "124",
+  "baseline_step_outcome": "failure",
+  "cache_file_count": 113,
   "github_run_attempt": "1",
   "github_run_id": "32617284889",
   "min_live_call_interval_seconds": 61.0,
   "model": "gemma-4-26b-a4b-it",
   "protocol": "direct-json-v1",
+  "result_present": false,
   "schema_version": 1,
   "split": "dev_validation",
-  "status": "running",
+  "status": "partial_timebox",
   "task_count": 174,
   "trigger_sha": "7ded98e4a328dadfd1e435e76254faba6f9c66fe"
 }
