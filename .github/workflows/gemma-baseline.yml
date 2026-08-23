@@ -20,6 +20,7 @@ jobs:
     timeout-minutes: 55
     env:
       GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      ARC_TARGET_MIN_LIVE_CALL_INTERVAL_SECONDS: '61'
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -49,6 +50,7 @@ jobs:
               "github_run_id": os.environ["GITHUB_RUN_ID"],
               "github_run_attempt": os.environ["GITHUB_RUN_ATTEMPT"],
               "trigger_sha": os.environ["GITHUB_SHA"],
+              "min_live_call_interval_seconds": float(os.environ["ARC_TARGET_MIN_LIVE_CALL_INTERVAL_SECONDS"]),
           }
           Path("lab/recon/gemma-baseline-latest.json").write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n")
           PY
@@ -86,12 +88,16 @@ jobs:
         continue-on-error: true
         run: |
           test -n "$GEMINI_API_KEY"
-          python -m arc_lab.baseline \
+          set +e
+          timeout --signal=TERM 42m python -m arc_lab.baseline \
             /tmp/arc-agi-2/data/training \
             lab/benchmarks/arc-agi-2-training-ids.txt \
             --split dev_validation \
             --cache-dir /tmp/arc-baseline-cache \
             --output /tmp/arc-r004-baseline.json
+          code=$?
+          echo "exit_code=$code" >> "$GITHUB_OUTPUT"
+          exit "$code"
       - name: Save cumulative request cache
         if: always()
         uses: actions/cache/save@v4
@@ -102,6 +108,7 @@ jobs:
         if: always()
         env:
           BASELINE_OUTCOME: ${{ steps.baseline.outcome }}
+          BASELINE_EXIT_CODE: ${{ steps.baseline.outputs.exit_code }}
         run: |
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
@@ -114,19 +121,28 @@ jobs:
           from pathlib import Path
           result_path = Path("/tmp/arc-r004-baseline.json")
           cache_dir = Path("/tmp/arc-baseline-cache")
+          exit_code = os.environ.get("BASELINE_EXIT_CODE", "")
+          if os.environ["BASELINE_OUTCOME"] == "success":
+              status = "success"
+          elif exit_code == "124":
+              status = "partial_timebox"
+          else:
+              status = "failure"
           payload = {
               "schema_version": 1,
               "protocol": "direct-json-v1",
               "model": "gemma-4-26b-a4b-it",
               "split": "dev_validation",
               "task_count": 174,
-              "status": "success" if os.environ["BASELINE_OUTCOME"] == "success" else "failure",
+              "status": status,
               "baseline_step_outcome": os.environ["BASELINE_OUTCOME"],
+              "baseline_exit_code": exit_code,
               "github_run_id": os.environ["GITHUB_RUN_ID"],
               "github_run_attempt": os.environ["GITHUB_RUN_ATTEMPT"],
               "trigger_sha": os.environ["GITHUB_SHA"],
               "result_present": result_path.exists(),
               "cache_file_count": len(list(cache_dir.glob("*.json"))) if cache_dir.exists() else 0,
+              "min_live_call_interval_seconds": float(os.environ["ARC_TARGET_MIN_LIVE_CALL_INTERVAL_SECONDS"]),
           }
           Path("lab/recon/gemma-baseline-latest.json").write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n")
           PY
@@ -152,4 +168,4 @@ jobs:
           OUTCOME: ${{ steps.baseline.outcome }}
         run: test "$OUTCOME" = success
 
-# ARC-R008 quota-resume repair: only the dedicated request file triggers pushes, a concurrency lock prevents duplicate live baselines, and cumulative request cache is restored/saved across runs. direct-json-v1 is unchanged.
+# ARC-R009 quota-pacing treatment: uncached live request starts are separated by at least 61 seconds, and the baseline process is timeboxed at 42 minutes so post-run cache persistence still executes. direct-json-v1 generation/scoring behavior is unchanged.
