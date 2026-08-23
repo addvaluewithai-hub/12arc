@@ -44,28 +44,25 @@
       "id": "T0001B-NVIDIA-EXECUTION-PATH",
       "title": "Promote NVIDIA NIM into the provider-neutral cached target-model path",
       "type": "infrastructure",
-      "status": "claimed",
+      "status": "done",
       "priority": 98,
       "depends_on": ["T0001-BENCHMARK-HARNESS"],
       "recommended_role": "llm-experimenter",
       "success_test": "Repository has a provider-neutral NVIDIA NIM adapter using NVIDIA_API_KEY only from environment/Actions secret, deterministic cache/accounting, tests, and live non-ARC smoke evidence for both deepseek-ai/deepseek-v4-flash-0731 and nvidia/nemotron-3-ultra-550b-a55b without exposing the secret.",
-      "progress": "Pre-task operational probe already proved the repository NVIDIA_API_KEY works on the common NVIDIA endpoint for Nemotron 3 Ultra (HTTP 200, ~0.687 s) and DeepSeek V4 Flash (HTTP 200, ~0.667 s). GPT-OSS-120B and Gemma 4 31B timed out at 120 s and are not active targets. Evidence: lab/recon/nvidia-model-smoke-latest.json.",
-      "claim": {
-        "shift_id": "run-now-20260823T1126+0300",
-        "claimed_at": "2026-08-23T11:26:00+03:00",
-        "lease_expires_at": "2026-08-23T13:26:00+03:00"
-      }
+      "completed_run": "ARC-R014",
+      "progress": "ARC-R014 promoted NvidiaNIMProvider into the provider-neutral cached client. GitHub Actions run 32628504884 passed 31 tests and verified one live non-ARC call plus one deterministic cache hit for each active model. DeepSeek: 19 input/2 output/21 total tokens, 7.4231 s. Nemotron: 31 input/36 output/67 total tokens, 2.2213 s, 146 reasoning chars observed without persisting reasoning text. Evidence: lab/recon/nvidia-adapter-smoke-latest.json and ARC-R014.md.",
+      "claim": null
     },
     {
       "id": "T0002B-NVIDIA-MODEL-TOURNAMENT",
       "title": "Select the stronger NVIDIA ARC research engine: DeepSeek V4 Flash vs Nemotron 3 Ultra",
       "type": "target-model-experiment",
-      "status": "blocked",
+      "status": "ready",
       "priority": 94,
       "depends_on": ["T0001B-NVIDIA-EXECUTION-PATH"],
       "recommended_role": "llm-experimenter",
       "success_test": "A small frozen public-training-derived development slice compares DeepSeek V4 Flash and Nemotron 3 Ultra under a controlled protocol and budget, recording exact solves, parseability, reasoning/output tokens, latency, failures, cache hits and known ARC-specific model exposure; one model is selected as the fixed primary engine by evidence rather than reputation.",
-      "blocker": "Requires provider-neutral NVIDIA execution path and cached accounting first.",
+      "progress": "Unblocked by ARC-R014. Use the verified provider-neutral NVIDIA adapter/cache path and a small frozen development slice; do not use public evaluation.",
       "claim": null
     },
     {
