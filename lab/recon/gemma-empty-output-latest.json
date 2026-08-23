@@ -1,0 +1,57 @@
+{
+  "attempt_index": 0,
+  "cache_hit": false,
+  "diagnostic_version": "direct-json-v1-r011-response-diagnostic",
+  "generation": {
+    "max_output_tokens": 2048,
+    "temperature": 1.0,
+    "top_k": 64,
+    "top_p": 0.95
+  },
+  "hypothesis": "The frozen 2048-token generation budget is consumed by model thoughts before any visible candidate text is emitted.",
+  "input_tokens": 2982,
+  "model": "gemma-4-26b-a4b-it",
+  "output_tokens": null,
+  "parsed_grid": null,
+  "primary_variable": "response telemetry only; generation settings and prompt are unchanged from direct-json-v1",
+  "prompt_sha256": "aefa22e7984e5bcf94f7c213cf3634db4b824d48f61ad3088ebd3fd9196bb578",
+  "provider_metadata": {
+    "model": {
+      "display_name": "Gemma 4 26B A4B IT",
+      "name": "models/gemma-4-26b-a4b-it",
+      "version": "001"
+    },
+    "response_diagnostics": {
+      "candidates": [
+        {
+          "finish_message": null,
+          "finish_reason": "MAX_TOKENS",
+          "parts": [
+            {
+              "has_text": true,
+              "has_thought_signature": false,
+              "text_chars": 4942,
+              "thought": true
+            }
+          ],
+          "token_count": null
+        }
+      ],
+      "usage": {
+        "candidates_token_count": null,
+        "prompt_token_count": 2982,
+        "thoughts_token_count": 2045,
+        "total_token_count": 5027
+      }
+    }
+  },
+  "request_fingerprint": "326a31f97f67f825d62a1be1dc5d121f2d9b55bdb3b3b537248a625f3e128058",
+  "runtime_seconds": 43.27229942300005,
+  "schema_version": 1,
+  "split": "dev_validation",
+  "task_id": "00dbd492",
+  "test_index": 0,
+  "total_tokens": 5027,
+  "visible_text": "",
+  "visible_text_chars": 0
+}
