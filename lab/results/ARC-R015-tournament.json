@@ -1,0 +1,184 @@
+{
+  "adversarial_interpretation": "A three-task slice has high variance; a win may reflect task-family fit or model pretraining exposure. Equal solves are not broken using parseability, latency, or reputation because exact solves are the declared primary metric.",
+  "manifest": {
+    "attempts_per_test": 1,
+    "exposure_note": "Foundation-model ARC-specific pretraining/exposure is not independently established by this run; scores are competition-utility evidence, not clean de-novo reasoning attribution.",
+    "falsification": "equal exact solves => INCONCLUSIVE",
+    "generation": {
+      "max_output_tokens": 4096,
+      "temperature": 0.0,
+      "top_k": null,
+      "top_p": 1.0
+    },
+    "hypothesis": "Under identical direct-JSON decoding and one attempt per test input, one NVIDIA candidate will solve more tasks on the frozen slice; an exact-solve tie is inconclusive rather than broken by reputation.",
+    "manifest_sha256": "d159e7209e785fa0879d249ffc989dc6092eab996d3c6c1468131f5dce0154d0",
+    "models": [
+      "deepseek-ai/deepseek-v4-flash-0731",
+      "nvidia/nemotron-3-ultra-550b-a55b"
+    ],
+    "primary_metric": "exact full-task solves",
+    "primary_variable": "target model identifier",
+    "provider": "nvidia-nim",
+    "public_evaluation_used": false,
+    "role": "llm-experimenter",
+    "run": "ARC-R015",
+    "schema_version": 1,
+    "secondary": [
+      "parseability",
+      "tokens",
+      "runtime",
+      "provider failures"
+    ],
+    "selection_rule": "first 3 lexicographically sorted dev_validation IDs under arc-lab-v1",
+    "split": "dev_validation",
+    "success_threshold": "strictly more exact full-task solves for one model",
+    "task_ids": [
+      "00dbd492",
+      "05f2a901",
+      "0607ce86"
+    ]
+  },
+  "results": [
+    {
+      "cache_hits": 0,
+      "calls": 2,
+      "input_tokens": 9932,
+      "model": "deepseek-ai/deepseek-v4-flash-0731",
+      "output_tokens": 1887,
+      "parse_failures": 0,
+      "provider_failures": 1,
+      "records": [
+        {
+          "solved": false,
+          "task_id": "00dbd492",
+          "tests": [
+            {
+              "cache_hit": false,
+              "finish_reason": "stop",
+              "input_tokens": 2986,
+              "model_resolved": "deepseek-ai/deepseek-v4-flash-0731",
+              "output_tokens": 802,
+              "parsed": true,
+              "reasoning_chars": 0,
+              "request_fingerprint": "e4fd7f00438734add735189c558b1adb70bf73ad563e6d39bd8e7da57da7581c",
+              "runtime_seconds": 28.96802039299999,
+              "test_index": 0,
+              "total_tokens": 3788
+            }
+          ]
+        },
+        {
+          "solved": false,
+          "task_id": "05f2a901",
+          "tests": [
+            {
+              "error": "NVIDIA NIM transport failure: TimeoutError: The read operation timed out",
+              "error_type": "RuntimeError",
+              "test_index": 0
+            }
+          ]
+        },
+        {
+          "solved": true,
+          "task_id": "0607ce86",
+          "tests": [
+            {
+              "cache_hit": false,
+              "finish_reason": "stop",
+              "input_tokens": 6946,
+              "model_resolved": "deepseek-ai/deepseek-v4-flash-0731",
+              "output_tokens": 1085,
+              "parsed": true,
+              "reasoning_chars": 0,
+              "request_fingerprint": "410d1ee226d38ceba75d5e46f0ce281692fd9bdaa821c0f5b003365e6f4d48ca",
+              "runtime_seconds": 22.050647012000013,
+              "test_index": 0,
+              "total_tokens": 8031
+            }
+          ]
+        }
+      ],
+      "runtime_seconds": 51.018667405,
+      "solved_tasks": 1,
+      "task_accuracy": 0.3333333333333333,
+      "task_count": 3,
+      "total_tokens": 11819
+    },
+    {
+      "cache_hits": 0,
+      "calls": 3,
+      "input_tokens": 11581,
+      "model": "nvidia/nemotron-3-ultra-550b-a55b",
+      "output_tokens": 12288,
+      "parse_failures": 3,
+      "provider_failures": 0,
+      "records": [
+        {
+          "solved": false,
+          "task_id": "00dbd492",
+          "tests": [
+            {
+              "cache_hit": false,
+              "finish_reason": "length",
+              "input_tokens": 3001,
+              "model_resolved": "nvidia/nemotron-3-ultra-550b-a55b",
+              "output_tokens": 4096,
+              "parsed": false,
+              "reasoning_chars": 8263,
+              "request_fingerprint": "b1f39f75e527087e91a368e84981f739bacfaf3cc91edcb0c2cd900fc95a65d0",
+              "runtime_seconds": 42.31053047400002,
+              "test_index": 0,
+              "total_tokens": 7097
+            }
+          ]
+        },
+        {
+          "solved": false,
+          "task_id": "05f2a901",
+          "tests": [
+            {
+              "cache_hit": false,
+              "finish_reason": "length",
+              "input_tokens": 1620,
+              "model_resolved": "nvidia/nemotron-3-ultra-550b-a55b",
+              "output_tokens": 4096,
+              "parsed": false,
+              "reasoning_chars": 11237,
+              "request_fingerprint": "b4254435c49e9632db77aad7999408eefd5892ce0062e909ceefe517d16ad2bf",
+              "runtime_seconds": 53.20078805600002,
+              "test_index": 0,
+              "total_tokens": 5716
+            }
+          ]
+        },
+        {
+          "solved": false,
+          "task_id": "0607ce86",
+          "tests": [
+            {
+              "cache_hit": false,
+              "finish_reason": "length",
+              "input_tokens": 6960,
+              "model_resolved": "nvidia/nemotron-3-ultra-550b-a55b",
+              "output_tokens": 4096,
+              "parsed": false,
+              "reasoning_chars": 8554,
+              "request_fingerprint": "cc9a71a71c20422a24c4902bacd730275a95f4c9dc487c409ea802742b1416ce",
+              "runtime_seconds": 107.30286740999998,
+              "test_index": 0,
+              "total_tokens": 11056
+            }
+          ]
+        }
+      ],
+      "runtime_seconds": 202.81418594000002,
+      "solved_tasks": 0,
+      "task_accuracy": 0.0,
+      "task_count": 3,
+      "total_tokens": 23869
+    }
+  ],
+  "schema_version": 1,
+  "selected_primary": "deepseek-ai/deepseek-v4-flash-0731",
+  "verdict": "PROMOTE"
+}
