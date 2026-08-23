@@ -1,42 +1,56 @@
 # ARC Research Lab — Current State
 
-Updated: 2026-08-23 20:48 EEST
-Phase: **PHASE 1 — NVIDIA baseline establishment / ARC-R016 recovery**
-Latest completed research run: **ARC-R015**
-Active reserved research run: **ARC-R016**
+Updated: 2026-08-23 21:47 EEST
+Phase: **PHASE 2 — first architecture tournament ready**
+Latest completed research run: **ARC-R016**
+Next research run: **ARC-R017**
 
 ## Target model / provider policy
 
 Current hosted provider: **NVIDIA NIM** via repository Actions secret `NVIDIA_API_KEY` (never expose or persist its value).
 
-ARC-R015 selected **`deepseek-ai/deepseek-v4-flash-0731`** as the fixed primary target model for baseline establishment. `nvidia/nemotron-3-ultra-550b-a55b` remains an escalation/research candidate. Gemma and GPT-OSS remain legacy comparators and should not receive routine research budget.
+ARC-R015 selected **`deepseek-ai/deepseek-v4-flash-0731`** as the fixed primary target model. ARC-R016 has now established its frozen direct-JSON baseline. `nvidia/nemotron-3-ultra-550b-a55b` remains an escalation/research candidate. Gemma and GPT-OSS remain legacy comparators and should not receive routine research budget.
 
 ## Leakage discipline
 
-ARC-R016 uses only the deterministic public-training-derived `dev_validation` split. Public evaluation remains sealed and unused.
+ARC-R016 used only the deterministic public-training-derived `dev_validation` split. Public evaluation remained sealed and unused.
 
-## ARC-R016 frozen baseline contract
+## Frozen ARC-R016 baseline comparator
 
 Protocol: `lab/experiments/ARC-R016-protocol.json`.
 Manifest SHA-256: `97102661ae8ae093dcc4afe3fb0122fbca7b0480893302d5b7a7a1044cb88433`.
 Task set: all 174 deterministic `dev_validation` task IDs.
-Model/settings: NVIDIA NIM / `deepseek-ai/deepseek-v4-flash-0731`; direct JSON; temperature 0.0; top_p 1.0; max_output_tokens 4096; one attempt per test input; no hidden provider retries.
+Model/settings: NVIDIA NIM / `deepseek-ai/deepseek-v4-flash-0731`; `nvidia-direct-json-baseline-v1`; temperature 0.0; top_p 1.0; top_k null; max_output_tokens 4096; one attempt per test input; no hidden provider retries.
 
-## Execution recovery finding
+Final retained baseline metrics:
 
-Initial workflow run `32649224421` completed chunks 0, 1, 2, 4 and 5 successfully and uploaded durable artifacts. Chunk 3 was cancelled at the GitHub Actions 45-minute job timeout while still executing model requests, before its artifact/cache archive could be uploaded. Aggregate therefore did not run and **no complete baseline score exists yet**.
+- exact solved tasks: **45 / 174**;
+- exact task accuracy: **25.8621%**;
+- 179 provider calls/request records;
+- 458,626 input tokens;
+- 175,994 output tokens;
+- 634,620 total tokens;
+- 4,625.097828976 seconds summed model runtime;
+- 13 parse failures recorded;
+- 10 provider failures recorded;
+- 108 wrong-but-parseable tasks recorded;
+- zero cache hits during the retained baseline execution;
+- 179 durable cache records across six hashed archives.
 
-Durable audit: `lab/recon/ARC-R016-workflow-audit.json`.
-Run report: `lab/runs/2026-08-23/ARC-R016.md`.
+Evidence: `lab/results/ARC-R016-baseline.json`, `lab/results/ARC-R016-cache-manifest.json`, `lab/results/ARC-R016-cache-archives/`, and `lab/runs/2026-08-23/ARC-R016.md`.
 
-This shift reconciled the stale claim and re-adopted the existing ARC-R016 reservation. It did not allocate ARC-R017. To avoid duplicating the five successful chunks, only failed chunk job `97218147036` was re-run. Recovery job `97234116594` is currently executing the frozen chunk-3 workload in the same workflow run.
+## ARC-R016 recovery note
 
-Because the first chunk-3 job timed out before upload, its ephemeral cache is unrecoverable; some chunk-3 requests may necessarily be repeated. There is no justification for repeating the five successful chunks.
+Initial workflow run `32649224421` completed chunks 0, 1, 2, 4 and 5, while original chunk-3 job `97218147036` hit the GitHub Actions 45-minute job limit before artifact upload. Recovery job `97234116594` succeeded for chunk 3. Aggregate job `97237369824` then downloaded the five original successful artifacts plus the recovered chunk-3 artifact, validated complete frozen coverage, and persisted the final baseline at commit `8143324`.
 
-## Current bottleneck
+The unrecoverable ephemeral work from the first cancelled chunk-3 job is execution overhead and is not counted as durable baseline cache evidence. Public evaluation was not used.
 
-`T0002C-NVIDIA-BASELINE` remains **ready/incomplete**. The next shift must adopt the existing ARC-R016 reservation and inspect workflow run `32649224421` before issuing any new inference.
+## Interpretation
 
-If recovery job `97234116594` completed and aggregate persisted `lab/results/ARC-R016-baseline.json`, `lab/results/ARC-R016-cache-manifest.json`, and cache archives, audit those artifacts and close T0002C. If the targeted rerun hits the same timeout, split only chunk 3 into smaller execution units while holding the frozen ARC-R016 task set/model/prompt/settings fixed, reuse the five retained artifacts, and aggregate only when all 174 IDs have durable evidence.
+ARC-R016 is a frozen comparator, not a claim that direct JSON is optimal. The 25.86% score reflects model reasoning, prompt/protocol quality, parsing behavior, and provider reliability together. Known ARC-specific foundation-model exposure was not independently established, so this is competition-utility evidence rather than a clean measure of de-novo ARC reasoning.
 
-`T0003-FIRST-ARCHITECTURE-TOURNAMENT` remains blocked until this baseline is complete.
+## Current bottleneck / next task
+
+`T0003-FIRST-ARCHITECTURE-TOURNAMENT` is now **ready** for ARC-R017.
+
+The next shift should compare the frozen ARC-R016 direct-JSON comparator against one structured hypothesis-generation + exact-verification treatment under a matched, controlled development experiment. Do not change multiple unrelated variables. Record exact new solves, regressions, parse/provider effects and resource deltas. Public evaluation remains milestone-only and sealed.
