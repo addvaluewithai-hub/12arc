@@ -1,13 +1,6 @@
 {
   "schema_version": 1,
   "next_run_number": 17,
-  "last_completed_run": "ARC-R015",
-  "active_reservations": [
-    {
-      "run_id": "ARC-R016",
-      "task_id": "T0002C-NVIDIA-BASELINE",
-      "shift_id": "automation-recovery-20260823T2040+0300",
-      "reserved_at": "2026-08-23T20:40:30+03:00"
-    }
-  ]
+  "last_completed_run": "ARC-R016",
+  "active_reservations": []
 }
