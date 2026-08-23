@@ -52,3 +52,14 @@ def test_protocol_output_budget_is_below_frozen_comparator_cap():
     assert manifest["max_total_output_tokens_per_test"] == 3584
     assert manifest["max_total_output_tokens_per_test"] < 4096
     assert manifest["public_evaluation_used"] is False
+
+
+def test_protocol_manifest_can_scope_transient_failure_recovery_without_changing_protocol():
+    full = protocol_manifest()
+    scoped = protocol_manifest(["00dbd492", "05f2a901"])
+    assert scoped["task_ids"] == ["00dbd492", "05f2a901"]
+    assert scoped["solver_version"] == full["solver_version"]
+    assert scoped["candidate_generation"] == full["candidate_generation"]
+    assert scoped["selector_generation"] == full["selector_generation"]
+    assert scoped["primary_variable"] == full["primary_variable"]
+    assert scoped["manifest_sha256"] != full["manifest_sha256"]
