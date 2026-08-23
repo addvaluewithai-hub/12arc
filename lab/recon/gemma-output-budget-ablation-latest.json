@@ -1,0 +1,85 @@
+{
+  "attempt_index": 0,
+  "cache_hit": false,
+  "comparator": {
+    "evidence": "lab/recon/gemma-empty-output-latest.json",
+    "finish_reason": "MAX_TOKENS",
+    "input_tokens": 2982,
+    "max_output_tokens": 2048,
+    "output_tokens": 0,
+    "runtime_seconds": 43.2723,
+    "thought_tokens": 2045,
+    "total_tokens": 5027,
+    "visible_text_chars": 0
+  },
+  "experiment_version": "arc-r012-output-budget-ablation",
+  "finish_reasons": [
+    "MAX_TOKENS"
+  ],
+  "frozen": {
+    "attempt_index": 0,
+    "model": "gemma-4-26b-a4b-it",
+    "prompt": "identical by deterministic construction and checked against ARC-R011 prompt SHA",
+    "solver_version": "direct-json-v1-r011-response-diagnostic",
+    "split": "dev_validation",
+    "task_id": "00dbd492",
+    "temperature": 1.0,
+    "test_index": 0,
+    "top_k": 64,
+    "top_p": 0.95
+  },
+  "generation": {
+    "max_output_tokens": 8192,
+    "temperature": 1.0,
+    "top_k": 64,
+    "top_p": 0.95
+  },
+  "hypothesis": "Increasing only max_output_tokens from 2048 to 8192 on the exact ARC-R011 request allows Gemma to finish thinking and emit a non-empty final candidate.",
+  "input_tokens": 2982,
+  "model": "gemma-4-26b-a4b-it",
+  "output_tokens": null,
+  "parsed_grid": null,
+  "primary_variable": "max_output_tokens: 2048 -> 8192",
+  "prompt_sha256": "aefa22e7984e5bcf94f7c213cf3634db4b824d48f61ad3088ebd3fd9196bb578",
+  "provider_metadata": {
+    "model": {
+      "display_name": "Gemma 4 26B A4B IT",
+      "name": "models/gemma-4-26b-a4b-it",
+      "version": "001"
+    },
+    "response_diagnostics": {
+      "candidates": [
+        {
+          "finish_message": null,
+          "finish_reason": "MAX_TOKENS",
+          "parts": [
+            {
+              "has_text": true,
+              "has_thought_signature": false,
+              "text_chars": 14886,
+              "thought": true
+            }
+          ],
+          "token_count": null
+        }
+      ],
+      "usage": {
+        "candidates_token_count": null,
+        "prompt_token_count": 2982,
+        "thoughts_token_count": 8189,
+        "total_token_count": 11171
+      }
+    }
+  },
+  "request_fingerprint": "3b5a9d4a9d9a93ab8168a5046ab9c9e5e74244c8ee8add434de4241992e75779",
+  "runtime_seconds": 172.106133682,
+  "schema_version": 1,
+  "split": "dev_validation",
+  "success": false,
+  "task_id": "00dbd492",
+  "test_index": 0,
+  "thought_tokens": 8189,
+  "total_tokens": 11171,
+  "visible_text": "",
+  "visible_text_chars": 0
+}
