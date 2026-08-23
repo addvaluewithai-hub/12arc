@@ -2,7 +2,7 @@
 
 Task: `T0004-COMPACT-HYPOTHESIS-SEARCH`  
 Role: **reasoning-systems-inventor**  
-Status: **running / awaiting durable workflow result**
+Status: **running — targeted transient-provider recovery in flight**
 
 ## Falsifiable hypothesis
 
@@ -31,8 +31,33 @@ Secondary diagnostics: new solves, regressions, candidate/selector parse failure
 
 PROMOTE only if treatment has at least one new solve and strictly more solved tasks than comparator. REJECT if it fails to strictly beat comparator. INCONCLUSIVE only if provider failure prevents matched comparison.
 
-## Adversarial check declared in advance
+## Initial durable result
 
-The selector is the same foundation model and may merely prefer its own wording rather than truly discriminate causal rules. Repeating training pairs in stage two also increases input-token cost. Even a positive eight-task result would be directional and require confirmation before scaling.
+The first complete workflow result landed at `lab/results/ARC-R018-compact-hypothesis-search.json` and is **INCONCLUSIVE under the predeclared contract**, because two transient provider errors prevent a matched eight-task comparison.
 
-Implementation: `src/arc_lab/compact_hypothesis_search.py`. Workflow: `.github/workflows/r018-compact-hypothesis-search.yml`.
+Observed initial totals:
+
+- comparator: **4/8 (50%)**;
+- treatment as observed: **2/8 (25%)**;
+- new solves: **1** (`0bb8deee`);
+- apparent regressions: **3**;
+- candidate parse failures: **2**;
+- selector parse failures: **0**;
+- provider failures: **2**;
+- calls: **11**;
+- total tokens: **44,378**;
+- summed model runtime: **274.813 s**.
+
+Both provider failures were NVIDIA NIM HTTP 529 `Service temporarily overloaded`. They affected `00dbd492` and `05f2a901`, both of which are comparator-solved tasks. Therefore counting them as treatment regressions would confound architecture quality with transient provider availability.
+
+## Targeted recovery
+
+Recovery changes **no experimental variable**. The code now supports scoping execution to an explicit frozen task-ID subset while retaining the same solver version, prompts, model, sampling and generation budgets. A dedicated workflow reruns **only** `00dbd492` and `05f2a901`, then merges those records into the original eight-task result and recomputes the verdict. The six unaffected task IDs are not re-inferred.
+
+Recovery trigger commit: `61a842e0b33df5be3accfe665904085b6dc57224`. Audit: `lab/recon/ARC-R018-provider-recovery-audit.json`.
+
+Until the recovered durable result lands, do not promote or reject the architecture and do not allocate ARC-R019.
+
+## Adversarial interpretation
+
+Even if recovery improves the score, the selector is the same foundation model and may merely prefer its own wording rather than genuinely discriminate causal rules. Repeating training pairs in stage two increases input-token cost. Eight tasks remain directional rather than a full-split estimate. Conversely, if the recovered result still fails to strictly beat 4/8, the treatment should be rejected under the frozen threshold rather than rescued by post-hoc interpretation.
