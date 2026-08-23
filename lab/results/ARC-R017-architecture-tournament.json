@@ -1,0 +1,229 @@
+{
+  "adversarial_interpretation": "The verification gate may improve validity while suppressing correct test guesses when a model cannot reproduce all training outputs in the requested schema. Any delta on eight tasks is directional, not a full-split estimate.",
+  "baseline_accuracy": 0.5,
+  "baseline_solved": 4,
+  "cache_hits": 0,
+  "calls": 8,
+  "input_tokens": 26344,
+  "new_solves": 0,
+  "output_tokens": 15000,
+  "parse_failures": 2,
+  "protocol": {
+    "attempts_per_test": 1,
+    "exposure_note": "Known ARC-specific foundation-model exposure is not independently established; interpret as competition utility.",
+    "falsification": "REJECT if treatment does not strictly beat comparator; INCONCLUSIVE only for missing coverage/provider failure that prevents matched comparison",
+    "frozen_comparator": "ARC-R016 nvidia-direct-json-baseline-v1",
+    "generation": {
+      "max_output_tokens": 4096,
+      "temperature": 0.0,
+      "top_k": null,
+      "top_p": 1.0
+    },
+    "hypothesis": "Requiring DeepSeek to state a transformation hypothesis and replay it on every training input, then accepting its test grid only when those replay grids exactly match every training output, will improve exact accuracy over the frozen ARC-R016 direct-JSON comparator on the same eight deterministic dev_validation tasks without changing model or generation budget.",
+    "manifest_sha256": "1b7c632200d0ca1807e3a9303436cc208dc72275f67e4c965544ce3590c468c7",
+    "model": "deepseek-ai/deepseek-v4-flash-0731",
+    "primary_metric": "exact task accuracy versus ARC-R016 on identical IDs",
+    "primary_variable": "structured hypothesis + exact training-replay verification gate",
+    "provider": "nvidia-nim",
+    "public_evaluation_used": false,
+    "role": "reasoning-systems-inventor",
+    "run": "ARC-R017",
+    "schema_version": 1,
+    "secondary": [
+      "new solves",
+      "regressions",
+      "verification pass rate",
+      "parse failures",
+      "provider failures",
+      "tokens",
+      "runtime"
+    ],
+    "selection_rule": "first eight lexicographically ordered IDs from frozen ARC-R016 dev_validation manifest",
+    "solver_version": "hypothesis-train-replay-v1",
+    "split": "dev_validation",
+    "success_threshold": "PROMOTE only if treatment has at least one new solve and strictly more solved tasks than comparator with no public-eval use",
+    "task_ids": [
+      "00dbd492",
+      "05f2a901",
+      "0607ce86",
+      "06df4c85",
+      "070dd51e",
+      "0bb8deee",
+      "0d3d703e",
+      "1190bc91"
+    ]
+  },
+  "provider_failures": 0,
+  "records": [
+    {
+      "baseline_solved": true,
+      "new_solve": false,
+      "regression": true,
+      "task_id": "00dbd492",
+      "tests": [
+        {
+          "cache_hit": false,
+          "finish_reason": "stop",
+          "input_tokens": 3035,
+          "output_tokens": 1926,
+          "parsed": true,
+          "runtime_seconds": 72.587686131,
+          "test_index": 0,
+          "total_tokens": 4961,
+          "verified": true
+        }
+      ],
+      "treatment_solved": false
+    },
+    {
+      "baseline_solved": true,
+      "new_solve": false,
+      "regression": true,
+      "task_id": "05f2a901",
+      "tests": [
+        {
+          "cache_hit": false,
+          "finish_reason": "stop",
+          "input_tokens": 1655,
+          "output_tokens": 964,
+          "parsed": true,
+          "runtime_seconds": 16.540640408,
+          "test_index": 0,
+          "total_tokens": 2619,
+          "verified": true
+        }
+      ],
+      "treatment_solved": false
+    },
+    {
+      "baseline_solved": true,
+      "new_solve": false,
+      "regression": true,
+      "task_id": "0607ce86",
+      "tests": [
+        {
+          "cache_hit": false,
+          "finish_reason": "length",
+          "input_tokens": 6995,
+          "output_tokens": 4096,
+          "parsed": false,
+          "runtime_seconds": 115.44565369899999,
+          "test_index": 0,
+          "total_tokens": 11091,
+          "verified": false
+        }
+      ],
+      "treatment_solved": false
+    },
+    {
+      "baseline_solved": false,
+      "new_solve": false,
+      "regression": false,
+      "task_id": "06df4c85",
+      "tests": [
+        {
+          "cache_hit": false,
+          "finish_reason": "length",
+          "input_tokens": 7315,
+          "output_tokens": 4096,
+          "parsed": false,
+          "runtime_seconds": 63.57515278300002,
+          "test_index": 0,
+          "total_tokens": 11411,
+          "verified": false
+        }
+      ],
+      "treatment_solved": false
+    },
+    {
+      "baseline_solved": false,
+      "new_solve": false,
+      "regression": false,
+      "task_id": "070dd51e",
+      "tests": [
+        {
+          "cache_hit": false,
+          "finish_reason": "stop",
+          "input_tokens": 4123,
+          "output_tokens": 2633,
+          "parsed": true,
+          "runtime_seconds": 71.314261515,
+          "test_index": 0,
+          "total_tokens": 6756,
+          "verified": true
+        }
+      ],
+      "treatment_solved": false
+    },
+    {
+      "baseline_solved": false,
+      "new_solve": false,
+      "regression": false,
+      "task_id": "0bb8deee",
+      "tests": [
+        {
+          "cache_hit": false,
+          "finish_reason": "stop",
+          "input_tokens": 1797,
+          "output_tokens": 374,
+          "parsed": true,
+          "runtime_seconds": 13.522400001999983,
+          "test_index": 0,
+          "total_tokens": 2171,
+          "verified": true
+        }
+      ],
+      "treatment_solved": false
+    },
+    {
+      "baseline_solved": true,
+      "new_solve": false,
+      "regression": false,
+      "task_id": "0d3d703e",
+      "tests": [
+        {
+          "cache_hit": false,
+          "finish_reason": "stop",
+          "input_tokens": 301,
+          "output_tokens": 171,
+          "parsed": true,
+          "runtime_seconds": 8.23719127999999,
+          "test_index": 0,
+          "total_tokens": 472,
+          "verified": true
+        }
+      ],
+      "treatment_solved": true
+    },
+    {
+      "baseline_solved": false,
+      "new_solve": false,
+      "regression": false,
+      "task_id": "1190bc91",
+      "tests": [
+        {
+          "cache_hit": false,
+          "finish_reason": "stop",
+          "input_tokens": 1123,
+          "output_tokens": 740,
+          "parsed": true,
+          "runtime_seconds": 22.754979194999976,
+          "test_index": 0,
+          "total_tokens": 1863,
+          "verified": true
+        }
+      ],
+      "treatment_solved": false
+    }
+  ],
+  "regressions": 3,
+  "run": "ARC-R017",
+  "runtime_seconds": 383.97796501299996,
+  "schema_version": 1,
+  "task_count": 8,
+  "total_tokens": 41344,
+  "treatment_accuracy": 0.125,
+  "treatment_solved": 1,
+  "verdict": "REJECT",
+  "verification_passed_tests": 6
+}
