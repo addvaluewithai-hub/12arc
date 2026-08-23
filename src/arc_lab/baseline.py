@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 from dataclasses import asdict
 from pathlib import Path
@@ -44,7 +45,14 @@ def run_baseline(training_dir: Path, ids_file: Path, output: Path, cache_dir: Pa
     ids = [line.strip() for line in ids_file.read_text().splitlines() if line.strip()]
     task_ids = partition(ids)[split]
     generation = GenerationConfig(temperature=1.0, top_p=0.95, top_k=64, max_output_tokens=2048)
-    client = CachedTargetClient(GoogleGenAIProvider(), cache_dir)
+    live_call_interval_seconds = float(
+        os.environ.get("ARC_TARGET_MIN_LIVE_CALL_INTERVAL_SECONDS", "0")
+    )
+    client = CachedTargetClient(
+        GoogleGenAIProvider(),
+        cache_dir,
+        min_live_call_interval_seconds=live_call_interval_seconds,
+    )
     records = []
     calls = cache_hits = input_tokens = output_tokens = total_tokens = 0
     runtime = 0.0
@@ -106,6 +114,7 @@ def run_baseline(training_dir: Path, ids_file: Path, output: Path, cache_dir: Pa
         "task_count": len(task_ids),
         "generation": asdict(generation),
         "attempts_per_test": 2,
+        "live_call_interval_seconds": live_call_interval_seconds,
         "solved_tasks": solved,
         "task_accuracy": solved / len(task_ids),
         "calls": calls,
@@ -131,7 +140,7 @@ def main() -> None:
     parser.add_argument("--split", default="dev_validation", choices=["dev_train", "dev_validation", "dev_holdout"])
     args = parser.parse_args()
     result = run_baseline(args.training_dir, args.ids_file, args.output, args.cache_dir, split=args.split)
-    print(json.dumps({k: result[k] for k in ("split", "task_count", "solved_tasks", "task_accuracy", "calls", "cache_hits", "input_tokens", "output_tokens", "total_tokens", "runtime_seconds", "parse_failures")}, sort_keys=True))
+    print(json.dumps({k: result[k] for k in ("split", "task_count", "solved_tasks", "task_accuracy", "calls", "cache_hits", "input_tokens", "output_tokens", "total_tokens", "runtime_seconds", "parse_failures", "live_call_interval_seconds")}, sort_keys=True))
 
 
 if __name__ == "__main__":
