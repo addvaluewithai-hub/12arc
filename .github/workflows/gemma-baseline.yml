@@ -5,6 +5,7 @@ on:
   push:
     paths:
       - '.github/workflows/gemma-baseline.yml'
+      - 'lab/triggers/gemma-baseline.request'
 
 permissions:
   contents: write
@@ -72,4 +73,4 @@ jobs:
           OUTCOME: ${{ steps.baseline.outcome }}
         run: test "$OUTCOME" = success
 
-# ARC-R005 orchestration trigger: preserve the frozen direct-json-v1 protocol unchanged.
+# ARC-R006 orchestration repair: a dedicated request file can trigger the frozen baseline without touching solver protocol or result paths.
