@@ -11,12 +11,41 @@
         "display_name": "Gemma 4 26B A4B IT",
         "name": "models/gemma-4-26b-a4b-it",
         "version": "001"
+      },
+      "response_diagnostics": {
+        "candidates": [
+          {
+            "finish_message": null,
+            "finish_reason": "STOP",
+            "parts": [
+              {
+                "has_text": true,
+                "has_thought_signature": false,
+                "text_chars": 458,
+                "thought": true
+              },
+              {
+                "has_text": true,
+                "has_thought_signature": false,
+                "text_chars": 29,
+                "thought": null
+              }
+            ],
+            "token_count": null
+          }
+        ],
+        "usage": {
+          "candidates_token_count": 5,
+          "prompt_token_count": 25,
+          "thoughts_token_count": 105,
+          "total_token_count": 135
+        }
       }
     },
-    "runtime_seconds": 4.322636649999993,
+    "runtime_seconds": 2.885094629000008,
     "text": "<redacted-non-benchmark-response>",
     "text_nonempty": true,
-    "total_tokens": 207
+    "total_tokens": 135
   },
   "generation": {
     "max_output_tokens": 256,
@@ -38,17 +67,46 @@
         "display_name": "Gemma 4 26B A4B IT",
         "name": "models/gemma-4-26b-a4b-it",
         "version": "001"
+      },
+      "response_diagnostics": {
+        "candidates": [
+          {
+            "finish_message": null,
+            "finish_reason": "STOP",
+            "parts": [
+              {
+                "has_text": true,
+                "has_thought_signature": false,
+                "text_chars": 458,
+                "thought": true
+              },
+              {
+                "has_text": true,
+                "has_thought_signature": false,
+                "text_chars": 29,
+                "thought": null
+              }
+            ],
+            "token_count": null
+          }
+        ],
+        "usage": {
+          "candidates_token_count": 5,
+          "prompt_token_count": 25,
+          "thoughts_token_count": 105,
+          "total_token_count": 135
+        }
       }
     },
-    "runtime_seconds": 4.322636649999993,
+    "runtime_seconds": 2.885094629000008,
     "text": "<redacted-cached-response>",
     "text_nonempty": true,
-    "total_tokens": 207
+    "total_tokens": 135
   },
   "verified_live_call": true,
   "workflow": {
-    "run_id": "32617250589",
+    "run_id": "32622320255",
     "smoke_outcome": "success",
-    "source_sha": "c4db4e9f2d256dd8951dfd495859331c98b92f54"
+    "source_sha": "aa1107485bf305fbb6033bed06b3201ab04abb51"
   }
 }
