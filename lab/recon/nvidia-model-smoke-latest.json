@@ -1,0 +1,8 @@
+{
+  "complete": false,
+  "endpoint": "https://integrate.api.nvidia.com/v1/chat/completions",
+  "models": [],
+  "purpose": "NVIDIA API key / hosted-model availability smoke test; non-ARC",
+  "schema_version": 1,
+  "secret_persisted": false
+}
