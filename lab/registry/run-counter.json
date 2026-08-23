@@ -1,13 +1,6 @@
 {
   "schema_version": 1,
   "next_run_number": 10,
-  "last_completed_run": "ARC-R008",
-  "active_reservations": [
-    {
-      "run_id": "ARC-R009",
-      "task_id": "T0002-GEMMA-BASELINE",
-      "shift_id": "scheduled-20260823T0707+0300",
-      "reserved_at": "2026-08-23T07:07:00+03:00"
-    }
-  ]
+  "last_completed_run": "ARC-R009",
+  "active_reservations": []
 }
