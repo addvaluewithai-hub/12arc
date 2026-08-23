@@ -1,11 +1,13 @@
 {
+  "baseline_step_outcome": "failure",
   "github_run_attempt": "1",
-  "github_run_id": "32612165079",
+  "github_run_id": "32612153608",
   "model": "gemma-4-26b-a4b-it",
   "protocol": "direct-json-v1",
+  "result_present": false,
   "schema_version": 1,
   "split": "dev_validation",
-  "status": "running",
+  "status": "failure",
   "task_count": 174,
-  "trigger_sha": "c7900869ab1d46626a6db1342c3554bbdf4eda14"
+  "trigger_sha": "95c0d1939a5688c212c9f032f3547096d24d9f78"
 }
