@@ -1,11 +1,14 @@
 {
+  "baseline_step_outcome": "failure",
+  "cache_file_count": 72,
   "github_run_attempt": "1",
   "github_run_id": "32614602241",
   "model": "gemma-4-26b-a4b-it",
   "protocol": "direct-json-v1",
+  "result_present": false,
   "schema_version": 1,
   "split": "dev_validation",
-  "status": "running",
+  "status": "failure",
   "task_count": 174,
   "trigger_sha": "ed9e1cd011bece32c4e3bef7cd72beab12a348a3"
 }
