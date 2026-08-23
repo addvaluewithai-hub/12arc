@@ -2,13 +2,13 @@
 
 Task: `T0004-COMPACT-HYPOTHESIS-SEARCH`  
 Role: **reasoning-systems-inventor**  
-Status: **running — targeted transient-provider recovery in flight**
+Status: **complete — REJECT**
 
 ## Falsifiable hypothesis
 
 On the same eight deterministic `dev_validation` tasks used by ARC-R017, fixed DeepSeek V4 Flash will improve exact task accuracy over the frozen ARC-R016 direct-JSON comparator if it first generates three compact competing transformation rules with candidate test grids, then a separate training-only discriminator selects the rule that best explains the training transformations.
 
-This treatment targets the two mechanisms exposed by ARC-R017: rule ambiguity despite exact training replay, and excessive output serialization from replaying complete training grids.
+This treatment targeted the two mechanisms exposed by ARC-R017: rule ambiguity despite exact training replay, and excessive output serialization from replaying complete training grids.
 
 ## Frozen matched design
 
@@ -17,47 +17,67 @@ Treatment: `compact-hypothesis-select-v1`.
 
 Fixed model/provider: NVIDIA NIM `deepseek-ai/deepseek-v4-flash-0731`.
 
-Fixed deterministic sampling: temperature 0, top_p 1, top_k null. The treatment divides generation budget across two stages: candidate generation max 3072 output tokens; selector max 512 output tokens; total configured output allowance is 3584/test, below the comparator's single-call 4096-token cap. The second stage receives training pairs and candidate rule text only; it does not receive the test input or candidate test-output grids.
+Fixed deterministic sampling: temperature 0, top_p 1, top_k null. Candidate generation max output 3072 tokens; selector max output 512 tokens; total configured treatment output allowance 3584/test, below the comparator's single-call 4096-token cap. The selector receives training pairs and the three candidate rule texts only; it does not receive the test input or candidate test-output grids.
 
 Frozen task IDs: `00dbd492`, `05f2a901`, `0607ce86`, `06df4c85`, `070dd51e`, `0bb8deee`, `0d3d703e`, `1190bc91`.
 
-Public evaluation is not used. Training data is fetched from pinned ARC-AGI-2 commit `f3283f727488ad98fe575ea6a5ac981e4a188e49`, sparse-checkout training only.
+Public evaluation was not used. Training data was fetched from pinned ARC-AGI-2 commit `f3283f727488ad98fe575ea6a5ac981e4a188e49`, sparse-checkout training only.
 
-## Metrics and threshold
+## Predeclared threshold
 
 Primary metric: exact task accuracy versus ARC-R016 on identical IDs.
 
-Secondary diagnostics: new solves, regressions, candidate/selector parse failures, provider failures, calls, cache hits, input/output/total tokens and summed model runtime.
-
 PROMOTE only if treatment has at least one new solve and strictly more solved tasks than comparator. REJECT if it fails to strictly beat comparator. INCONCLUSIVE only if provider failure prevents matched comparison.
 
-## Initial durable result
+## Provider-recovery audit
 
-The first complete workflow result landed at `lab/results/ARC-R018-compact-hypothesis-search.json` and is **INCONCLUSIVE under the predeclared contract**, because two transient provider errors prevent a matched eight-task comparison.
+The initial execution was INCONCLUSIVE because NVIDIA NIM returned transient HTTP 529 overloads for `00dbd492` and `05f2a901`, both comparator-solved tasks. A targeted recovery reran only those two IDs under the exact same solver version, prompts, model, sampling and generation budgets. The six unaffected tasks were not repeated.
 
-Observed initial totals:
+Recovery succeeded with zero provider failures. It added four live calls, 12,348 tokens and 105.299 s summed model runtime. Both recovered tasks parsed successfully through both stages but remained treatment failures, so they are genuine matched regressions rather than provider confounds.
 
-- comparator: **4/8 (50%)**;
-- treatment as observed: **2/8 (25%)**;
-- new solves: **1** (`0bb8deee`);
-- apparent regressions: **3**;
-- candidate parse failures: **2**;
+Durable recovery evidence: `lab/results/ARC-R018-provider-recovery.json`. Merged final evidence: `lab/results/ARC-R018-compact-hypothesis-search.json`.
+
+## Final result
+
+Frozen comparator: **4/8 = 50%**.  
+Treatment: **2/8 = 25%**.  
+Verdict: **REJECT**.
+
+Final accounting after targeted recovery:
+
+- treatment solved: **2/8**;
+- new solves: **1** — `0bb8deee`;
+- regressions: **3** — `00dbd492`, `05f2a901`, `0607ce86`;
+- candidate parse failures: **2** — `0607ce86`, `06df4c85`;
 - selector parse failures: **0**;
-- provider failures: **2**;
-- calls: **11**;
-- total tokens: **44,378**;
-- summed model runtime: **274.813 s**.
+- unresolved provider failures: **0**;
+- live calls: **15**;
+- input tokens: **39,778**;
+- output tokens: **16,948**;
+- total tokens: **56,726**;
+- summed model runtime: **380.112 s**;
+- cache hits: **0**.
 
-Both provider failures were NVIDIA NIM HTTP 529 `Service temporarily overloaded`. They affected `00dbd492` and `05f2a901`, both of which are comparator-solved tasks. Therefore counting them as treatment regressions would confound architecture quality with transient provider availability.
+The treatment therefore misses the frozen promotion threshold by two tasks despite producing one genuine new solve.
 
-## Targeted recovery
+## Failure analysis
 
-Recovery changes **no experimental variable**. The code now supports scoping execution to an explicit frozen task-ID subset while retaining the same solver version, prompts, model, sampling and generation budgets. A dedicated workflow reruns **only** `00dbd492` and `05f2a901`, then merges those records into the original eight-task result and recomputes the verdict. The six unaffected task IDs are not re-inferred.
+The experiment separates two failure mechanisms.
 
-Recovery trigger commit: `61a842e0b33df5be3accfe665904085b6dc57224`. Audit: `lab/recon/ARC-R018-provider-recovery-audit.json`.
+First, compact multi-hypothesis generation contains useful signal: `0bb8deee` was a genuine new solve, and `0d3d703e` remained solved. So generating several compact rules is not uniformly harmful.
 
-Until the recovered durable result lands, do not promote or reject the architecture and do not allocate ARC-R019.
+Second, the discriminator does not protect already-solvable cases. After transient-provider recovery, `00dbd492` and `05f2a901` produced parseable candidate/selector outputs but still regressed. This means their failures cannot be explained by provider availability or JSON parsing. The treatment can confidently select a wrong hypothesis even when the frozen direct baseline solved the task.
+
+Third, output pressure remains on large tasks even after removing full training-grid replay. Candidate generation hit the 3072-token cap and failed parsing on `0607ce86` and `06df4c85`. `0607ce86` is a comparator-solved task, so one of the three regressions is directly attributable to candidate-stage serialization failure.
 
 ## Adversarial interpretation
 
-Even if recovery improves the score, the selector is the same foundation model and may merely prefer its own wording rather than genuinely discriminate causal rules. Repeating training pairs in stage two increases input-token cost. Eight tasks remain directional rather than a full-split estimate. Conversely, if the recovered result still fails to strictly beat 4/8, the treatment should be rejected under the frozen threshold rather than rescued by post-hoc interpretation.
+This is only an eight-task directional slice, so it does not estimate full-split performance precisely. The selector uses the same foundation model and may merely prefer its own natural-language phrasing instead of discriminating transformation causality. Repeating training pairs in stage two also raises input cost. Conversely, the one new solve shows that rejecting this exact architecture should not be interpreted as evidence that multi-hypothesis search itself is useless.
+
+The cleanest next uncertainty is whether the regressions come from **candidate-set omission** (the correct/direct solution is absent) or **selection error** (a correct candidate exists but the discriminator chooses another). That distinction should be established from durable candidate evidence before another model-facing architecture variant is justified.
+
+## Verdict
+
+**REJECT `compact-hypothesis-select-v1`.**
+
+Do not promote it to the full 174-task baseline. Preserve the `0bb8deee` new solve as evidence that candidate diversity can help, but diagnose candidate coverage versus selector error before spending calls on a successor architecture.
