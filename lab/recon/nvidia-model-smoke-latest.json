@@ -1,5 +1,6 @@
 {
-  "complete": false,
+  "all_http_200": false,
+  "complete": true,
   "endpoint": "https://integrate.api.nvidia.com/v1/chat/completions",
   "models": [
     {
