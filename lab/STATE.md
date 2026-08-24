@@ -1,9 +1,9 @@
 # ARC Research Lab — Current State
 
-Updated: 2026-08-24 10:25 EEST
+Updated: 2026-08-24 10:55 EEST
 Phase: **PHASE 2 — architecture research**
-Latest completed research run: **ARC-R023**
-Next unallocated research run: **ARC-R024**
+Latest completed research run: **ARC-R024**
+Next unallocated research run: **ARC-R025**
 
 ## Fixed comparator and model policy
 
@@ -13,16 +13,16 @@ ARC-R016 direct-JSON baseline remains frozen at **45/174 = 25.8621%** exact accu
 
 ## Current bottleneck
 
-Candidate generation/representation remains weak, but ARC-R022 showed that experiment metadata integrity must be hardened before interpreting task-level deltas. ARC-R023 addressed the immediate failure mode.
+Candidate generation/representation remains weak. Before further inference, experiment accounting has now been hardened against the ARC-R021 comparator-metadata inversion discovered by ARC-R022.
 
-## ARC-R023 comparator integrity guard
+## ARC-R024 mandatory reporting integration
 
-Added `src/arc_lab/comparator_integrity.py`. Comparator candidate coverage can now be derived mechanically from persisted `candidate_correct` evidence; manual annotations can be checked and rejected on disagreement; new-covered/regressed IDs are computed only from matched maps.
+Added `src/arc_lab/architecture_reporting.py` as the shared candidate-coverage reporting boundary. It requires a referenced durable comparator result, mechanically derives comparator and treatment coverage through `comparator_integrity`, enforces identical task sets, and only then persists new-covered/regressed task IDs. There is no API parameter for manually supplied baseline coverage flags.
 
-Added `tests/test_comparator_integrity.py`, including an explicit ARC-R021-style inversion fixture (`0bb8deee` falsely covered / `0d3d703e` falsely uncovered) that must raise an integrity error. Added a narrow GitHub Actions workflow for this regression test. The available connector could not enumerate generic push-triggered workflow runs during the shift, so no CI-success claim is made; the executable guard/tests are durable in Git.
+Added `tests/test_architecture_reporting.py` for durable comparator derivation, persisted delta integrity, and fail-before-write task-set mismatch behavior. The GitHub connector returned no workflow run for the final test commit, so ARC-R024 does not claim CI execution success; code/tests are durable in Git.
 
-ARC-R023 used zero target-model calls, zero tokens and no public evaluation. Report: `lab/runs/2026-08-24/ARC-R023.md`.
+ARC-R024 used zero target-model calls, zero tokens and no public evaluation. Report: `lab/runs/2026-08-24/ARC-R024.md`.
 
 ## Next task
 
-`T0010-INTEGRITY-GUARD-INTEGRATION` is ready for ARC-R024. Make the guard mandatory in shared architecture experiment reporting so future experiment code cannot bypass it by reintroducing hard-coded baseline flags. Stop after that one task.
+`T0011-CANDIDATE-FAILURE-TAXONOMY` is ready for ARC-R025. Use mechanically verified persisted ARC-R020/ARC-R021 candidate evidence to classify uncovered task morphologies and derive one falsifiable representation/routing hypothesis before spending more NVIDIA inference. Stop after that one task.
