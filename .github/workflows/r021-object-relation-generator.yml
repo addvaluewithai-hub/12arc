@@ -1,0 +1,40 @@
+name: r021-object-relation-generator
+on:
+  push:
+    paths: ['lab/triggers/r021-object-relation-generator.request']
+permissions:
+  contents: write
+jobs:
+  experiment:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install -e '.[dev]'
+      - run: pytest -q
+      - name: Fetch pinned public training only
+        run: |
+          git init /tmp/arc-agi-2
+          git -C /tmp/arc-agi-2 remote add origin https://github.com/arcprize/ARC-AGI-2.git
+          git -C /tmp/arc-agi-2 sparse-checkout init --cone
+          git -C /tmp/arc-agi-2 sparse-checkout set data/training
+          git -C /tmp/arc-agi-2 fetch --depth=1 origin f3283f727488ad98fe575ea6a5ac981e4a188e49
+          git -C /tmp/arc-agi-2 checkout FETCH_HEAD
+          test ! -e /tmp/arc-agi-2/data/evaluation
+      - name: Execute object-relation candidate coverage experiment
+        run: |
+          test -n "$NVIDIA_API_KEY"
+          python -m arc_lab.object_relation_generator /tmp/arc-agi-2/data/training --cache-dir /tmp/arc-r021-cache --output /tmp/ARC-R021-result.json
+      - name: Persist sanitized result
+        run: |
+          git pull --rebase origin "$GITHUB_REF_NAME"
+          cp /tmp/ARC-R021-result.json lab/results/ARC-R021-object-relation-generator.json
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add lab/results/ARC-R021-object-relation-generator.json
+          git commit -m 'ARC-R021: persist object-relation result'
+          git push origin HEAD:"$GITHUB_REF_NAME"
