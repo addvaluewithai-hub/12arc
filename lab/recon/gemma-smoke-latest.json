@@ -22,7 +22,7 @@
               {
                 "has_text": true,
                 "has_thought_signature": false,
-                "text_chars": 629,
+                "text_chars": 721,
                 "thought": true
               },
               {
@@ -38,24 +38,25 @@
         "usage": {
           "candidates_token_count": 5,
           "prompt_token_count": 25,
-          "thoughts_token_count": 147,
-          "total_token_count": 177
+          "thoughts_token_count": 170,
+          "total_token_count": 200
         }
       }
     },
-    "runtime_seconds": 3.668177976999999,
+    "runtime_seconds": 4.235523931000003,
     "text": "<redacted-non-benchmark-response>",
     "text_nonempty": true,
-    "total_tokens": 177
+    "total_tokens": 200
   },
   "generation": {
     "max_output_tokens": 256,
+    "reasoning_effort": null,
     "temperature": 1.0,
     "top_k": 64,
     "top_p": 0.95
   },
   "purpose": "non-ARC infrastructure smoke test",
-  "request_fingerprint": "99595b324799f6c1737fd75f8169fda2e2ad4fbe78e4b357a69eafec6cab1047",
+  "request_fingerprint": "56b7472b477482a9f530bd07a5e6a1e7adf4583b4dc0ab9ed999427660bf0e0c",
   "schema_version": 1,
   "second_call": {
     "cache_hit": true,
@@ -79,7 +80,7 @@
               {
                 "has_text": true,
                 "has_thought_signature": false,
-                "text_chars": 629,
+                "text_chars": 721,
                 "thought": true
               },
               {
@@ -95,20 +96,20 @@
         "usage": {
           "candidates_token_count": 5,
           "prompt_token_count": 25,
-          "thoughts_token_count": 147,
-          "total_token_count": 177
+          "thoughts_token_count": 170,
+          "total_token_count": 200
         }
       }
     },
-    "runtime_seconds": 3.668177976999999,
+    "runtime_seconds": 4.235523931000003,
     "text": "<redacted-cached-response>",
     "text_nonempty": true,
-    "total_tokens": 177
+    "total_tokens": 200
   },
   "verified_live_call": true,
   "workflow": {
-    "run_id": "32628437534",
+    "run_id": "32728346466",
     "smoke_outcome": "success",
-    "source_sha": "4e3613fe6e57531136e7a4e730179e16bea861f4"
+    "source_sha": "48b4eb225ee1e539f748248a453d193229f5e054"
   }
 }
