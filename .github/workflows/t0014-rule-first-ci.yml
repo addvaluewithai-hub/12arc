@@ -1,0 +1,27 @@
+name: T0014 Rule-First Harness CI
+
+on:
+  push:
+    paths:
+      - 'src/arc_lab/rule_first.py'
+      - 'tests/test_rule_first.py'
+      - '.github/workflows/t0014-rule-first-ci.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install -e '.[dev]'
+      - name: Run rule-first harness tests
+        env:
+          NVIDIA_API_KEY: ''
+        run: python -m pytest -q tests/test_rule_first.py tests/test_comparator_integrity.py tests/test_scoring.py
