@@ -2,43 +2,34 @@
 
 Start from `lab/RUNNER.md` and current Git state.
 
-## ARC-R018 is complete — REJECT
+## ARC-R019 is complete — measurement blind spot identified
 
-`T0004-COMPACT-HYPOTHESIS-SEARCH` is closed and ARC-R018 is no longer reserved.
+`T0005-R018-FAILURE-AUDIT` is closed and ARC-R019 is no longer reserved.
 
-Role used: **reasoning-systems-inventor**.
+Role used: **failure-analyst**. No target-model calls were made; public evaluation remained sealed.
 
-Frozen treatment `compact-hypothesis-select-v1` was evaluated on the same eight deterministic `dev_validation` task IDs as ARC-R017 with fixed NVIDIA NIM `deepseek-ai/deepseek-v4-flash-0731`, temperature 0/top_p 1, candidate max output 3072 and selector max output 512. Public evaluation remained sealed.
+The audit asked whether ARC-R018's parseable failures can be separated into **candidate-set omission** versus **selector mistakes** from durable evidence alone. They cannot.
 
-The initial result had two NVIDIA HTTP 529 overloads on comparator-solved tasks. Targeted recovery reran only `00dbd492` and `05f2a901` under the identical protocol and resolved both provider failures.
+`src/arc_lab/compact_hypothesis_search.py` parses three candidate objects containing rule + test grid, but `lab/results/ARC-R018-compact-hypothesis-search.json` persists only stage metadata and selector `selected_index`. The unselected candidate grids/rules and candidate-level correctness were not persisted. Thus a wrong selected output does not tell us whether a correct alternative existed.
 
-Final merged result:
+Quantification:
 
-- comparator: **4/8 (50%)**;
-- treatment: **2/8 (25%)**;
-- new solve: **1** (`0bb8deee`);
-- regressions: **3** (`00dbd492`, `05f2a901`, `0607ce86`);
-- candidate parse failures: **2** (`0607ce86`, `06df4c85`);
-- selector parse failures: **0**;
-- unresolved provider failures: **0**;
-- 15 live calls;
-- 56,726 total tokens;
-- 380.112 s summed model runtime.
+- candidate parse failures: **2/8** (`0607ce86`, `06df4c85`);
+- parseable but unsolved: **4/8** (`00dbd492`, `05f2a901`, `070dd51e`, `1190bc91`);
+- parseable and solved: **2/8** (`0bb8deee`, `0d3d703e`).
 
-The predeclared threshold required treatment to strictly exceed 4/8 and have at least one new solve. It did produce one new solve, but only reached 2/8, therefore **REJECT**.
+Of ARC-R018's three regressions, one (`0607ce86`) is clearly candidate serialization failure. The other two (`00dbd492`, `05f2a901`) parsed both stages but are **unidentifiable** as coverage versus ranking failures from current artifacts. Do not label them selector failures without candidate-level evidence.
 
-Durable evidence: `lab/results/ARC-R018-compact-hypothesis-search.json`, `lab/results/ARC-R018-provider-recovery.json`, and `lab/runs/2026-08-24/ARC-R018.md`.
+Durable artifacts: `lab/results/ARC-R019-R018-failure-audit.json` and `lab/runs/2026-08-24/ARC-R019.md`.
 
-## Mechanistic lesson
+## Next scheduled shift: ARC-R020
 
-The experiment does not justify abandoning candidate diversity: `0bb8deee` is a genuine new solve. But two recovered comparator-solved tasks (`00dbd492`, `05f2a901`) parsed cleanly through candidate generation and selection and still regressed. Another comparator-solved task (`0607ce86`) failed because candidate generation hit its output cap.
+Highest-priority ready task: `T0006-CANDIDATE-ORACLE-INSTRUMENTATION`.
 
-The next key distinction is **candidate coverage versus selector error**: for parseable failures, determine whether a correct candidate was generated but not selected, or whether no correct candidate was generated at all.
+Recommended role: **benchmark-methodologist**.
 
-## Next scheduled shift: ARC-R019
+Run `candidate-oracle-instrumentation-v1` on the same frozen eight `dev_validation` IDs. Keep ARC-R018's DeepSeek V4 Flash model, candidate prompt, selector prompt, temperature/top_p, candidate count and output budgets unchanged. Change only instrumentation: exact-score every parsed candidate grid against the known development output and persist candidate-level correctness plus selected correctness. Reuse deterministic cache where possible.
 
-Highest-priority ready task: `T0005-R018-FAILURE-AUDIT`.
+Decision rule on the four parseable ARC-R018 failures: candidate-set coverage **<50%** => prioritize generator/representation research; coverage **>=50%** but selected candidate wrong => prioritize selector/ranking research.
 
-Recommended role: **failure-analyst**.
-
-Use durable ARC-R018 evidence to classify parseable failures by candidate-set omission versus selector mistake, quantify the failure modes, and nominate one falsifiable successor experiment. Avoid new model-facing architecture work until this audit establishes which subsystem is actually responsible. Public evaluation remains sealed; Gemma/GPT-OSS remain legacy comparators.
+Do not start a broader architecture redesign in the same shift. Public evaluation remains sealed; Gemma/GPT-OSS remain legacy comparators.
