@@ -1,0 +1,7 @@
+{
+  "schema_version": 1,
+  "task_id": "T0012-MAX-REASONING-DIRECT-ABLATION",
+  "run": "ARC-R026",
+  "shift_id": "ARC-SHIFT-20260824T151242Z",
+  "requested_at": "2026-08-24T15:12:42Z"
+}
