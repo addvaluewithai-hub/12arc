@@ -1,11 +1,17 @@
 {
   "expected_result": "lab/results/ARC-R026-max-reasoning-direct.json",
+  "finished_at": "2026-08-24T16:47:02.260584+00:00",
+  "operational_recovered_solved": 41,
+  "primary_first_attempt_accuracy": 0.21264367816091953,
+  "primary_first_attempt_solved": 37,
+  "result_path": "lab/results/ARC-R026-max-reasoning-direct.json",
   "run": "ARC-R026",
   "schema_version": 1,
   "started_at": "2026-08-24T15:15:02.234707+00:00",
-  "status": "running",
+  "status": "complete",
   "task_id": "T0012-MAX-REASONING-DIRECT-ABLATION",
   "trigger_commit": "0627ce9d915f1c8ddd83f6f0a7b25228024cbe05",
+  "verdict": "REJECT",
   "workflow_run_id": "32743684588",
   "workflow_url": "https://github.com/addvaluewithai-hub/12arc/actions/runs/32743684588"
 }
