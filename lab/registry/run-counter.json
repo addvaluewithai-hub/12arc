@@ -1,6 +1,13 @@
 {
   "schema_version": 1,
-  "next_run_number": 19,
+  "next_run_number": 20,
   "last_completed_run": "ARC-R018",
-  "active_reservations": []
+  "active_reservations": [
+    {
+      "run_id": "ARC-R019",
+      "task_id": "T0005-R018-FAILURE-AUDIT",
+      "shift_id": "scheduled-20260824T0335+0300",
+      "reserved_at": "2026-08-24T03:35:21+03:00"
+    }
+  ]
 }
