@@ -2,8 +2,8 @@
 
 Updated: 2026-08-24
 Phase: **PHASE 2 — architecture research**
-Latest completed research run: **ARC-R026**
-Next unallocated research run: **ARC-R027**
+Latest completed research run: **ARC-R027**
+Next unallocated research run: **ARC-R028**
 
 ## Fixed comparator and model policy
 
@@ -13,46 +13,30 @@ ARC-R016 direct-JSON baseline remains frozen at **45/174 = 25.8621%** exact accu
 
 ## ARC-R026 max-reasoning direct ablation
 
-`T0012-MAX-REASONING-DIRECT-ABLATION` is complete with verdict **REJECT**.
+`T0012-MAX-REASONING-DIRECT-ABLATION` is complete with verdict **REJECT**. First-attempt score was 37/174; after transport recovery 41/174, still below the frozen 45/174 comparator. The 16K output cap was never reached and does not explain the gap.
 
-Frozen treatment versus ARC-R016:
+## ARC-R027 candidate failure taxonomy
 
-- same 174-task `dev_validation` split;
-- same DeepSeek V4 Flash model;
-- same direct ARC prompt and exact scorer;
-- temperature 0, top_p 1;
-- `reasoning_effort=max`;
-- `max_output_tokens=16384`;
-- one prediction/test input, with transport recovery accounted separately.
+`T0011-CANDIDATE-FAILURE-TAXONOMY` is complete with verdict **RESEARCH_DIRECTION** and made **zero target-model calls**.
 
-Results:
+Mechanically verified ARC-R020 and ARC-R021 coverage is the same: **1/8**, with only `0d3d703e` covered. The seven uncovered IDs are `00dbd492`, `05f2a901`, `0607ce86`, `06df4c85`, `070dd51e`, `0bb8deee`, and `1190bc91`.
 
-- primary first attempt: **37/174 = 21.2644%**;
-- operational after explicit transport recovery: **41/174 = 23.5632%**;
-- frozen comparator: **45/174 = 25.8621%**;
-- six new solves versus ARC-R016;
-- fourteen first-attempt regressions; ten regressions after transport recovery;
-- 234 live calls;
-- 458,220 input tokens;
-- 146,054 output tokens;
-- 604,274 total tokens;
-- 57 transport failure events;
-- 12 terminal provider failures;
-- 1 parse failure;
-- successful-output token buckets: 173 `<=4096`, 3 `4097-8192`, 1 `8193-16383`, 0 at the 16384 cap.
+Key failure families:
 
-The workflow completed under external execution run id `32743684588`. Transport instability materially affected the first-attempt score, but even recovered execution remained four solves below the comparator. The 16K cap was never reached and was rarely relevant. This rejects the bundled maximum direct-inference regime as the main explanation for the current gap; it does not separately identify reasoning effort versus output cap causality.
+- repeated candidate-serialization overflow: `0607ce86`, `06df4c85` both ended candidate generation with `finish_reason=length` in R020 and R021;
+- parseable object-attribute binding near miss: `00dbd492`;
+- parseable relational motion near miss: `05f2a901`;
+- parseable connectivity/path near miss: `070dd51e`;
+- parseable but still unresolved compositional failures: `0bb8deee`, `1190bc91`;
+- control case `0d3d703e` remains a simple cellwise color permutation already covered by both generators.
 
-Report: `lab/runs/2026-08-24/ARC-R026.md`.
-Result: `lab/results/ARC-R026-max-reasoning-direct.json`.
-Execution status: `lab/executions/ARC-R026.json`.
+The strongest falsifiable next direction is **rule-first serialization routing** on `0607ce86` and `06df4c85`: generate compact rule/program hypotheses without full predicted grids, execute them deterministically, and require 2/2 parseability plus at least 1/2 mechanically verified candidate coverage under a matched comparator.
+
+Artifacts:
+
+- `lab/results/ARC-R027-candidate-failure-taxonomy.json`
+- `lab/runs/2026-08-24/ARC-R027.md`
 
 ## Next task
 
-The next highest-priority eligible ready task is **`T0011-CANDIDATE-FAILURE-TAXONOMY`**.
-
-Its purpose is to use persisted ARC-R020/ARC-R021 mechanically verified candidate evidence, with **no new target-model calls**, to classify uncovered tasks by observable transformation/morphology features and derive at least one falsifiable candidate-generator routing or representation hypothesis with exact task IDs and adversarial alternatives.
-
-The next shift should reconstruct Git truth, claim T0011, reserve **ARC-R027**, choose the `failure-analyst` role, and perform exactly one substantive taxonomy/hypothesis task. Do not start additional work in the same shift.
-
-Public evaluation remains sealed.
+No follow-up task has been invented automatically. The queue should be extended deliberately from the ARC-R027 hypothesis before another substantive experiment begins. Public evaluation remains sealed.
