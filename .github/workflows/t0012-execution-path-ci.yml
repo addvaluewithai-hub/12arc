@@ -32,13 +32,14 @@ jobs:
           from pathlib import Path
           p = Path('.github/workflows/t0012-max-reasoning-direct.yml')
           text = p.read_text()
+          secret_expr = 'NVIDIA_API_KEY: $' + '{{ secrets.NVIDIA_API_KEY }}'
           required = [
-              "lab/triggers/t0012-max-reasoning.request",
-              "timeout-minutes: 360",
-              "NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}",
-              "--provider-timeout-seconds 900",
-              "--max-transport-retries 2",
-              "max-parallel: 6",
+              'lab/triggers/t0012-max-reasoning.request',
+              'timeout-minutes: 360',
+              secret_expr,
+              '--provider-timeout-seconds 900',
+              '--max-transport-retries 2',
+              'max-parallel: 6',
           ]
           missing = [item for item in required if item not in text]
           if missing:
