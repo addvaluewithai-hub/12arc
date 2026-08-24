@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "run": "ARC-R019",
+  "task": "T0005-R018-FAILURE-AUDIT",
+  "role": "failure-analyst",
+  "hypothesis": "Durable ARC-R018 evidence is sufficient to determine whether selector error or candidate-set omission is the dominant cause of parseable treatment failures.",
+  "primary_variable": "evidence audit only; no target-model calls and no solver change",
+  "source_result": "lab/results/ARC-R018-compact-hypothesis-search.json",
+  "source_solver": "src/arc_lab/compact_hypothesis_search.py",
+  "public_evaluation_used": false,
+  "target_model_calls": 0,
+  "finding": "The requested candidate-coverage versus selector-error distinction is not identifiable from the durable ARC-R018 artifacts because the runner persisted only stage metadata and selected_index, not the three candidate grids/rules or an oracle candidate-correctness vector.",
+  "parseable_tasks": 6,
+  "parseable_failures": 4,
+  "parseable_successes": 2,
+  "parse_failures": 2,
+  "parseable_failure_task_ids": ["00dbd492", "05f2a901", "070dd51e", "1190bc91"],
+  "parse_failure_task_ids": ["0607ce86", "06df4c85"],
+  "known_regression_breakdown": {
+    "parseable_regressions_unidentifiable_coverage_vs_selection": ["00dbd492", "05f2a901"],
+    "candidate_serialization_regression": ["0607ce86"]
+  },
+  "selected_indices_for_parseable_failures": {
+    "00dbd492": 0,
+    "05f2a901": 1,
+    "070dd51e": 0,
+    "1190bc91": 0
+  },
+  "identifiability_reason": "parse_hypotheses() holds three rules/test_output grids in memory, but run() persists only candidate parsed/token/runtime/finish metadata; selector persistence includes selected_index only. Therefore exact scoring can tell whether the selected grid was wrong, but cannot tell whether an unselected candidate grid was correct.",
+  "quantified_mechanisms": {
+    "all_tasks": {
+      "candidate_parse_failure": 2,
+      "parseable_but_unsolved": 4,
+      "parseable_and_solved": 2
+    },
+    "three_regressions": {
+      "candidate_parse_failure": 1,
+      "parseable_but_unsolved_unidentifiable": 2,
+      "selector_error_proven": 0,
+      "candidate_omission_proven": 0
+    }
+  },
+  "adversarial_interpretation": "A wrong selected output does not imply selector error: all three generated candidates may be wrong. Conversely, selector success/failure cannot be inferred from selected_index alone. Any stronger retrospective classification would fabricate evidence that ARC-R018 did not persist.",
+  "successor_experiment": {
+    "name": "candidate-oracle-instrumentation-v1",
+    "falsifiable_hypothesis": "On the same frozen eight-task dev_validation slice, persisting and exact-scoring all three generated candidate grids before selection will show whether candidate-set coverage is at least 50% on the four parseable ARC-R018 failures; if coverage is below 50%, candidate generation/representation is the dominant bottleneck, otherwise selector/ranking is the dominant bottleneck.",
+    "design": "Keep model, candidate prompt, selector prompt, sampling, task IDs and budgets fixed. Change only instrumentation so each parsed candidate grid is exact-scored against the already-authorized public-training-derived test output and persisted with candidate_correct flags plus selected_index. Reuse cache where possible; do not use public evaluation.",
+    "decision_rule": "Among parseable failure tasks, candidate-set coverage < 50% => prioritize generator/representation; coverage >= 50% with selected candidate wrong => prioritize selector/ranking.",
+    "required_durable_fields": ["candidate_index", "candidate_grid_or_hash", "candidate_correct", "selected_index", "selected_correct"]
+  },
+  "verdict": "INCONCLUSIVE",
+  "verdict_scope": "The audit succeeds in identifying a measurement blind spot but cannot honestly classify candidate omission versus selector mistakes from existing evidence."
+}
