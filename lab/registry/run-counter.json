@@ -1,6 +1,13 @@
 {
   "schema_version": 1,
-  "next_run_number": 23,
+  "next_run_number": 24,
   "last_completed_run": "ARC-R022",
-  "active_reservations": []
+  "active_reservations": [
+    {
+      "run_id": "ARC-R023",
+      "task_id": "T0009-COMPARATOR-INTEGRITY-GUARD",
+      "shift_id": "arc-r023-20260824T1014+0300",
+      "reserved_at": "2026-08-24T10:14:40+03:00"
+    }
+  ]
 }
