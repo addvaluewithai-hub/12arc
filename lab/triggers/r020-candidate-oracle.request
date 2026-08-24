@@ -1,0 +1,4 @@
+requested_at=2026-08-24T04:42:00+03:00
+run_id=ARC-R020
+task_id=T0006-CANDIDATE-ORACLE-INSTRUMENTATION
+purpose=instrument-and-exact-score-all-compact-search-candidates
