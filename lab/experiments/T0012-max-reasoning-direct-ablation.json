@@ -3,7 +3,7 @@
   "task_id": "T0012-MAX-REASONING-DIRECT-ABLATION",
   "title": "Measure DeepSeek V4 Flash under maximum supported direct-inference regime",
   "status": "planned",
-  "intended_next_run": "ARC-R025 subject to normal claim/reservation",
+  "intended_next_run": "ARC-R026 subject to normal claim/reservation",
   "hypothesis": "On the same 174 deterministic dev_validation tasks and the exact same direct ARC prompt/scorer used by ARC-R016, DeepSeek V4 Flash with reasoning_effort=max and max_output_tokens=16384 will materially exceed the frozen ARC-R016 exact accuracy of 45/174 (25.8621%).",
   "research_question": "How much of the current gap is caused by an under-provisioned inference regime before introducing more solver architecture?",
   "primary_change": "Inference-regime bundle only: reasoning_effort=max plus the model endpoint's maximum supported 16384 output-token cap. Prompt, model, task set, scorer and one-prediction contract remain fixed.",
@@ -35,7 +35,16 @@
     "resumable": true,
     "checkpoint_granularity": "per task or equivalently small durable unit; do not lose completed work when a job ends",
     "parallelization": "allowed; preserve exact task accounting and avoid duplicate uncached inference",
-    "transport_recovery": "Any retry of 429/529/timeout must be explicit and separately accounted. Preserve a first-attempt matched statistic so provider recovery cannot be mistaken for reasoning gain."
+    "transport_recovery": "Any retry of 429/529/timeout must be explicit and separately accounted. Preserve a first-attempt matched statistic so provider recovery cannot be mistaken for reasoning gain.",
+    "external_execution_path": {
+      "kind": "github-actions-push-trigger",
+      "workflow": ".github/workflows/t0012-max-reasoning-direct.yml",
+      "trigger_file": "lab/triggers/t0012-max-reasoning.request",
+      "expected_result": "lab/results/{run}-max-reasoning-direct.json",
+      "status_file": "lab/executions/{run}.json",
+      "max_wait_minutes": 420,
+      "required_secret": "NVIDIA_API_KEY"
+    }
   },
   "primary_metric": "exact full-task accuracy on the identical 174-task dev_validation set",
   "secondary_metrics": [
