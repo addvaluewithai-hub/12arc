@@ -1,0 +1,72 @@
+{
+  "schema_version": 1,
+  "run_id": "ARC-R028",
+  "task_id": "T0013-RESEARCH-AGENDA-GENERATION",
+  "role": "reasoning-systems-inventor",
+  "verdict": "RESEARCH_DIRECTION",
+  "model_calls": 0,
+  "public_evaluation_used": false,
+  "source_evidence": [
+    "lab/results/ARC-R027-candidate-failure-taxonomy.json",
+    "lab/results/ARC-R020-candidate-oracle.json",
+    "lab/results/ARC-R021-object-relation-generator.json",
+    "lab/results/ARC-R022-representation-coverage-audit.json"
+  ],
+  "current_bottleneck": "Candidate generation on 0607ce86 and 06df4c85 repeatedly terminates with finish_reason=length under both ARC-R020 and ARC-R021, preventing exact candidate-oracle verification. The strongest local hypothesis is that full-grid candidate serialization, not verifier selection, is the first removable bottleneck on these tasks.",
+  "agenda": [
+    {
+      "task_id": "T0014-RULE-FIRST-SERIALIZATION-HARNESS",
+      "status": "ready",
+      "priority": 71,
+      "type": "infrastructure-research",
+      "role": "program-synthesis-researcher",
+      "hypothesis": "A compact, machine-parseable rule IR plus deterministic execution can remove full-grid model-output serialization from the candidate stage while preserving exact mechanical scoring and comparator integrity.",
+      "primary_change": "Introduce rule/program candidate serialization and deterministic execution; no target-model calls in this task.",
+      "frozen_comparator": "ARC-R020 compact-hypothesis protocol and mechanical candidate-oracle accounting on task IDs 0607ce86 and 06df4c85.",
+      "task_ids": ["0607ce86", "06df4c85"],
+      "resources": ["GitHub read/write", "Python test execution", "existing ARC public-training-derived development data"],
+      "success_threshold": "Parser/executor round-trip tests pass for a versioned rule IR; invalid/unsupported programs fail closed; exact scorer and comparator-integrity boundary consume deterministically executed candidate grids; a zero-model-call validation path proves no full-grid candidate serialization is required by the harness.",
+      "falsification": "If the proposed compact IR cannot express a sufficiently general but bounded transformation interface for the two overflow tasks without task-specific solution encoding, or if deterministic execution cannot integrate with exact candidate-oracle/comparator accounting, do not proceed to the target-model ablation.",
+      "expected_artifacts": [
+        "src/arc_lab/rule_first_candidates.py or equivalent provider-neutral module",
+        "tests for rule parsing/execution/fail-closed behavior",
+        "integration tests with candidate-oracle/comparator integrity",
+        "lab/validation/T0014-rule-first-harness.json",
+        "external execution path specification for T0015 if validation passes"
+      ],
+      "evidence_motivation": "ARC-R027: both overflow tasks hit finish_reason=length twice while six of eight tasks were parseable; full-grid serialization is therefore a distinct pre-verification failure layer."
+    },
+    {
+      "task_id": "T0015-RULE-FIRST-OVERFLOW-ABLATION",
+      "status": "blocked",
+      "priority": 70,
+      "type": "target-model-experiment",
+      "role": "program-synthesis-researcher",
+      "depends_on": ["T0014-RULE-FIRST-SERIALIZATION-HARNESS"],
+      "hypothesis": "On the two repeated overflow tasks, rule-first candidate generation under the same DeepSeek model and 3072 candidate-output-token budget will make both candidate stages parseable and yield at least one mechanically exact candidate after deterministic execution.",
+      "primary_change": "Candidate response format only: compact rule/program hypotheses instead of materialized full-grid candidates.",
+      "frozen_comparator": "ARC-R020 compact-hypothesis candidate generation on 0607ce86 and 06df4c85, with identical provider/model, task inputs, candidate count, temperature/reasoning settings, and 3072-token candidate budget wherever those settings are durably available.",
+      "task_ids": ["0607ce86", "06df4c85"],
+      "provider": "nvidia-nim",
+      "model": "deepseek-ai/deepseek-v4-flash-0731",
+      "resources": ["validated T0014 harness", "push-triggered GitHub Actions path with NVIDIA_API_KEY secret", "mechanical exact scorer", "comparator-integrity reporting"],
+      "success_threshold": "2/2 candidate stages parseable, no full-grid candidate serialization in model responses, and >=1/2 mechanically verified candidate-oracle coverage after deterministic execution.",
+      "falsification": "Either task remains unparsable/length-terminated under the matched budget, or both parse but deterministic execution yields 0/2 exact candidate coverage.",
+      "secondary_diagnostics": ["finish_reason", "candidate response tokens", "parse failures", "program validation failures", "execution failures", "exact candidate coverage", "provider failures", "calls/tokens/runtime", "new coverage vs comparator"],
+      "expected_artifacts": [
+        "versioned experiment contract",
+        "trigger/status/result files under lab/triggers, lab/executions and lab/results",
+        "cached target-model responses or hashes",
+        "mechanically validated matched-comparator report"
+      ],
+      "unblock_condition": "T0014 completes with a validated fail-closed rule-first harness and a declared authorized external execution path."
+    }
+  ],
+  "adversarial_review": [
+    "The repeated length stops may be caused by verbosity rather than task morphology; the matched T0015 treatment therefore changes only serialization format, not model, task set, or candidate budget.",
+    "Two tasks are insufficient evidence for a population-wide router; T0015 is deliberately a narrow local ablation.",
+    "A compact DSL can accidentally encode task-specific solutions; T0014 must test generic primitives and reject task-ID-specific hard coding.",
+    "Improved parseability without exact candidate coverage would show transport/serialization improvement but falsify the stronger semantic-coverage hypothesis."
+  ],
+  "next_action": "Execute T0014 only; do not start T0015 until T0014 is durably complete and the queue explicitly unblocks it."
+}
