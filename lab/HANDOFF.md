@@ -2,16 +2,16 @@
 
 Start from `lab/RUNNER.md` and current Git state.
 
-## ARC-R021 closed — object/relation prompt rejected
+## ARC-R022 closed — reported ARC-R021 coverage swap was a metadata error
 
-`T0007-OBJECT-RELATION-CANDIDATE-GENERATOR` is done and ARC-R021 is released.
+`T0008-REPRESENTATION-COVERAGE-AUDIT` is done and ARC-R022 is released. No target-model calls were made; public evaluation remained sealed.
 
-ARC-R020 established the generator/representation bottleneck with candidate coverage 1/8. ARC-R021 changed only candidate-generation representation guidance: explicit object/relation reasoning before emitting the same three hypotheses, with DeepSeek V4 Flash, selector, task slice and budgets frozen.
+The audit compared persisted candidate correctness rather than trusting ARC-R021's embedded baseline flags. ARC-R020 says `0bb8deee` was uncovered and `0d3d703e` was covered. ARC-R021's baseline annotation fields invert those facts. ARC-R021 treatment leaves `0bb8deee` uncovered and `0d3d703e` covered.
 
-Result: **REJECT**. One task became newly candidate-covered but one previously covered task regressed, leaving net coverage **1/8**, below the >=3/8 promotion threshold and violating the no-regression condition. Provider failures were 0. Accounting: 14 calls, 37,364 input + 14,112 output = 51,476 total tokens; 0 cache hits. Public evaluation was unused. See `lab/results/ARC-R021-object-relation-generator.json` and `lab/runs/2026-08-24/ARC-R021.md`.
+Corrected ARC-R020 -> ARC-R021 candidate coverage is therefore **1/8 -> 1/8**, with **0 new coverage and 0 regressions**. The ARC-R021 REJECT verdict remains correct because coverage did not reach >=3/8, but do not repeat the old claim that object/relation prompting caused a one-task coverage swap. `0d3d703e` is a cellwise fixed color-permutation task and was covered in both durable runs.
 
-The result is a coverage swap, not a gain. Do not promote the universal object/relation prompt. It does not rule out deterministic object extraction or routing object-centric reasoning only to compatible task morphologies.
+Evidence: `lab/results/ARC-R022-representation-coverage-audit.json`; report: `lab/runs/2026-08-24/ARC-R022.md`.
 
-## Next shift: ARC-R022
+## Next shift: ARC-R023
 
-Highest-priority ready task is `T0008-REPRESENTATION-COVERAGE-AUDIT`, role **failure-analyst**. This is deliberately a no-model-call audit. Compare durable ARC-R020 and ARC-R021 candidate evidence to identify the newly covered and regressed task IDs, inspect their candidate rules and public-training task morphology, and formulate a falsifiable criterion for when object-centric representation should be routed versus avoided. Persist the audit and queue the resulting matched experiment. Do not start that experiment in the same shift.
+Highest-priority ready task is `T0009-COMPARATOR-INTEGRITY-GUARD`, role **benchmark-methodologist**. Implement a mechanical comparator-coverage derivation/check from referenced durable candidate records, with tests that reproduce and reject the ARC-R021-style inversion. Do not spend NVIDIA inference on another representation/routing experiment until this integrity guard exists. Stop after that one task.
