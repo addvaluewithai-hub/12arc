@@ -9,12 +9,14 @@ from arc_lab.rule_first import (
 )
 
 
-def test_valid_program_parses_and_executes_deterministically():
+def test_valid_program_parses_and_executes_deterministically_without_mutating_input():
     program = {"schema_version": 1, "steps": [{"op": "rotate90"}, {"op": "recolor", "from": 1, "to": 2}]}
     grid = [[1, 0], [0, 1]]
+    original = [row[:] for row in grid]
     first = execute_program(program, grid)
     second = execute_program(program, grid)
     assert first == second == [[0, 2], [2, 0]]
+    assert grid == original
 
 
 def test_malformed_and_unsupported_programs_fail_closed():
