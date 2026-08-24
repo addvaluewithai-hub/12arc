@@ -1,10 +1,9 @@
 # ARC Research Lab — Current State
 
-Updated: 2026-08-24 04:45 EEST
+Updated: 2026-08-24 05:37 EEST
 Phase: **PHASE 2 — architecture research**
-Latest completed research run: **ARC-R019**
-Active research run: **ARC-R020**
-Next unallocated research run: **ARC-R021**
+Latest completed research run: **ARC-R020**
+Next research run: **ARC-R021**
 
 ## Fixed comparator and model policy
 
@@ -14,20 +13,18 @@ ARC-R016 direct-JSON baseline is frozen at **45/174 = 25.8621%** exact accuracy 
 
 ## Architecture history
 
-ARC-R017 `hypothesis-train-replay-v1` was rejected at **1/8** versus comparator **4/8**. ARC-R018 `compact-hypothesis-select-v1` was rejected after provider recovery at **2/8** versus comparator **4/8**, with one new solve and three regressions. ARC-R019 then established that ARC-R018 did not persist unselected candidate grids/correctness, making candidate omission versus selector error observationally unidentifiable from historical artifacts.
+ARC-R017 full training replay was rejected at 1/8 versus comparator 4/8. ARC-R018 compact multi-hypothesis selection was rejected at 2/8 versus 4/8, with one new solve and three regressions. ARC-R019 found that ARC-R018 had not persisted unselected candidate correctness, so omission versus selection error was not identifiable historically.
 
-## ARC-R020 candidate-oracle instrumentation
+## ARC-R020 candidate-oracle diagnosis
 
-`T0006-CANDIDATE-ORACLE-INSTRUMENTATION` is claimed/reserved as ARC-R020. Role: **benchmark-methodologist**.
+ARC-R020 reran the frozen ARC-R018 model-facing protocol with instrumentation only, persisting and exact-scoring all generated candidates.
 
-The experiment keeps ARC-R018's model-facing protocol fixed on the same eight deterministic `dev_validation` IDs and changes instrumentation only: every parsed candidate rule/grid is persisted and exact-scored after generation, together with `selected_index` and `selected_correct`. Development ground truth is not exposed to candidate generation or selection.
+The predeclared diagnostic set was the four prior parseable ARC-R018 failures: `00dbd492`, `05f2a901`, `070dd51e`, `1190bc91`. All 4/4 were parseable in ARC-R020, and **0/4 candidate sets contained a correct answer (0% coverage)**. The declared boundary was <50% candidate coverage => generator/representation bottleneck; >=50% with wrong selections => selector/ranking bottleneck. Therefore the current diagnosis is **generator/representation bottleneck**.
 
-Predeclared diagnostic boundary on the four prior parseable ARC-R018 failures (`00dbd492`, `05f2a901`, `070dd51e`, `1190bc91`): candidate-set coverage **<50%** => generator/representation bottleneck; coverage **>=50%** with wrong selections => selector/ranking bottleneck.
+Across all eight tasks, 6/8 candidate stages were parseable, only 1/8 had any correct candidate, and 1/8 selected correctly. Accounting: 13 live calls, 35,719 input + 14,570 output = **50,289 tokens**, **434.5213 s** summed model runtime, zero cache hits, and one transient NVIDIA HTTP 529 overload outside the fully observed four-task diagnostic statistic. Public evaluation was not used.
 
-Implementation, test, workflow and trigger are committed. The authorized NVIDIA workflow was triggered, using pinned public training only and explicitly excluding public evaluation. At this state update, `lab/results/ARC-R020-candidate-oracle.json` had not yet landed. Do not invent coverage, token/runtime accounting or a bottleneck verdict.
-
-Run report: `lab/runs/2026-08-24/ARC-R020.md`.
+Adversarial caveat: this fresh temperature-zero hosted rerun measures current frozen-protocol coverage, not the unknowable historical ARC-R018 candidate set. The four-task diagnostic is directional and small, but selector improvement cannot recover candidates that are absent.
 
 ## Next action
 
-Reconcile ARC-R020 before allocating ARC-R021. If the durable result has landed, inspect candidate-level correctness, apply the predeclared diagnostic boundary, record calls/tokens/runtime/provider failures and adversarial interpretation, finalize queue/state/handoff, then release ARC-R020. If the workflow failed, persist the failure evidence and repair only this experiment; do not start a new architecture task in the same shift.
+`T0007-OBJECT-RELATION-CANDIDATE-GENERATOR` is ready for ARC-R021. Attack candidate omission rather than selector sophistication: test whether a compact object/relation representation before hypothesis generation materially increases candidate-oracle coverage under controlled model and selector budget. Freeze a development slice and retain candidate-level oracle scoring so coverage, selected accuracy, regressions and cost are all observable.
