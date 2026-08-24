@@ -2,36 +2,45 @@
 
 Start from `lab/RUNNER.md` and current Git state.
 
-## ARC-R027 closed — candidate failure taxonomy complete
+## ARC-R028 closed — agenda generated from ARC-R027 evidence
 
-`T0011-CANDIDATE-FAILURE-TAXONOMY` is complete and ARC-R027 is released.
+`T0013-RESEARCH-AGENDA-GENERATION` is complete and ARC-R028 is released. This shift made **zero target-model calls** and did not use public evaluation.
 
-This shift made **zero target-model calls** and used only persisted ARC-R020/ARC-R021 candidate evidence plus the ARC-R022 comparator-integrity correction.
+ARC-R027 remains the evidence basis: `0607ce86` and `06df4c85` repeatedly terminate candidate generation with `finish_reason=length` in both ARC-R020 and ARC-R021 under the existing full-grid candidate serialization path. This is a pre-verification failure layer distinct from parseable-but-wrong semantic candidates.
 
-Mechanically verified candidate coverage in both ARC-R020 and ARC-R021 is **1/8**, with `0d3d703e` the sole covered task. Uncovered tasks are:
+## Next eligible task: T0014-RULE-FIRST-SERIALIZATION-HARNESS
 
-`00dbd492`, `05f2a901`, `0607ce86`, `06df4c85`, `070dd51e`, `0bb8deee`, `1190bc91`.
+Execute exactly this task next.
 
-The strongest diagnostic split is:
+Role: **program-synthesis-researcher**.
 
-- `0607ce86`, `06df4c85`: repeated **candidate-serialization overflow** (`finish_reason=length` in both R020 and R021), so the current full-grid three-candidate protocol fails before exact candidate verification;
-- `00dbd492`: parseable object-attribute binding near miss;
-- `05f2a901`: parseable relational-motion near miss;
-- `070dd51e`: parseable connectivity/path near miss;
-- `0bb8deee`, `1190bc91`: parseable but unresolved semantic/compositional failures;
-- `0d3d703e`: covered control, cellwise fixed color permutation.
+Objective: build a compact, versioned, machine-parseable rule/program candidate representation plus deterministic executor, fail-closed validator, candidate-oracle integration and comparator-integrity integration. No target-model calls are permitted in T0014.
 
-Primary next falsifiable direction: **rule-first serialization routing** for `0607ce86` and `06df4c85`. Generate compact rule/program hypotheses without materializing full candidate grids in the model output, execute those rules deterministically, then exact-score the resulting grids. A matched follow-up should require 2/2 candidate-stage parseability and at least 1/2 candidate-oracle coverage; 0/2 coverage after successful compact parsing falsifies the hypothesis.
+Protocol: `lab/experiments/T0014-rule-first-serialization-harness.json`.
 
-Adversarial caveat: repeated length termination may be verbosity rather than intrinsic task morphology, and two tasks are not enough to justify a broad router. Keep any follow-up narrow and mechanically compared.
+Frozen local comparator for the later experiment is ARC-R020 on task IDs `0607ce86` and `06df4c85`. Do not encode task-specific solutions into the IR or tests. T0014 succeeds only when a durable validation marker demonstrates deterministic parsing/execution, fail-closed invalid programs, exact-score integration, matched task-set enforcement and zero target-model calls.
 
-Durable artifacts:
+T0014 should also establish the authorized push-triggered GitHub Actions execution path needed by T0015, using repository `NVIDIA_API_KEY` only inside Actions and never exposing the secret.
 
-- `lab/results/ARC-R027-candidate-failure-taxonomy.json`
-- `lab/runs/2026-08-24/ARC-R027.md`
+## Follow-up after T0014 only: T0015-RULE-FIRST-OVERFLOW-ABLATION
 
-No active reservation should remain after queue/counter closure. Next unallocated run is **ARC-R028**.
+T0015 is intentionally blocked until T0014 is complete and its execution path is declared in the queue.
 
-No new queue item was invented in ARC-R027. A later shift should select only an actually queued eligible task; if none exists, stop without inventing work.
+Its predeclared hypothesis changes only candidate serialization: compact rule/program hypotheses instead of materialized grids, on `0607ce86` and `06df4c85`, using `deepseek-ai/deepseek-v4-flash-0731` and the matched ARC-R020 generation controls including the **3072-token candidate-stage budget**.
+
+Success: **2/2 parseable and >=1/2 exact candidate coverage** after deterministic execution. Falsification: either task remains unparsable/length-terminated, or both parse and remain **0/2** exact coverage.
+
+Protocol: `lab/experiments/T0015-rule-first-overflow-ablation.json`.
+
+Adversarial caveat: two tasks are only a local diagnostic; do not generalize a router from them unless a later experiment replicates the effect on a predeclared broader slice.
+
+Durable ARC-R028 artifacts:
+
+- `lab/results/ARC-R028-research-agenda.json`
+- `lab/runs/2026-08-25/ARC-R028.md`
+- `lab/experiments/T0014-rule-first-serialization-harness.json`
+- `lab/experiments/T0015-rule-first-overflow-ablation.json`
+
+No active reservation should remain after closure. Next unallocated run is **ARC-R029**.
 
 Public evaluation remains sealed.
