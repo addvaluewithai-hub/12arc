@@ -1,6 +1,13 @@
 {
   "schema_version": 1,
-  "next_run_number": 22,
+  "next_run_number": 23,
   "last_completed_run": "ARC-R021",
-  "active_reservations": []
+  "active_reservations": [
+    {
+      "run_id": "ARC-R022",
+      "task_id": "T0008-REPRESENTATION-COVERAGE-AUDIT",
+      "shift_id": "automation-20260824T0835+0300",
+      "reserved_at": "2026-08-24T08:35:31+03:00"
+    }
+  ]
 }
