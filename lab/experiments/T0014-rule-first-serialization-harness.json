@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "task_id": "T0014-RULE-FIRST-SERIALIZATION-HARNESS",
+  "type": "infrastructure-research",
+  "hypothesis": "A compact, machine-parseable rule IR plus deterministic execution can remove full-grid model-output serialization from the candidate stage while preserving exact candidate-oracle and comparator-integrity accounting.",
+  "baseline": {
+    "run": "ARC-R020",
+    "protocol": "compact-hypothesis candidate generation",
+    "task_ids": ["0607ce86", "06df4c85"],
+    "observed_failure": "finish_reason=length on candidate generation for both tasks"
+  },
+  "primary_change": "Introduce a versioned compact rule/program candidate representation, parser, validator, and deterministic executor. This task makes zero target-model calls.",
+  "controls": {
+    "public_evaluation": "sealed",
+    "task_source": "deterministic public-training-derived development data only",
+    "no_task_specific_solution_encoding": true,
+    "exact_scorer_unchanged": true,
+    "comparator_integrity_required": true
+  },
+  "required_tests": [
+    "valid rule programs parse deterministically",
+    "unsupported or malformed programs fail closed",
+    "execution is deterministic for identical input/program pairs",
+    "candidate-oracle receives only executed grids and exact-scores them",
+    "matched comparator task IDs are mechanically validated",
+    "zero-model-call validation demonstrates harness wiring without provider access"
+  ],
+  "success_threshold": "All required tests pass and lab/validation/T0014-rule-first-harness.json records zero target-model calls plus the validated interface needed for a later matched ablation.",
+  "falsification": "If a bounded generic rule IR cannot integrate with deterministic execution and exact mechanical scoring without embedding task-specific solutions, mark the task REJECT/INCONCLUSIVE and do not unblock T0015.",
+  "expected_follow_up": "T0015-RULE-FIRST-OVERFLOW-ABLATION"
+}
