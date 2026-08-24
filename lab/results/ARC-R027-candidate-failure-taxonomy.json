@@ -1,0 +1,81 @@
+{
+  "schema_version": 1,
+  "run_id": "ARC-R027",
+  "task_id": "T0011-CANDIDATE-FAILURE-TAXONOMY",
+  "role": "failure-analyst",
+  "model_calls": 0,
+  "public_evaluation_used": false,
+  "sources": [
+    "lab/results/ARC-R020-candidate-oracle.json",
+    "lab/results/ARC-R021-object-relation-generator.json",
+    "lab/results/ARC-R022-representation-coverage-audit.json"
+  ],
+  "mechanical_coverage": {
+    "ARC-R020": {"covered": ["0d3d703e"], "uncovered": ["00dbd492","05f2a901","0607ce86","06df4c85","070dd51e","0bb8deee","1190bc91"], "coverage": "1/8"},
+    "ARC-R021": {"covered": ["0d3d703e"], "uncovered": ["00dbd492","05f2a901","0607ce86","06df4c85","070dd51e","0bb8deee","1190bc91"], "coverage": "1/8"}
+  },
+  "taxonomy": [
+    {
+      "family": "candidate-serialization-overflow",
+      "task_ids": ["0607ce86","06df4c85"],
+      "evidence": "Candidate generation terminated with finish_reason=length in both ARC-R020 and ARC-R021, so no exact candidate set was available for oracle coverage.",
+      "observable_feature": "large/complex same-grid transformations whose full-grid three-candidate serialization exhausts the fixed 3072-token candidate budget",
+      "failure_layer": "representation/output protocol before semantic candidate verification"
+    },
+    {
+      "family": "parseable-object-attribute-binding-near-miss",
+      "task_ids": ["00dbd492"],
+      "evidence": "Both runs produced parseable candidates and zero exact coverage; persisted candidate rules repeatedly identify red rectangular regions and propose interior fills conditioned on object attributes, but exact outputs remain wrong.",
+      "observable_feature": "multiple bounded objects with attribute-conditioned recoloring/filling",
+      "failure_layer": "semantic rule induction / attribute-to-action binding"
+    },
+    {
+      "family": "parseable-relational-motion-near-miss",
+      "task_ids": ["05f2a901"],
+      "evidence": "Both runs are parseable with zero exact coverage; persisted candidates propose moving one colored object relative to another under several alignment rules, but none exact-match.",
+      "observable_feature": "object translation controlled by a relation/termination condition",
+      "failure_layer": "relational goal inference rather than object detection"
+    },
+    {
+      "family": "parseable-connectivity-path-near-miss",
+      "task_ids": ["070dd51e"],
+      "evidence": "Both runs are parseable with zero exact coverage; persisted candidates propose connecting same-colored points with horizontal/vertical lines, indicating the family is recognized but path/ordering details are wrong.",
+      "observable_feature": "same-color endpoint connectivity with line construction and interaction/precedence constraints",
+      "failure_layer": "relational path construction / precedence"
+    },
+    {
+      "family": "parseable-unresolved-compositional",
+      "task_ids": ["0bb8deee","1190bc91"],
+      "evidence": "Both tasks have parseable candidate stages in ARC-R020 and ARC-R021 but no mechanically verified correct candidate in either run. Existing durable evidence is insufficient to assign a narrower morphology without importing manual annotations.",
+      "observable_feature": "nontrivial transformation with stable parsing but zero candidate-oracle coverage under both generic and object/relation prompts",
+      "failure_layer": "semantic generation, subtype unresolved"
+    }
+  ],
+  "control_case": {
+    "task_id": "0d3d703e",
+    "mechanical_status": "covered in ARC-R020 and ARC-R021",
+    "morphology": "cellwise fixed color permutation",
+    "interpretation": "simple local color mapping is already representable; do not route it through heavier object-centric machinery"
+  },
+  "primary_falsifiable_hypothesis": {
+    "name": "rule-first serialization routing for length-overflow tasks",
+    "statement": "If candidate generation is routed to compact rule/program hypotheses without materializing full predicted grids for tasks whose candidate stage would exceed the fixed output budget, then 0607ce86 and 06df4c85 should become parseable under the same model/budget, and at least one should gain exact candidate-oracle coverage when rules are executed deterministically.",
+    "frozen_comparator": "ARC-R020 compact-hypothesis candidate generation on the same task IDs and model settings",
+    "proposed_test_set": ["0607ce86","06df4c85"],
+    "success_threshold": "2/2 candidate stages parseable and >=1/2 mechanically verified candidate coverage, with no full-grid candidate serialization",
+    "falsification": "Either task still fails to produce a parseable compact rule within the same token budget, or both are parseable but deterministic execution yields 0/2 exact candidate coverage."
+  },
+  "secondary_routing_hypothesis": {
+    "statement": "Route by morphology rather than universal object prompting: retain direct/local mapping for 0d3d703e; use relation-specific primitives for 05f2a901 and 070dd51e; use attribute-binding primitives for 00dbd492.",
+    "testable_requirement": "A future matched routing experiment must mechanically derive comparator coverage and predeclare per-family task IDs before calls."
+  },
+  "adversarial_alternatives": [
+    "finish_reason=length may reflect verbose model behavior rather than intrinsic task morphology; compact prompting alone could fix parseability without a new representation.",
+    "The two overflow tasks are too small a sample to justify a general router; the hypothesis is deliberately local until replicated.",
+    "Parseable zero-coverage tasks may fail because three candidates are too few rather than because the inferred primitive family is wrong.",
+    "Candidate rules can sound morphologically appropriate while still being semantically wrong; taxonomy labels are diagnostics, not proof of the true ARC rule.",
+    "Hosted deterministic inference can vary between runs, so any future treatment requires a matched comparator and mechanical coverage accounting."
+  ],
+  "verdict": "RESEARCH_DIRECTION",
+  "next_recommendation": "Test compact rule-first candidate serialization on the two repeated length-overflow tasks before spending inference on another universal representation prompt."
+}
