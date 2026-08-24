@@ -1,6 +1,13 @@
 {
   "schema_version": 1,
-  "next_run_number": 20,
+  "next_run_number": 21,
   "last_completed_run": "ARC-R019",
-  "active_reservations": []
+  "active_reservations": [
+    {
+      "run_id": "ARC-R020",
+      "task_id": "T0006-CANDIDATE-ORACLE-INSTRUMENTATION",
+      "shift_id": "scheduled-20260824T0435+0300",
+      "reserved_at": "2026-08-24T04:35:00+03:00"
+    }
+  ]
 }
