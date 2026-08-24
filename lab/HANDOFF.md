@@ -2,16 +2,16 @@
 
 Start from `lab/RUNNER.md` and current Git state.
 
-## ARC-R023 closed — comparator integrity guard added
+## ARC-R024 closed — comparator integrity is mandatory at shared reporting boundary
 
-`T0009-COMPARATOR-INTEGRITY-GUARD` is done and ARC-R023 is released. No target-model calls were made and public evaluation remained sealed.
+`T0010-INTEGRITY-GUARD-INTEGRATION` is done and ARC-R024 is released. No target-model calls were made and public evaluation remained sealed.
 
-The new `src/arc_lab/comparator_integrity.py` derives task-level candidate coverage from persisted candidate correctness, rejects annotations that disagree with that durable evidence, and computes new-covered/regressed task IDs only on matched task maps. `tests/test_comparator_integrity.py` includes the exact class of inversion found by ARC-R022: durable facts `0bb8deee=false`, `0d3d703e=true` versus inverted manual labels. That inversion must raise `ValueError`.
+`src/arc_lab/architecture_reporting.py` now builds candidate-coverage deltas only by loading a referenced durable comparator result and deriving both comparator/treatment maps through `comparator_integrity`. It has no manual comparator-coverage argument. Task-set mismatch raises before report persistence. Integration tests live in `tests/test_architecture_reporting.py`.
 
-A narrow CI workflow was added for the guard tests. The connector in ARC-R023 could not enumerate generic push workflow runs, so do not retroactively claim CI success without checking GitHub Actions evidence.
+Do not claim CI success for ARC-R024: the available connector returned no workflow run for the final test commit. The implementation and executable tests are durable; this is recorded rather than hidden.
 
-Report: `lab/runs/2026-08-24/ARC-R023.md`.
+Report: `lab/runs/2026-08-24/ARC-R024.md`.
 
-## Next shift: ARC-R024
+## Next shift: ARC-R025
 
-Highest-priority ready task is `T0010-INTEGRITY-GUARD-INTEGRATION`, role **benchmark-methodologist**. Integrate the guard into shared architecture experiment reporting so experiment runners cannot silently bypass it with manual comparator labels. Add an integration test proving inverted comparator metadata cannot reach persisted new-solve/regression fields. Do not spend NVIDIA inference on another architecture variant in that shift. Stop after that one task.
+Highest-priority ready task is `T0011-CANDIDATE-FAILURE-TAXONOMY`, role **failure-analyst**. Use persisted ARC-R020/ARC-R021 candidate evidence and the new mechanical reporting discipline to classify uncovered tasks by observable transformation/morphology features. Derive at least one falsifiable candidate-generator routing or representation hypothesis with exact task IDs and adversarial alternatives. This is deliberately a no-model-call audit; do not spend NVIDIA inference in that shift. Stop after that one task.
