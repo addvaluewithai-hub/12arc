@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "task_id": "T0014-RULE-FIRST-SERIALIZATION-HARNESS",
+  "run": "ARC-R029",
+  "status": "passed",
+  "target_model_calls": 0,
+  "public_evaluation_used": false,
+  "workflow": "T0014 Rule-First Harness CI",
+  "workflow_file": ".github/workflows/t0014-rule-first-ci.yml",
+  "workflow_run_id": 32789570942,
+  "workflow_url": "https://github.com/addvaluewithai-hub/12arc/actions/runs/32789570942",
+  "workflow_conclusion": "success",
+  "head_sha": "c67ac14cfea35c19b7188eb0201d78448993c77c",
+  "test_command": "python -m pytest -q tests/test_rule_first.py tests/test_comparator_integrity.py tests/test_scoring.py",
+  "validated_properties": [
+    "versioned compact generic rule/program IR",
+    "deterministic execution without input mutation",
+    "fail-closed malformed/unsupported program validation",
+    "exact scoring of deterministically materialized candidate grids",
+    "mechanical per-task candidate coverage",
+    "matched comparator task-set enforcement"
+  ],
+  "artifacts": [
+    "src/arc_lab/rule_first.py",
+    "tests/test_rule_first.py",
+    ".github/workflows/t0014-rule-first-ci.yml",
+    "src/arc_lab/rule_first_ablation.py",
+    ".github/workflows/t0015-rule-first-overflow.yml"
+  ],
+  "external_execution_path": {
+    "task_id": "T0015-RULE-FIRST-OVERFLOW-ABLATION",
+    "kind": "github-actions-push-trigger",
+    "workflow": ".github/workflows/t0015-rule-first-overflow.yml",
+    "trigger_file": "lab/triggers/t0015-rule-first-overflow.request",
+    "expected_result": "lab/results/{run}-rule-first-overflow.json",
+    "status_file": "lab/executions/{run}.json",
+    "max_wait_minutes": 120,
+    "required_secret": "NVIDIA_API_KEY",
+    "on_trigger": "Write JSON with schema_version=1, task_id, reserved run, claim shift_id, and requested_at; then stop the shift and let GitHub Actions execute."
+  }
+}
