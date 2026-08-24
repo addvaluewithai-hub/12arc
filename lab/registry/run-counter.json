@@ -1,13 +1,6 @@
 {
   "schema_version": 1,
   "next_run_number": 25,
-  "last_completed_run": "ARC-R023",
-  "active_reservations": [
-    {
-      "run_id": "ARC-R024",
-      "task_id": "T0010-INTEGRITY-GUARD-INTEGRATION",
-      "shift_id": "automation-20260824T1045+0300",
-      "reserved_at": "2026-08-24T10:45:10+03:00"
-    }
-  ]
+  "last_completed_run": "ARC-R024",
+  "active_reservations": []
 }
