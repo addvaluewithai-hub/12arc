@@ -1,0 +1,11 @@
+{
+  "expected_result": "lab/results/ARC-R026-max-reasoning-direct.json",
+  "run": "ARC-R026",
+  "schema_version": 1,
+  "started_at": "2026-08-24T15:15:02.234707+00:00",
+  "status": "running",
+  "task_id": "T0012-MAX-REASONING-DIRECT-ABLATION",
+  "trigger_commit": "0627ce9d915f1c8ddd83f6f0a7b25228024cbe05",
+  "workflow_run_id": "32743684588",
+  "workflow_url": "https://github.com/addvaluewithai-hub/12arc/actions/runs/32743684588"
+}
