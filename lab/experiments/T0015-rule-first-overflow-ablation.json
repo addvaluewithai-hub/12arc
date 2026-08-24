@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "task_id": "T0015-RULE-FIRST-OVERFLOW-ABLATION",
+  "status": "blocked_pending_T0014",
+  "hypothesis": "Replacing full-grid candidate serialization with compact rule/program hypotheses on 0607ce86 and 06df4c85 will make both candidate stages parseable under the same candidate-output-token budget and yield at least one exact candidate after deterministic execution.",
+  "baseline": {
+    "run": "ARC-R020",
+    "task_ids": ["0607ce86", "06df4c85"],
+    "candidate_protocol": "compact-hypothesis-select-v1 candidate stage",
+    "candidate_output_budget_tokens": 3072,
+    "mechanical_coverage": "0/2 on the two overflow tasks because candidate generation terminated with finish_reason=length"
+  },
+  "treatment": {
+    "primary_change": "candidate response serialization only: compact versioned rule/program hypotheses instead of materialized predicted grids",
+    "deterministic_postprocessing": "validate and execute each rule with the T0014 harness, then exact-score resulting grids",
+    "candidate_count": "match ARC-R020",
+    "task_ids": ["0607ce86", "06df4c85"]
+  },
+  "target_model": {
+    "provider": "nvidia-nim",
+    "model": "deepseek-ai/deepseek-v4-flash-0731",
+    "generation_settings": "freeze ARC-R020 settings exactly from durable implementation/config at execution time; do not silently alter temperature, reasoning settings, attempts, candidate count, or 3072-token candidate budget"
+  },
+  "metrics": {
+    "primary": "mechanically verified candidate-oracle coverage on 2 tasks",
+    "success_threshold": "2/2 candidate stages parseable and >=1/2 exact candidate coverage",
+    "falsification": "Either task remains unparsable/length-terminated, or both parse but exact deterministic execution yields 0/2 coverage",
+    "required_diagnostics": ["finish_reason", "input_tokens", "output_tokens", "runtime", "request_count", "provider_failures", "parse_failures", "program_validation_failures", "program_execution_failures", "candidate_coverage", "new_coverage", "regressions"]
+  },
+  "controls": {
+    "public_evaluation": "sealed",
+    "development_data": "deterministic public-training-derived split only",
+    "matched_comparator": "required through shared comparator-integrity reporting",
+    "cache": "required by provider/model/messages/settings/task/attempt key",
+    "no_task_specific_hints": true
+  },
+  "resources": {
+    "requires": ["T0014 validated harness", "authorized GitHub Actions push-trigger execution path", "repository secret NVIDIA_API_KEY"],
+    "execution_path": "must be declared in queue before T0015 can become ready"
+  }
+}
