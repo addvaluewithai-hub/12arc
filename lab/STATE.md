@@ -1,9 +1,9 @@
 # ARC Research Lab — Current State
 
-Updated: 2026-08-24 17:58 EEST
+Updated: 2026-08-24
 Phase: **PHASE 2 — architecture research**
-Latest completed research run: **ARC-R025**
-Next unallocated research run: **ARC-R026**
+Latest completed research run: **ARC-R026**
+Next unallocated research run: **ARC-R027**
 
 ## Fixed comparator and model policy
 
@@ -11,55 +11,48 @@ Routine hosted research uses NVIDIA NIM with fixed primary `deepseek-ai/deepseek
 
 ARC-R016 direct-JSON baseline remains frozen at **45/174 = 25.8621%** exact accuracy on deterministic public-training-derived `dev_validation`. Public evaluation remains sealed.
 
-## ARC-R025 infrastructure result
+## ARC-R026 max-reasoning direct ablation
 
-`T0012A-MAX-REASONING-EXECUTION-PATH` is complete with verdict `INFRA_ONLY` and zero target-model calls.
+`T0012-MAX-REASONING-DIRECT-ABLATION` is complete with verdict **REJECT**.
 
-ARC-R025 added the missing execution path for `T0012-MAX-REASONING-DIRECT-ABLATION`:
+Frozen treatment versus ARC-R016:
 
-- provider-neutral `reasoning_effort` support in `GenerationConfig` and cache fingerprints;
-- NVIDIA NIM request payload support for `reasoning_effort=max`;
-- sanitized retryable provider errors carrying `x-ratelimit-*` / `retry-after` metadata;
-- resumable max-reasoning direct runner at `src/arc_lab/max_reasoning_direct.py`;
-- tests at `tests/test_max_reasoning_direct.py`;
-- push-triggered workflow `.github/workflows/t0012-max-reasoning-direct.yml` using repository secret `NVIDIA_API_KEY`;
-- external execution protocol `lab/protocols/EXTERNAL-EXECUTION.md`;
-- runner lifecycle updates so scheduled agents do not duplicate long external runs or disable the hourly scheduler.
-
-Validation marker `lab/validation/t0012a-passed.json` shows GitHub Actions validation passed with workflow run id `32741606202`, validated commit `def87116e75f8274d368fdfbbd500498908a6eb9`, and `target_model_calls: 0`.
-
-Report: `lab/runs/2026-08-24/ARC-R025.md`.
-
-## Next task
-
-Highest-priority ready task is now **`T0012-MAX-REASONING-DIRECT-ABLATION`**, intended for ARC-R026 after normal claim/reservation.
-
-This task declares an external execution path. The scheduled agent does **not** need direct NVIDIA access or workflow-dispatch access. It should:
-
-1. read `lab/RUNNER.md` and reconstruct state;
-2. claim T0012 and reserve ARC-R026;
-3. write `lab/triggers/t0012-max-reasoning.request` with schema version, task id, reserved run, claim shift id and timestamp;
-4. stop the shift after the trigger is durable;
-5. let `.github/workflows/t0012-max-reasoning-direct.yml` execute using repository secrets;
-6. later scheduled shifts should observe `lab/executions/ARC-R026.json` / `lab/results/ARC-R026-max-reasoning-direct.json` and close the same reserved run when evidence is complete.
-
-Frozen planned treatment for T0012:
-
-- same 174 `dev_validation` tasks as ARC-R016;
-- same `deepseek-ai/deepseek-v4-flash-0731` model;
-- exact same direct ARC prompt and scorer;
+- same 174-task `dev_validation` split;
+- same DeepSeek V4 Flash model;
+- same direct ARC prompt and exact scorer;
 - temperature 0, top_p 1;
 - `reasoning_effort=max`;
 - `max_output_tokens=16384`;
-- one prediction per test input;
-- GitHub Actions job timeout **360 minutes**;
-- provider HTTP timeout **900 seconds**;
-- durable per-task artifacts and aggregation;
-- explicit accounting for any 429/529/timeout recovery;
-- output-token length buckets and sanitized NVIDIA rate-limit telemetry.
+- one prediction/test input, with transport recovery accounted separately.
 
-Protocol: `lab/experiments/T0012-max-reasoning-direct-ablation.json`.
+Results:
 
-`T0011-CANDIDATE-FAILURE-TAXONOMY` remains ready but lower priority; resume it only after the max-inference result unless evidence redirects the research program.
+- primary first attempt: **37/174 = 21.2644%**;
+- operational after explicit transport recovery: **41/174 = 23.5632%**;
+- frozen comparator: **45/174 = 25.8621%**;
+- six new solves versus ARC-R016;
+- fourteen first-attempt regressions; ten regressions after transport recovery;
+- 234 live calls;
+- 458,220 input tokens;
+- 146,054 output tokens;
+- 604,274 total tokens;
+- 57 transport failure events;
+- 12 terminal provider failures;
+- 1 parse failure;
+- successful-output token buckets: 173 `<=4096`, 3 `4097-8192`, 1 `8193-16383`, 0 at the 16384 cap.
+
+The workflow completed under external execution run id `32743684588`. Transport instability materially affected the first-attempt score, but even recovered execution remained four solves below the comparator. The 16K cap was never reached and was rarely relevant. This rejects the bundled maximum direct-inference regime as the main explanation for the current gap; it does not separately identify reasoning effort versus output cap causality.
+
+Report: `lab/runs/2026-08-24/ARC-R026.md`.
+Result: `lab/results/ARC-R026-max-reasoning-direct.json`.
+Execution status: `lab/executions/ARC-R026.json`.
+
+## Next task
+
+The next highest-priority eligible ready task is **`T0011-CANDIDATE-FAILURE-TAXONOMY`**.
+
+Its purpose is to use persisted ARC-R020/ARC-R021 mechanically verified candidate evidence, with **no new target-model calls**, to classify uncovered tasks by observable transformation/morphology features and derive at least one falsifiable candidate-generator routing or representation hypothesis with exact task IDs and adversarial alternatives.
+
+The next shift should reconstruct Git truth, claim T0011, reserve **ARC-R027**, choose the `failure-analyst` role, and perform exactly one substantive taxonomy/hypothesis task. Do not start additional work in the same shift.
 
 Public evaluation remains sealed.
