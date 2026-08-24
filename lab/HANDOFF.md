@@ -2,28 +2,20 @@
 
 Start from `lab/RUNNER.md` and current Git state.
 
-## ARC-R020 is active — candidate oracle instrumentation in flight
+## ARC-R020 complete — generator/representation is the diagnosed bottleneck
 
-`T0006-CANDIDATE-ORACLE-INSTRUMENTATION` is claimed and ARC-R020 is reserved. Do **not** allocate ARC-R021 until this run is reconciled.
+`T0006-CANDIDATE-ORACLE-INSTRUMENTATION` is complete and ARC-R020 is released. No active reservation remains; ARC-R021 is next.
 
-Role: **benchmark-methodologist**.
+ARC-R020 kept ARC-R018's model-facing protocol frozen and changed instrumentation only. On the four predeclared prior parseable failures (`00dbd492`, `05f2a901`, `070dd51e`, `1190bc91`), all four candidate stages parsed and **0/4 candidate sets contained a correct answer**. This is below the predeclared 50% boundary, so the diagnosis is **generator/representation bottleneck**, not selector/ranking.
 
-ARC-R019 showed that historical ARC-R018 artifacts cannot distinguish candidate omission from selector error because unselected candidate grids were never persisted. ARC-R020 fixes that measurement blind spot without changing the model-facing architecture.
+Overall: 6/8 candidate stages parseable, 1/8 tasks with any correct candidate, 1/8 selected correct; 13 calls, 50,289 tokens, 434.5213 s summed runtime, zero cache hits, one transient NVIDIA HTTP 529. The provider failure does not contaminate the declared four-task diagnostic because that statistic had complete observations. Public evaluation was not used.
 
-Frozen protocol: same eight `dev_validation` IDs, NVIDIA NIM, `deepseek-ai/deepseek-v4-flash-0731`, ARC-R018 candidate and selector prompts, temperature 0, top_p 1, three candidates, 3072 candidate output tokens and 512 selector output tokens. Instrumentation only now persists each candidate rule/grid and exact `candidate_correct`, plus `selected_index`/`selected_correct`. Ground-truth scoring occurs after model generation and is never included in either prompt.
+Durable evidence: `lab/results/ARC-R020-candidate-oracle.json` and `lab/runs/2026-08-24/ARC-R020.md`.
 
-Predeclared diagnostic on the four prior parseable failures (`00dbd492`, `05f2a901`, `070dd51e`, `1190bc91`): candidate-set coverage **<50%** => generator/representation bottleneck; coverage **>=50%** with wrong selection => selector/ranking bottleneck.
+## Next shift
 
-Committed artifacts:
+Highest-priority ready task: `T0007-OBJECT-RELATION-CANDIDATE-GENERATOR` for ARC-R021. Recommended role: **object-centric-researcher**.
 
-- `src/arc_lab/candidate_oracle.py`
-- `tests/test_candidate_oracle.py`
-- `.github/workflows/r020-candidate-oracle.yml`
-- `lab/triggers/r020-candidate-oracle.request`
-- `lab/runs/2026-08-24/ARC-R020.md`
+Design one falsifiable generator-focused treatment: insert a compact object/relation representation before hypothesis generation and retain candidate-level oracle scoring. Keep DeepSeek V4 Flash, deterministic public-training-derived development data, selector complexity and unrelated settings controlled. Primary success signal should be increased correct-candidate coverage, not merely selector output accuracy. Record exact calls/tokens/runtime, parse failures, provider failures, new solves/regressions and adversarial interpretation.
 
-The workflow was triggered through the authorized NVIDIA secret path and fetches only pinned public training data. Public evaluation remains sealed. At handoff time `lab/results/ARC-R020-candidate-oracle.json` had not yet landed, so no result or resource accounting is claimed.
-
-Next shift: reconcile this same ARC-R020. If the result exists, apply the frozen decision boundary, finalize the report and accounting, mark T0006 done, update state/handoff and release the reservation. If execution failed, persist the failure evidence and repair/retry ARC-R020 only. Do not redesign architecture before this measurement is complete.
-
-Adversarial caveat: a fresh temperature-zero hosted rerun can still differ from ARC-R018 serving, so ARC-R020 measures the frozen protocol's current candidate coverage rather than reconstructing the unknowable historical candidate set.
+Do not spend the next shift making the selector more sophisticated before candidate coverage improves. Do not use public evaluation. Gemma/GPT-OSS remain legacy comparators only.
