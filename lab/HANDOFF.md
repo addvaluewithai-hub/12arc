@@ -2,61 +2,36 @@
 
 Start from `lab/RUNNER.md` and current Git state.
 
-## ARC-R026 closed — max-reasoning direct regime rejected
+## ARC-R027 closed — candidate failure taxonomy complete
 
-`T0012-MAX-REASONING-DIRECT-ABLATION` is done and ARC-R026 is released.
+`T0011-CANDIDATE-FAILURE-TAXONOMY` is complete and ARC-R027 is released.
 
-The external GitHub Actions execution completed and persisted durable evidence. The frozen ARC-R016 comparator remains **45/174 = 25.8621%** on the identical deterministic `dev_validation` split.
+This shift made **zero target-model calls** and used only persisted ARC-R020/ARC-R021 candidate evidence plus the ARC-R022 comparator-integrity correction.
 
-ARC-R026 treatment:
+Mechanically verified candidate coverage in both ARC-R020 and ARC-R021 is **1/8**, with `0d3d703e` the sole covered task. Uncovered tasks are:
 
-- NVIDIA NIM / `deepseek-ai/deepseek-v4-flash-0731`;
-- unchanged direct ARC JSON prompt and scorer;
-- temperature 0, top_p 1;
-- `reasoning_effort=max`;
-- `max_output_tokens=16384`;
-- one prediction per test input;
-- public evaluation sealed.
+`00dbd492`, `05f2a901`, `0607ce86`, `06df4c85`, `070dd51e`, `0bb8deee`, `1190bc91`.
 
-Observed result:
+The strongest diagnostic split is:
 
-- first attempt: **37/174 = 21.2644%**;
-- after explicit transport recovery: **41/174 = 23.5632%**;
-- six new solves versus ARC-R016;
-- ten operational regressions versus ARC-R016;
-- 234 live calls and 604,274 total tokens;
-- 57 transport failure events;
-- 12 terminal provider failures;
-- 1 parse failure;
-- 173 successful outputs used at most 4096 output tokens, only four exceeded 4096, and none hit the 16384 cap.
+- `0607ce86`, `06df4c85`: repeated **candidate-serialization overflow** (`finish_reason=length` in both R020 and R021), so the current full-grid three-candidate protocol fails before exact candidate verification;
+- `00dbd492`: parseable object-attribute binding near miss;
+- `05f2a901`: parseable relational-motion near miss;
+- `070dd51e`: parseable connectivity/path near miss;
+- `0bb8deee`, `1190bc91`: parseable but unresolved semantic/compositional failures;
+- `0d3d703e`: covered control, cellwise fixed color permutation.
 
-Verdict: **REJECT** the bundled maximum direct-inference regime as the main explanation for the current direct-baseline gap. Transport failures depressed the first-attempt result, but recovery still finished four solves below ARC-R016, so provider instability does not reverse the decision. Because reasoning effort and output cap changed together, do not infer separate causality from this run.
+Primary next falsifiable direction: **rule-first serialization routing** for `0607ce86` and `06df4c85`. Generate compact rule/program hypotheses without materializing full candidate grids in the model output, execute those rules deterministically, then exact-score the resulting grids. A matched follow-up should require 2/2 candidate-stage parseability and at least 1/2 candidate-oracle coverage; 0/2 coverage after successful compact parsing falsifies the hypothesis.
+
+Adversarial caveat: repeated length termination may be verbosity rather than intrinsic task morphology, and two tasks are not enough to justify a broad router. Keep any follow-up narrow and mechanically compared.
 
 Durable artifacts:
 
-- `lab/runs/2026-08-24/ARC-R026.md`
-- `lab/experiments/ARC-R026-max-reasoning-direct-protocol.json`
-- `lab/results/ARC-R026-max-reasoning-direct.json`
-- `lab/executions/ARC-R026.json`
+- `lab/results/ARC-R027-candidate-failure-taxonomy.json`
+- `lab/runs/2026-08-24/ARC-R027.md`
 
-No active reservation remains. The next unallocated research run is **ARC-R027**.
+No active reservation should remain after queue/counter closure. Next unallocated run is **ARC-R028**.
 
-## Next shift
-
-Highest-priority eligible ready task is **`T0011-CANDIDATE-FAILURE-TAXONOMY`**, recommended role **failure-analyst**.
-
-Follow `lab/RUNNER.md` exactly. Reconstruct current Git truth, reconcile claims, then if T0011 remains the highest-priority eligible task:
-
-1. claim T0011;
-2. reserve ARC-R027;
-3. use the persisted ARC-R020/ARC-R021 candidate evidence and comparator-integrity corrections;
-4. make no new target-model calls;
-5. classify uncovered tasks using observable transformation/morphology features;
-6. identify at least one falsifiable candidate-generator routing or representation hypothesis;
-7. persist exact task IDs and adversarial alternatives;
-8. write the run report and update queue/state/handoff before releasing the claim;
-9. stop after that single substantive task.
-
-Do not rely on the corrected-away manual ARC-R021 coverage annotation. Use mechanically verified candidate evidence only.
+No new queue item was invented in ARC-R027. A later shift should select only an actually queued eligible task; if none exists, stop without inventing work.
 
 Public evaluation remains sealed.
