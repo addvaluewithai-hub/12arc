@@ -1,0 +1,112 @@
+name: t0015-rule-first-overflow
+
+on:
+  push:
+    paths:
+      - 'lab/triggers/t0015-rule-first-overflow.request'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: t0015-rule-first-overflow
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install -e '.[dev]'
+      - name: Validate trigger against durable claim and reservation
+        id: freeze
+        run: |
+          python - <<'PY' > /tmp/freeze.json
+          import json
+          from pathlib import Path
+          trigger=json.loads(Path('lab/triggers/t0015-rule-first-overflow.request').read_text())
+          queue=json.loads(Path('lab/registry/queue.json').read_text())
+          counter=json.loads(Path('lab/registry/run-counter.json').read_text())
+          assert trigger['schema_version']==1
+          assert trigger['task_id']=='T0015-RULE-FIRST-OVERFLOW-ABLATION'
+          task=next(t for t in queue['tasks'] if t['id']==trigger['task_id'])
+          assert task['status']=='claimed' and task['claim']['shift_id']==trigger['shift_id']
+          assert any(r['run']==trigger['run'] and r['task_id']==trigger['task_id'] and r['shift_id']==trigger['shift_id'] for r in counter['active_reservations'])
+          print(json.dumps({'run':trigger['run']}))
+          PY
+          RUN=$(python -c 'import json; print(json.load(open("/tmp/freeze.json"))["run"])')
+          echo "run=$RUN" >> "$GITHUB_OUTPUT"
+          test -n "$NVIDIA_API_KEY"
+      - name: Mark external execution running
+        env:
+          RUN: ${{ steps.freeze.outputs.run }}
+        run: |
+          mkdir -p lab/executions
+          python - <<'PY'
+          import json, os
+          from datetime import datetime, timezone
+          from pathlib import Path
+          run=os.environ['RUN']
+          payload={'schema_version':1,'run':run,'task_id':'T0015-RULE-FIRST-OVERFLOW-ABLATION','status':'running','started_at':datetime.now(timezone.utc).isoformat(),'workflow_run_id':os.environ['GITHUB_RUN_ID'],'workflow_url':f"https://github.com/{os.environ['GITHUB_REPOSITORY']}/actions/runs/{os.environ['GITHUB_RUN_ID']}",'expected_result':f'lab/results/{run}-rule-first-overflow.json'}
+          Path(f'lab/executions/{run}.json').write_text(json.dumps(payload,indent=2,sort_keys=True)+'\n')
+          PY
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add "lab/executions/${RUN}.json"
+          git commit -m "${RUN}: mark rule-first overflow execution running"
+          git pull --rebase origin "$GITHUB_REF_NAME"
+          git push origin HEAD:"$GITHUB_REF_NAME"
+      - name: Fetch pinned public training data only
+        run: |
+          git init /tmp/arc-agi-2
+          git -C /tmp/arc-agi-2 remote add origin https://github.com/arcprize/ARC-AGI-2.git
+          git -C /tmp/arc-agi-2 sparse-checkout init --cone
+          git -C /tmp/arc-agi-2 sparse-checkout set data/training
+          git -C /tmp/arc-agi-2 fetch --depth=1 origin f3283f727488ad98fe575ea6a5ac981e4a188e49
+          git -C /tmp/arc-agi-2 checkout FETCH_HEAD
+          test ! -e /tmp/arc-agi-2/data/evaluation
+      - uses: actions/cache@v4
+        with:
+          path: /tmp/t0015-cache
+          key: t0015-${{ steps.freeze.outputs.run }}-v1
+      - name: Execute matched rule-first ablation
+        env:
+          RUN: ${{ steps.freeze.outputs.run }}
+        run: |
+          mkdir -p /tmp/t0015-cache lab/results
+          python -m arc_lab.rule_first_ablation /tmp/arc-agi-2/data/training \
+            --baseline lab/results/ARC-R020-candidate-oracle.json \
+            --cache-dir /tmp/t0015-cache \
+            --output "lab/results/${RUN}-rule-first-overflow.json" \
+            > /tmp/t0015-summary.json
+      - name: Persist result and complete status
+        env:
+          RUN: ${{ steps.freeze.outputs.run }}
+        run: |
+          git pull --rebase origin "$GITHUB_REF_NAME"
+          python - <<'PY'
+          import json, os
+          from datetime import datetime, timezone
+          from pathlib import Path
+          run=os.environ['RUN']
+          result_path=Path(f'lab/results/{run}-rule-first-overflow.json')
+          result=json.loads(result_path.read_text())
+          status_path=Path(f'lab/executions/{run}.json')
+          status=json.loads(status_path.read_text())
+          status.update({'status':'complete','finished_at':datetime.now(timezone.utc).isoformat(),'result_path':str(result_path),'verdict':result['verdict'],'parseable_tasks':result['parseable_tasks'],'covered_tasks':result['covered_tasks']})
+          status_path.write_text(json.dumps(status,indent=2,sort_keys=True)+'\n')
+          PY
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add "lab/results/${RUN}-rule-first-overflow.json" "lab/executions/${RUN}.json"
+          git commit -m "${RUN}: persist rule-first overflow result"
+          git pull --rebase origin "$GITHUB_REF_NAME"
+          git push origin HEAD:"$GITHUB_REF_NAME"
