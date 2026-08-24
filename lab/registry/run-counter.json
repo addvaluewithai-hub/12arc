@@ -1,13 +1,6 @@
 {
   "schema_version": 1,
   "next_run_number": 22,
-  "last_completed_run": "ARC-R020",
-  "active_reservations": [
-    {
-      "run_id": "ARC-R021",
-      "task_id": "T0007-OBJECT-RELATION-CANDIDATE-GENERATOR",
-      "shift_id": "automation-20260824T0640+0300",
-      "reserved_at": "2026-08-24T06:40:14+03:00"
-    }
-  ]
+  "last_completed_run": "ARC-R021",
+  "active_reservations": []
 }
