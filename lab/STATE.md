@@ -1,9 +1,10 @@
 # ARC Research Lab — Current State
 
-Updated: 2026-08-24 03:35 EEST
+Updated: 2026-08-24 04:45 EEST
 Phase: **PHASE 2 — architecture research**
 Latest completed research run: **ARC-R019**
-Next unallocated research run: **ARC-R020**
+Active research run: **ARC-R020**
+Next unallocated research run: **ARC-R021**
 
 ## Fixed comparator and model policy
 
@@ -13,37 +14,20 @@ ARC-R016 direct-JSON baseline is frozen at **45/174 = 25.8621%** exact accuracy 
 
 ## Architecture history
 
-ARC-R017 `hypothesis-train-replay-v1` was rejected at **1/8** versus comparator **4/8**. ARC-R018 `compact-hypothesis-select-v1` was rejected after provider recovery at **2/8** versus comparator **4/8**, with one new solve and three regressions.
+ARC-R017 `hypothesis-train-replay-v1` was rejected at **1/8** versus comparator **4/8**. ARC-R018 `compact-hypothesis-select-v1` was rejected after provider recovery at **2/8** versus comparator **4/8**, with one new solve and three regressions. ARC-R019 then established that ARC-R018 did not persist unselected candidate grids/correctness, making candidate omission versus selector error observationally unidentifiable from historical artifacts.
 
-ARC-R018 final accounting remains: 15 live calls, 56,726 tokens, 380.112 s summed runtime, two candidate parse failures, zero unresolved provider failures.
+## ARC-R020 candidate-oracle instrumentation
 
-## ARC-R019 failure audit
+`T0006-CANDIDATE-ORACLE-INSTRUMENTATION` is claimed/reserved as ARC-R020. Role: **benchmark-methodologist**.
 
-`T0005-R018-FAILURE-AUDIT` is complete. Role: **failure-analyst**. No target-model calls were made and public evaluation was not used.
+The experiment keeps ARC-R018's model-facing protocol fixed on the same eight deterministic `dev_validation` IDs and changes instrumentation only: every parsed candidate rule/grid is persisted and exact-scored after generation, together with `selected_index` and `selected_correct`. Development ground truth is not exposed to candidate generation or selection.
 
-The audit tested whether existing durable ARC-R018 evidence can classify parseable failures as **candidate-set omission** versus **selector error**. Result: **INCONCLUSIVE because the distinction is not identifiable from the persisted artifacts**.
+Predeclared diagnostic boundary on the four prior parseable ARC-R018 failures (`00dbd492`, `05f2a901`, `070dd51e`, `1190bc91`): candidate-set coverage **<50%** => generator/representation bottleneck; coverage **>=50%** with wrong selections => selector/ranking bottleneck.
 
-ARC-R018's implementation holds three candidate rules/test grids in memory, but the durable result persists only candidate-stage metadata and selector `selected_index`. It does not persist the three candidate grids/rules or exact `candidate_correct` flags. Therefore a wrong selected candidate is compatible with either a correct unselected candidate (selector error) or three wrong candidates (candidate omission).
+Implementation, test, workflow and trigger are committed. The authorized NVIDIA workflow was triggered, using pinned public training only and explicitly excluding public evaluation. At this state update, `lab/results/ARC-R020-candidate-oracle.json` had not yet landed. Do not invent coverage, token/runtime accounting or a bottleneck verdict.
 
-Quantified ARC-R018 mechanisms:
+Run report: `lab/runs/2026-08-24/ARC-R020.md`.
 
-- candidate parse failure: **2/8** (`0607ce86`, `06df4c85`);
-- parseable but unsolved: **4/8** (`00dbd492`, `05f2a901`, `070dd51e`, `1190bc91`);
-- parseable and solved: **2/8** (`0bb8deee`, `0d3d703e`).
+## Next action
 
-Among the three comparator regressions:
-
-- **1/3** is attributable to candidate serialization/parse failure (`0607ce86`);
-- **2/3** are parseable but coverage-vs-selection is unidentifiable (`00dbd492`, `05f2a901`);
-- selector error proven: **0/3**;
-- candidate omission proven: **0/3**.
-
-Durable audit: `lab/results/ARC-R019-R018-failure-audit.json`; report: `lab/runs/2026-08-24/ARC-R019.md`.
-
-## Next task
-
-`T0006-CANDIDATE-ORACLE-INSTRUMENTATION` is the highest-priority ready task for ARC-R020.
-
-Run a matched instrumentation-only experiment on the same frozen eight `dev_validation` IDs. Keep the ARC-R018 DeepSeek model, candidate/selector prompts, sampling and output budgets fixed; exact-score and persist all three parsed candidate grids plus `selected_index`/`selected_correct`. Reuse deterministic cache where available.
-
-Predeclared diagnostic boundary on the four parseable ARC-R018 failures: candidate-set coverage **<50%** means generator/representation is the dominant bottleneck; coverage **>=50%** with wrong selection means selector/ranking is the dominant bottleneck. Do not redesign the architecture before this measurement exists.
+Reconcile ARC-R020 before allocating ARC-R021. If the durable result has landed, inspect candidate-level correctness, apply the predeclared diagnostic boundary, record calls/tokens/runtime/provider failures and adversarial interpretation, finalize queue/state/handoff, then release ARC-R020. If the workflow failed, persist the failure evidence and repair only this experiment; do not start a new architecture task in the same shift.
