@@ -17,6 +17,7 @@ class GenerationConfig:
     top_p: float | None = 0.95
     top_k: int | None = 64
     max_output_tokens: int = 256
+    reasoning_effort: str | None = None
 
 
 @dataclass(frozen=True)
@@ -47,6 +48,23 @@ class TargetResponse:
     runtime_seconds: float
     cache_hit: bool = False
     provider_metadata: dict[str, Any] | None = None
+
+
+class TargetProviderError(RuntimeError):
+    """Sanitized provider failure carrying retry/rate-limit metadata."""
+
+    def __init__(
+        self,
+        message: str,
+        *,
+        status_code: int | None = None,
+        retryable: bool = False,
+        rate_limit_headers: dict[str, str] | None = None,
+    ):
+        super().__init__(message)
+        self.status_code = status_code
+        self.retryable = retryable
+        self.rate_limit_headers = rate_limit_headers or {}
 
 
 class TargetProvider(Protocol):
@@ -144,6 +162,21 @@ class NvidiaNIMProvider:
             return {"message": str(error)[:500]}
         return None
 
+    @staticmethod
+    def _rate_limit_headers(headers: Any) -> dict[str, str]:
+        if headers is None:
+            return {}
+        try:
+            items = headers.items()
+        except AttributeError:
+            return {}
+        return {
+            str(key).lower(): str(value)
+            for key, value in items
+            if str(key).lower().startswith("x-ratelimit")
+            or str(key).lower() == "retry-after"
+        }
+
     def generate(self, request: TargetRequest) -> TargetResponse:
         generation = request.generation
         payload: dict[str, Any] = {
@@ -157,6 +190,8 @@ class NvidiaNIMProvider:
             payload["top_p"] = generation.top_p
         if generation.top_k is not None:
             payload["top_k"] = generation.top_k
+        if generation.reasoning_effort is not None:
+            payload["reasoning_effort"] = generation.reasoning_effort
 
         http_request = urllib.request.Request(
             self.endpoint,
@@ -174,18 +209,31 @@ class NvidiaNIMProvider:
             with urllib.request.urlopen(http_request, timeout=self.timeout_seconds) as response:
                 status = response.status
                 body = response.read().decode("utf-8", errors="replace")
-                headers = dict(response.headers.items())
+                headers = response.headers
         except urllib.error.HTTPError as exc:
             body = exc.read().decode("utf-8", errors="replace")
             safe_error = self._safe_error_payload(body)
             detail = safe_error or {"message": body[:500]}
-            raise RuntimeError(f"NVIDIA NIM HTTP {exc.code}: {detail}") from exc
+            raise TargetProviderError(
+                f"NVIDIA NIM HTTP {exc.code}: {detail}",
+                status_code=exc.code,
+                retryable=exc.code in {408, 429, 500, 502, 503, 504, 529},
+                rate_limit_headers=self._rate_limit_headers(exc.headers),
+            ) from exc
         except Exception as exc:
-            raise RuntimeError(f"NVIDIA NIM transport failure: {type(exc).__name__}: {exc}") from exc
+            raise TargetProviderError(
+                f"NVIDIA NIM transport failure: {type(exc).__name__}: {exc}",
+                retryable=True,
+            ) from exc
 
         runtime = time.perf_counter() - started
         if status != 200:
-            raise RuntimeError(f"NVIDIA NIM unexpected HTTP status {status}")
+            raise TargetProviderError(
+                f"NVIDIA NIM unexpected HTTP status {status}",
+                status_code=status,
+                retryable=status in {408, 429, 500, 502, 503, 504, 529},
+                rate_limit_headers=self._rate_limit_headers(headers),
+            )
         try:
             data = json.loads(body)
         except json.JSONDecodeError as exc:
@@ -204,11 +252,7 @@ class NvidiaNIMProvider:
         if not isinstance(usage, dict):
             usage = {}
 
-        rate_headers = {
-            key.lower(): value
-            for key, value in headers.items()
-            if key.lower().startswith("x-ratelimit") or key.lower() in {"retry-after"}
-        }
+        rate_headers = self._rate_limit_headers(headers)
         return TargetResponse(
             model_requested=request.model,
             model_resolved=data.get("model"),
