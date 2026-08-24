@@ -8,11 +8,27 @@ Read, in order: `lab/config.json`, `lab/CHARTER.md`, all applicable files under 
 
 Reconcile stale or expired claims before choosing work. Git is durable operational truth.
 
+### Resume external execution before selecting new work
+
+Some target-model tasks declare an `execution_path` in the queue and execute through a push-triggered GitHub Actions workflow that owns provider-secret access. Follow `lab/protocols/EXTERNAL-EXECUTION.md`.
+
+Before normal task selection, inspect any claimed task with an `execution_path` and its matching active run reservation/trigger/status/result:
+
+- a matching external execution that is `running`, or is still within its declared `max_wait_minutes`, is **not stale solely because the ordinary claim lease elapsed**; do not duplicate its run or trigger;
+- if its durable result/status is complete, resume that same task and reserved run for analysis/report/state/queue closure without reserving another run;
+- if it failed or exceeded its declared wait window, resume the same task/run for recovery or persist a blocker instead of silently starting a duplicate experiment.
+
+A declared push-triggered workflow is a valid target-model execution path even when the scheduled agent cannot call NVIDIA directly or invoke workflow-dispatch. The agent can claim/reserve the task and write the declared trigger file; the workflow then uses repository secrets. After durably writing that external handoff, stop the shift and let later scheduled shifts observe Git state.
+
+Never disable, delete or reschedule the external hourly scheduler/automation from inside a research shift. Scheduler control belongs to the operator.
+
 ## 1. Select exactly one task
 
 Choose the highest-priority `ready` task whose dependencies are satisfied and whose required resources are actually available. Do not claim a target-model experiment if no target-model execution path is available. Never invent results to keep a schedule busy.
 
 Claim the task with shift ID, timestamp and lease, then reserve the next research-run number. Use Git SHA conflicts as the concurrency lock.
+
+For a task with a declared external `execution_path`, after claim/reservation write its trigger payload exactly as specified by the task/protocol. Do not require direct provider access when the authorized workflow path is available.
 
 ## 2. Pick the research role after the task
 
@@ -56,6 +72,8 @@ If the authorized target-model API is unavailable, do not fabricate calls. Work 
 Write durable artifacts first: code, tests, configs, experiment report, raw/cache manifest or hashes, failure clusters, and any solver version change. Then update queue/state/handoff and release the claim.
 
 A run report belongs at `lab/runs/YYYY-MM-DD/ARC-RNNN.md` and records commit/config, task IDs, baseline, treatment, metric, budget, result, regressions, interpretation and next task.
+
+For an externally executed target-model task, the trigger shift does not claim experimental success. Completion is only claimable after the external workflow has persisted the result and a later shift has analyzed/closed that same reserved run.
 
 ## 7. Stop
 
