@@ -2,44 +2,69 @@
 
 Start from `lab/RUNNER.md` and current Git state.
 
-## ARC-R024 closed — comparator integrity is mandatory at shared reporting boundary
+## ARC-R025 closed — T0012 external execution path is ready
 
-`T0010-INTEGRITY-GUARD-INTEGRATION` is done and ARC-R024 is released. No target-model calls were made and public evaluation remained sealed.
+`T0012A-MAX-REASONING-EXECUTION-PATH` is done and ARC-R025 is released. This was an `INFRA_ONLY` run with **zero target-model calls** and no public evaluation.
 
-`src/arc_lab/architecture_reporting.py` builds candidate-coverage deltas only from referenced durable comparator evidence. Task-set mismatch raises before report persistence. Integration tests live in `tests/test_architecture_reporting.py`.
+ARC-R025 added and validated the missing path that lets a GitHub-write-only scheduled agent start the max-reasoning NVIDIA experiment without direct NVIDIA access or workflow-dispatch access.
 
-Do not claim CI success for ARC-R024: the available connector returned no workflow run for the final test commit.
+Key durable changes:
 
-Report: `lab/runs/2026-08-24/ARC-R024.md`.
+- `src/arc_lab/target_model.py` supports `GenerationConfig.reasoning_effort`, includes it in fingerprints, sends it to NVIDIA when configured, and exposes sanitized retryable provider errors with rate-limit headers.
+- `src/arc_lab/max_reasoning_direct.py` implements the resumable direct-JSON T0012 runner.
+- `tests/test_max_reasoning_direct.py` covers max config, fingerprinting, provider payload/timeout, retryable errors, token buckets, trigger validation and aggregation.
+- `.github/workflows/t0012-max-reasoning-direct.yml` is the target workflow. It triggers on pushes to `lab/triggers/t0012-max-reasoning.request`, uses `NVIDIA_API_KEY` from repository secrets, has 360-minute job timeouts, provider timeout 900s, per-task artifacts, transport-retry accounting and durable aggregation.
+- `lab/protocols/EXTERNAL-EXECUTION.md` and `lab/RUNNER.md` now define external-execution lifecycle rules: do not duplicate running external workflows, do not treat normal claim lease expiry alone as stale for a running external execution, and never disable the hourly scheduler from inside a shift.
 
-## Operator reprioritization before ARC-R025
+Validation marker: `lab/validation/t0012a-passed.json`.
 
-Do **not** start the previously next `T0011-CANDIDATE-FAILURE-TAXONOMY` first. The operator has explicitly prioritized `T0012-MAX-REASONING-DIRECT-ABLATION` to test whether the frozen 4096-token/high-reasoning regime materially under-provisioned DeepSeek before more representation/classifier work.
+Validation marker records:
 
-The experiment contract is durable at `lab/experiments/T0012-max-reasoning-direct-ablation.json`.
+- status `passed`;
+- validated commit `def87116e75f8274d368fdfbbd500498908a6eb9`;
+- workflow run id `32741606202`;
+- tests `tests/test_target_model.py`, `tests/test_nvidia_baseline.py`, `tests/test_max_reasoning_direct.py`;
+- target-model calls `0`.
 
-## Next shift: ARC-R025
+Report: `lab/runs/2026-08-24/ARC-R025.md`.
+
+## Next shift: ARC-R026 trigger handoff for T0012
 
 Highest-priority ready task is **`T0012-MAX-REASONING-DIRECT-ABLATION`**, role **llm-experimenter**.
 
-Before inference, follow `lab/RUNNER.md`: reconcile claims, claim T0012 and reserve ARC-R025. Then implement/verify the minimum execution changes needed for the frozen treatment and run it on the identical 174-task `dev_validation` set.
+Follow `lab/RUNNER.md` exactly. For T0012:
 
-Frozen treatment requirements:
+1. claim T0012 and reserve ARC-R026;
+2. write `lab/triggers/t0012-max-reasoning.request` with:
+   - `schema_version: 1`
+   - `task_id: T0012-MAX-REASONING-DIRECT-ABLATION`
+   - `run: ARC-R026`
+   - the active claim `shift_id`
+   - `requested_at`
+3. stop the shift after the trigger is durable.
+
+Do **not** claim the 174-task experimental result merely because the trigger was written. The workflow must first persist:
+
+- `lab/executions/ARC-R026.json`
+- `lab/experiments/ARC-R026-max-reasoning-direct-protocol.json`
+- `lab/results/ARC-R026-max-reasoning-direct.json`
+
+Later scheduled shifts should inspect these durable files before selecting new work. If the execution is running or still within `max_wait_minutes`, do not start a duplicate. If it is complete, close the same reserved ARC-R026 with a run report and queue/state updates. If failed, recover or persist a blocker for the same run.
+
+Frozen T0012 treatment remains:
 
 - comparator: durable ARC-R016, 45/174 = 25.8621%;
 - model/provider: NVIDIA NIM / `deepseek-ai/deepseek-v4-flash-0731`;
-- reuse the exact direct ARC prompt and scorer from ARC-R016;
+- exact direct ARC prompt and scorer from ARC-R016;
 - temperature 0, top_p 1, one prediction/test input;
 - `reasoning_effort=max`;
 - `max_output_tokens=16384`;
-- GitHub Actions timeout: **360 minutes**;
-- provider HTTP timeout: **900 seconds**;
-- execution must be resumable with durable per-task or equivalently small-unit evidence;
-- any 429/529/timeout retries must be explicit and separately counted; preserve a first-attempt matched statistic so recovery is not mistaken for reasoning gain;
-- persist calls/tokens/runtime, finish reasons, parse/provider failures, output-length buckets (`<=4096`, `4097-8192`, `8193-16383`, `16384 cap`), and sanitized `x-ratelimit-*` / `retry-after` telemetry when NVIDIA returns it;
+- GitHub Actions timeout 360 minutes;
+- provider HTTP timeout 900 seconds;
+- explicit 429/529/timeout retry accounting;
+- first-attempt statistic preserved separately from operational recovery;
+- output-length buckets and sanitized rate-limit telemetry;
 - public evaluation remains sealed.
-
-This is intentionally an inference-regime **bundle** experiment: it measures maximum supported direct-inference utility, not separate causality of `reasoning_effort=max` versus the larger token cap. If the gain is material, a later ablation may separate those factors.
 
 `T0011-CANDIDATE-FAILURE-TAXONOMY` remains ready at lower priority and should be reconsidered only after T0012 evidence is durable.
 
