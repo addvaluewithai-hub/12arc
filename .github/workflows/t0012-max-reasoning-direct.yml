@@ -1,0 +1,230 @@
+name: t0012-max-reasoning-direct
+
+on:
+  push:
+    paths:
+      - 'lab/triggers/t0012-max-reasoning.request'
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: t0012-max-reasoning-direct
+  cancel-in-progress: false
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    outputs:
+      run: ${{ steps.freeze.outputs.run }}
+      task_ids: ${{ steps.freeze.outputs.task_ids }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install -e '.[dev]'
+      - run: pytest -q tests/test_target_model.py tests/test_nvidia_baseline.py tests/test_max_reasoning_direct.py
+      - id: freeze
+        name: Validate trigger and freeze run protocol
+        run: |
+          python -m arc_lab.max_reasoning_direct prepare \
+            --planned-protocol lab/experiments/T0012-max-reasoning-direct-ablation.json \
+            --ids-file lab/benchmarks/arc-agi-2-training-ids.txt \
+            --trigger lab/triggers/t0012-max-reasoning.request \
+            --queue lab/registry/queue.json \
+            --run-counter lab/registry/run-counter.json \
+            --output /tmp/t0012-protocol.json \
+            > /tmp/t0012-prepare.json
+          RUN=$(python -c 'import json; print(json.load(open("/tmp/t0012-prepare.json"))["run"])')
+          TASK_IDS=$(python -c 'import json; print(json.dumps(json.load(open("/tmp/t0012-prepare.json"))["task_ids"],separators=(",",":")))')
+          echo "run=$RUN" >> "$GITHUB_OUTPUT"
+          echo "task_ids=$TASK_IDS" >> "$GITHUB_OUTPUT"
+          mkdir -p lab/experiments lab/executions
+          cp /tmp/t0012-protocol.json "lab/experiments/${RUN}-max-reasoning-direct-protocol.json"
+          RUN="$RUN" python - <<'PY'
+          import json, os
+          from datetime import datetime, timezone
+          from pathlib import Path
+          run=os.environ['RUN']
+          payload={
+              'schema_version':1,
+              'run':run,
+              'task_id':'T0012-MAX-REASONING-DIRECT-ABLATION',
+              'status':'running',
+              'started_at':datetime.now(timezone.utc).isoformat(),
+              'trigger_commit':os.environ['GITHUB_SHA'],
+              'workflow_run_id':os.environ['GITHUB_RUN_ID'],
+              'workflow_url':f"https://github.com/{os.environ['GITHUB_REPOSITORY']}/actions/runs/{os.environ['GITHUB_RUN_ID']}",
+              'expected_result':f'lab/results/{run}-max-reasoning-direct.json',
+          }
+          Path(f'lab/executions/{run}.json').write_text(json.dumps(payload,indent=2,sort_keys=True)+'\n')
+          PY
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add "lab/experiments/${RUN}-max-reasoning-direct-protocol.json" "lab/executions/${RUN}.json"
+          git commit -m "${RUN}: freeze max-reasoning protocol and mark execution running"
+          git pull --rebase origin "$GITHUB_REF_NAME"
+          git push origin HEAD:"$GITHUB_REF_NAME"
+      - name: Fetch pinned public training only once
+        run: |
+          git init /tmp/arc-agi-2
+          git -C /tmp/arc-agi-2 remote add origin https://github.com/arcprize/ARC-AGI-2.git
+          git -C /tmp/arc-agi-2 sparse-checkout init --cone
+          git -C /tmp/arc-agi-2 sparse-checkout set data/training
+          git -C /tmp/arc-agi-2 fetch --depth=1 origin f3283f727488ad98fe575ea6a5ac981e4a188e49
+          git -C /tmp/arc-agi-2 checkout FETCH_HEAD
+          test ! -e /tmp/arc-agi-2/data/evaluation
+          tar -czf /tmp/arc-agi-2-training.tar.gz -C /tmp/arc-agi-2 data/training
+      - uses: actions/upload-artifact@v4
+        with:
+          name: t0012-${{ steps.freeze.outputs.run }}-training
+          path: /tmp/arc-agi-2-training.tar.gz
+          if-no-files-found: error
+          retention-days: 7
+
+  task:
+    needs: prepare
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    strategy:
+      fail-fast: false
+      max-parallel: 6
+      matrix:
+        task_id: ${{ fromJSON(needs.prepare.outputs.task_ids) }}
+    env:
+      NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install -e '.[dev]'
+      - uses: actions/download-artifact@v4
+        with:
+          name: t0012-${{ needs.prepare.outputs.run }}-training
+          path: /tmp/t0012-training
+      - name: Extract pinned training corpus
+        run: |
+          mkdir -p /tmp/arc-agi-2
+          tar -xzf /tmp/t0012-training/arc-agi-2-training.tar.gz -C /tmp/arc-agi-2
+          test ! -e /tmp/arc-agi-2/data/evaluation
+      - uses: actions/cache@v4
+        with:
+          path: /tmp/t0012-cache
+          key: t0012-${{ needs.prepare.outputs.run }}-${{ matrix.task_id }}-v1
+      - name: Execute one resumable ARC task at max reasoning
+        run: |
+          test -n "$NVIDIA_API_KEY"
+          mkdir -p /tmp/t0012-cache /tmp/t0012-out
+          python -m arc_lab.max_reasoning_direct run-task \
+            /tmp/arc-agi-2/data/training \
+            --task-id '${{ matrix.task_id }}' \
+            --cache-dir /tmp/t0012-cache \
+            --output '/tmp/t0012-out/task-${{ matrix.task_id }}.json' \
+            --provider-timeout-seconds 900 \
+            --max-transport-retries 2
+      - uses: actions/upload-artifact@v4
+        with:
+          name: t0012-${{ needs.prepare.outputs.run }}-task-${{ matrix.task_id }}
+          path: /tmp/t0012-out/task-${{ matrix.task_id }}.json
+          if-no-files-found: error
+          retention-days: 14
+
+  aggregate:
+    needs: [prepare, task]
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - run: git pull --rebase origin "$GITHUB_REF_NAME"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install -e '.[dev]'
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: t0012-${{ needs.prepare.outputs.run }}-task-*
+          path: /tmp/t0012-parts
+          merge-multiple: true
+      - name: Aggregate mechanically against ARC-R016
+        run: |
+          RUN='${{ needs.prepare.outputs.run }}'
+          python -m arc_lab.max_reasoning_direct aggregate \
+            --protocol "lab/experiments/${RUN}-max-reasoning-direct-protocol.json" \
+            --parts-dir /tmp/t0012-parts \
+            --comparator lab/results/ARC-R016-baseline.json \
+            --output "lab/results/${RUN}-max-reasoning-direct.json"
+          RUN="$RUN" python - <<'PY'
+          import json, os
+          from datetime import datetime, timezone
+          from pathlib import Path
+          run=os.environ['RUN']
+          status_path=Path(f'lab/executions/{run}.json')
+          status=json.loads(status_path.read_text())
+          result_path=Path(f'lab/results/{run}-max-reasoning-direct.json')
+          result=json.loads(result_path.read_text())
+          status.update({
+              'status':'complete',
+              'finished_at':datetime.now(timezone.utc).isoformat(),
+              'result_path':str(result_path),
+              'primary_first_attempt_solved':result['primary_first_attempt']['solved'],
+              'primary_first_attempt_accuracy':result['primary_first_attempt']['accuracy'],
+              'operational_recovered_solved':result['operational_with_transport_recovery']['solved'],
+              'verdict':result['verdict'],
+          })
+          status_path.write_text(json.dumps(status,indent=2,sort_keys=True)+'\n')
+          PY
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add "lab/results/${RUN}-max-reasoning-direct.json" "lab/executions/${RUN}.json"
+          git commit -m "${RUN}: persist max-reasoning direct result"
+          git pull --rebase origin "$GITHUB_REF_NAME"
+          git push origin HEAD:"$GITHUB_REF_NAME"
+
+  finalize-failure:
+    needs: [prepare, task, aggregate]
+    if: ${{ always() && needs.prepare.result == 'success' && needs.aggregate.result != 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - run: git pull --rebase origin "$GITHUB_REF_NAME"
+      - name: Persist failed external-execution state
+        env:
+          RUN: ${{ needs.prepare.outputs.run }}
+          TASK_RESULT: ${{ needs.task.result }}
+          AGGREGATE_RESULT: ${{ needs.aggregate.result }}
+        run: |
+          python - <<'PY'
+          import json, os
+          from datetime import datetime, timezone
+          from pathlib import Path
+          run=os.environ['RUN']
+          path=Path(f'lab/executions/{run}.json')
+          if not path.exists():
+              raise SystemExit(0)
+          status=json.loads(path.read_text())
+          status.update({
+              'status':'failed',
+              'finished_at':datetime.now(timezone.utc).isoformat(),
+              'task_job_result':os.environ['TASK_RESULT'],
+              'aggregate_job_result':os.environ['AGGREGATE_RESULT'],
+          })
+          path.write_text(json.dumps(status,indent=2,sort_keys=True)+'\n')
+          PY
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add "lab/executions/${RUN}.json"
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "${RUN}: record max-reasoning execution failure"
+          git pull --rebase origin "$GITHUB_REF_NAME"
+          git push origin HEAD:"$GITHUB_REF_NAME"
