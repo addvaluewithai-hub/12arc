@@ -1,9 +1,9 @@
 # ARC Research Lab — Current State
 
-Updated: 2026-08-24
+Updated: 2026-08-25
 Phase: **PHASE 2 — architecture research**
-Latest completed research run: **ARC-R027**
-Next unallocated research run: **ARC-R028**
+Latest completed research run: **ARC-R028**
+Next unallocated research run: **ARC-R029**
 
 ## Fixed comparator and model policy
 
@@ -30,13 +30,29 @@ Key failure families:
 - parseable but still unresolved compositional failures: `0bb8deee`, `1190bc91`;
 - control case `0d3d703e` remains a simple cellwise color permutation already covered by both generators.
 
-The strongest falsifiable next direction is **rule-first serialization routing** on `0607ce86` and `06df4c85`: generate compact rule/program hypotheses without full predicted grids, execute them deterministically, and require 2/2 parseability plus at least 1/2 mechanically verified candidate coverage under a matched comparator.
+## ARC-R028 agenda generation
+
+`T0013-RESEARCH-AGENDA-GENERATION` is complete with verdict **RESEARCH_DIRECTION** and made **zero target-model calls**. It converted the ARC-R027 bottleneck into a two-stage falsifiable queue rather than idling.
+
+### Ready now: T0014-RULE-FIRST-SERIALIZATION-HARNESS
+
+Build and validate a compact, versioned rule/program candidate IR with deterministic execution, fail-closed parsing, exact candidate-oracle integration, and comparator-integrity enforcement. This task is infrastructure/research only and must make zero target-model calls.
+
+Frozen local comparator: ARC-R020 compact-hypothesis candidate generation on `0607ce86` and `06df4c85`. The next target-model ablation must preserve the original DeepSeek model/settings and 3072-token candidate-stage budget except for the candidate serialization format.
+
+T0014 success requires a zero-model-call validation marker and a declared authorized external execution path for the later ablation.
+
+### Blocked follow-up: T0015-RULE-FIRST-OVERFLOW-ABLATION
+
+After T0014 passes, test rule-first candidate serialization on `0607ce86` and `06df4c85`. Success is **2/2 candidate stages parseable and at least 1/2 mechanically verified candidate coverage** after deterministic execution. If both parse but coverage stays 0/2, the stronger semantic-coverage hypothesis is falsified.
 
 Artifacts:
 
-- `lab/results/ARC-R027-candidate-failure-taxonomy.json`
-- `lab/runs/2026-08-24/ARC-R027.md`
+- `lab/results/ARC-R028-research-agenda.json`
+- `lab/experiments/T0014-rule-first-serialization-harness.json`
+- `lab/experiments/T0015-rule-first-overflow-ablation.json`
+- `lab/runs/2026-08-25/ARC-R028.md`
 
 ## Next task
 
-No follow-up task has been invented automatically. The queue should be extended deliberately from the ARC-R027 hypothesis before another substantive experiment begins. Public evaluation remains sealed.
+Execute exactly `T0014-RULE-FIRST-SERIALIZATION-HARNESS`. Do not start T0015 in the same shift. Public evaluation remains sealed.
