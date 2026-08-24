@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "task_id": "T0012-MAX-REASONING-DIRECT-ABLATION",
+  "title": "Measure DeepSeek V4 Flash under maximum supported direct-inference regime",
+  "status": "planned",
+  "intended_next_run": "ARC-R025 subject to normal claim/reservation",
+  "hypothesis": "On the same 174 deterministic dev_validation tasks and the exact same direct ARC prompt/scorer used by ARC-R016, DeepSeek V4 Flash with reasoning_effort=max and max_output_tokens=16384 will materially exceed the frozen ARC-R016 exact accuracy of 45/174 (25.8621%).",
+  "research_question": "How much of the current gap is caused by an under-provisioned inference regime before introducing more solver architecture?",
+  "primary_change": "Inference-regime bundle only: reasoning_effort=max plus the model endpoint's maximum supported 16384 output-token cap. Prompt, model, task set, scorer and one-prediction contract remain fixed.",
+  "frozen_comparator": {
+    "run": "ARC-R016",
+    "result": "lab/results/ARC-R016-baseline.json",
+    "solver_version": "nvidia-direct-json-baseline-v1",
+    "solved": 45,
+    "tasks": 174,
+    "accuracy": 0.25862068965517243
+  },
+  "provider": "nvidia-nim",
+  "model": "deepseek-ai/deepseek-v4-flash-0731",
+  "split": "dev_validation",
+  "task_count": 174,
+  "public_evaluation_used": false,
+  "prompt_contract": "Reuse baseline.build_prompt unchanged: infer one rule from all training examples, apply it to the test input, return only the output grid as JSON.",
+  "generation": {
+    "temperature": 0.0,
+    "top_p": 1.0,
+    "top_k": null,
+    "reasoning_effort": "max",
+    "max_output_tokens": 16384,
+    "attempts_per_test": 1
+  },
+  "execution": {
+    "github_actions_timeout_minutes": 360,
+    "provider_http_timeout_seconds": 900,
+    "resumable": true,
+    "checkpoint_granularity": "per task or equivalently small durable unit; do not lose completed work when a job ends",
+    "parallelization": "allowed; preserve exact task accounting and avoid duplicate uncached inference",
+    "transport_recovery": "Any retry of 429/529/timeout must be explicit and separately accounted. Preserve a first-attempt matched statistic so provider recovery cannot be mistaken for reasoning gain."
+  },
+  "primary_metric": "exact full-task accuracy on the identical 174-task dev_validation set",
+  "secondary_metrics": [
+    "new solves and regressions versus ARC-R016",
+    "parse failures",
+    "provider failures",
+    "input/output/total tokens",
+    "runtime",
+    "finish_reason distribution",
+    "output-token length buckets including <=4096, 4097-8192, 8193-16383, and 16384 cap hits",
+    "sanitized x-ratelimit-* and retry-after telemetry when returned by NVIDIA"
+  ],
+  "decision_rule": {
+    "promote_for_followup": "Treatment must strictly exceed 45/174 with mechanically matched task accounting. Larger gains justify delaying taxonomy/classifier work and first measuring the remaining direct-inference gap.",
+    "reject_regime_as_main_explanation": "If the score remains near the frozen baseline despite clean execution, resume representation/generation research with T0011.",
+    "causal_limit": "Because max reasoning effort and output cap change together, this run measures the utility of the maximum supported inference regime, not which of the two settings caused any gain. If the gain is material, a later matched ablation may separate reasoning_effort from token-cap effects."
+  },
+  "dashboard_requirement": "Read-only observability only; no run-control buttons are required. Expose progress, solved count/accuracy, calls/tokens/runtime, finish reasons, provider failures and rate-limit telemetry from durable artifacts.",
+  "endpoint_limit_evidence": "NVIDIA API reference checked 2026-08-24: deepseek-v4-flash-0731 supports reasoning_effort none/high/max and max_tokens 1..16384."
+}
