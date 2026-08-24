@@ -1,6 +1,14 @@
 {
   "schema_version": 1,
-  "next_run_number": 25,
+  "next_run_number": 26,
   "last_completed_run": "ARC-R024",
-  "active_reservations": []
+  "active_reservations": [
+    {
+      "run": "ARC-R025",
+      "task_id": "T0012A-MAX-REASONING-EXECUTION-PATH",
+      "shift_id": "interactive-20260824T153331+0300-t0012a",
+      "reserved_at": "2026-08-24T15:33:31+03:00",
+      "lease_expires_at": "2026-08-24T17:33:31+03:00"
+    }
+  ]
 }
