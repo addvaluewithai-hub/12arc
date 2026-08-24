@@ -2,20 +2,18 @@
 
 Start from `lab/RUNNER.md` and current Git state.
 
-## ARC-R020 complete — generator/representation is the diagnosed bottleneck
+## ARC-R021 active — object/relation candidate generator
 
-`T0006-CANDIDATE-ORACLE-INSTRUMENTATION` is complete and ARC-R020 is released. No active reservation remains; ARC-R021 is next.
+`T0007-OBJECT-RELATION-CANDIDATE-GENERATOR` is claimed and ARC-R021 is reserved. Do **not** allocate ARC-R022 until this run is reconciled.
 
-ARC-R020 kept ARC-R018's model-facing protocol frozen and changed instrumentation only. On the four predeclared prior parseable failures (`00dbd492`, `05f2a901`, `070dd51e`, `1190bc91`), all four candidate stages parsed and **0/4 candidate sets contained a correct answer**. This is below the predeclared 50% boundary, so the diagnosis is **generator/representation bottleneck**, not selector/ranking.
+ARC-R020 diagnosed generator/representation as the bottleneck: on the four predeclared prior parseable failures all four candidate stages parsed but 0/4 candidate sets contained a correct answer; overall candidate coverage was only 1/8.
 
-Overall: 6/8 candidate stages parseable, 1/8 tasks with any correct candidate, 1/8 selected correct; 13 calls, 50,289 tokens, 434.5213 s summed runtime, zero cache hits, one transient NVIDIA HTTP 529. The provider failure does not contaminate the declared four-task diagnostic because that statistic had complete observations. Public evaluation was not used.
+ARC-R021 uses role **object-centric-researcher** and changes one primary variable: candidate generation now explicitly reasons in a compact object/relation representation before producing the same three rule+grid hypotheses. It asks for background, connected objects, color/size/bounding-box/shape, repeated motifs, containment/touching/alignment/symmetry and supported object-level operations, without serializing the intermediate scene graph.
 
-Durable evidence: `lab/results/ARC-R020-candidate-oracle.json` and `lab/runs/2026-08-24/ARC-R020.md`.
+Controls remain frozen: same eight ARC-R020 `dev_validation` IDs, NVIDIA NIM `deepseek-ai/deepseek-v4-flash-0731`, temperature 0/top_p 1, candidate output cap 3072, selector cap 512, one attempt/test, same selector prompt, candidate-level oracle scoring. Public evaluation is unused.
 
-## Next shift
+Decision rule: PROMOTE iff candidate coverage >=3/8, >=2 newly covered tasks versus ARC-R020, and previously covered `0bb8deee` remains covered. Provider failures => INCONCLUSIVE; otherwise REJECT.
 
-Highest-priority ready task: `T0007-OBJECT-RELATION-CANDIDATE-GENERATOR` for ARC-R021. Recommended role: **object-centric-researcher**.
+Durable pre-execution artifacts: `src/arc_lab/object_relation_generator.py`, `tests/test_object_relation_generator.py`, `.github/workflows/r021-object-relation-generator.yml`, `lab/runs/2026-08-24/ARC-R021.md`. Trigger: `lab/triggers/r021-object-relation-generator.request`.
 
-Design one falsifiable generator-focused treatment: insert a compact object/relation representation before hypothesis generation and retain candidate-level oracle scoring. Keep DeepSeek V4 Flash, deterministic public-training-derived development data, selector complexity and unrelated settings controlled. Primary success signal should be increased correct-candidate coverage, not merely selector output accuracy. Record exact calls/tokens/runtime, parse failures, provider failures, new solves/regressions and adversarial interpretation.
-
-Do not spend the next shift making the selector more sophisticated before candidate coverage improves. Do not use public evaluation. Gemma/GPT-OSS remain legacy comparators only.
+At handoff, `lab/results/ARC-R021-object-relation-generator.json` had not yet landed. Next shift must check for that result first. If present, apply the predeclared decision rule, record exact calls/tokens/runtime, parse/provider failures, new candidate coverage and regressions, finalize queue/state/handoff, release ARC-R021, then stop. If still in flight, retain the reservation and do not invent results.
