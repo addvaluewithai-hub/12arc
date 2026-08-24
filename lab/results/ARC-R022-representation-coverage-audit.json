@@ -1,0 +1,37 @@
+{
+  "run_id": "ARC-R022",
+  "task_id": "T0008-REPRESENTATION-COVERAGE-AUDIT",
+  "role": "failure-analyst",
+  "model_calls": 0,
+  "public_evaluation_used": false,
+  "sources": [
+    "lab/results/ARC-R020-candidate-oracle.json",
+    "lab/results/ARC-R021-object-relation-generator.json"
+  ],
+  "finding": "ARC-R021 baseline coverage annotations are inconsistent with ARC-R020 durable candidate oracle evidence.",
+  "arc_r020_grounded_coverage": {
+    "0bb8deee": false,
+    "0d3d703e": true
+  },
+  "arc_r021_embedded_baseline_annotations": {
+    "0bb8deee": true,
+    "0d3d703e": false
+  },
+  "arc_r021_treatment_coverage": {
+    "0bb8deee": false,
+    "0d3d703e": true
+  },
+  "corrected_comparison": {
+    "baseline_candidate_coverage": "1/8",
+    "treatment_candidate_coverage": "1/8",
+    "new_candidate_covered_tasks": [],
+    "candidate_coverage_regressions": [],
+    "preserved_covered_tasks": ["0d3d703e"],
+    "coverage_delta": 0
+  },
+  "morphology_note": "0d3d703e is a cellwise fixed color-permutation task; ARC-R020 and ARC-R021 both generated exact correct color-mapping candidates. The supposed new coverage therefore cannot support an object-centric routing hypothesis. 0bb8deee was uncovered in both runs, so it is not a treatment regression.",
+  "interpretation": "ARC-R021 remains REJECT because 1/8 coverage is below the predeclared >=3/8 promotion threshold, but the previously reported coverage-swap mechanism is invalid. The durable evidence supports no candidate-coverage change from the universal object/relation prompt on this slice.",
+  "adversarial_interpretation": "Hosted deterministic serving can vary across runs, but this audit compares persisted exact candidate correctness, not inferred outputs. The metadata inversion is directly falsified by ARC-R020 records for the two affected IDs.",
+  "next_hypothesis": "A deterministic morphology classifier plus representation routing should not be tested until baseline/treatment coverage labels are derived mechanically from persisted candidate correctness rather than manually supplied. First add an integrity check that reconstructs comparator coverage from the referenced result and fails on annotation mismatch; then future routing experiments can use trustworthy per-task deltas.",
+  "verdict": "AUDIT_CORRECTION"
+}
