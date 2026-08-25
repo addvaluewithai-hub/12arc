@@ -2,29 +2,30 @@
 
 Start from `lab/RUNNER.md` and current Git state.
 
-## ARC-R031 closed — schema-v1 expressivity is insufficient
+## ARC-R032 closed — lattice-region primitive sufficiency rejected
 
-`T0016-RULE-FIRST-SEMANTIC-PRIMITIVE-AUDIT` completed as a no-model failure audit. Public evaluation was not used.
+`T0017-LATTICE-REGION-PRIMITIVE-ABLATION` completed under the frozen ARC-R030 comparator controls. Public evaluation was not used.
 
-Durable evidence: `lab/results/ARC-R031-semantic-primitive-audit.json` and `lab/runs/2026-08-25/ARC-R031.md`.
+Durable evidence: `lab/results/ARC-R032-lattice-region.json`, `lab/executions/ARC-R032.json`, and `lab/runs/2026-08-25/ARC-R032.md`.
 
-The decisive mechanical fact is that `src/arc_lab/rule_first.py` schema-v1 supports only identity, whole-grid rotations/flips, and global recolor. Those operations cannot condition edits on region/cell membership or change only selected occurrences of a color while retaining other occurrences unchanged.
+Result: **REJECT**. The treatment was 2/2 parseable but 0/2 exact candidate coverage, identical to comparator 0/2, so the predeclared success threshold was missed and the explicit falsification condition was met. There were 2 live NVIDIA calls, 0 cache hits, 14,526 input tokens, 419 output tokens, 57.807 s model runtime, 0 provider failures and 0 parse failures.
 
-On permitted public-training examples:
+The new representation was actually used: five normalized program ASTs were generated and `lattice_peer_reduce` appeared seven times. This rules out the trivial explanation that DeepSeek never emitted the new operator.
 
-- `0607ce86` requires selective local repair inside repeated/lattice-like structure; same colors survive in some locations while noisy occurrences are corrected elsewhere.
-- `06df4c85` uses a separator-defined lattice and selectively fills/propagates payloads into some cells while preserving other zeros and separators.
+Per-task evidence differs:
 
-Classification: **2/2 missing generic DSL/IR expressivity**, high confidence. Search/induction or prompt diversity may still be weak, but no search over schema-v1 can represent the observed mappings.
+- `0607ce86`: response parsed, then executor failed closed with `inferred lattice cells must have equal size`. Treat this as a partition-model / validation-boundary signal.
+- `06df4c85`: response parsed and executed lattice-peer reductions, but all candidates were exact-wrong. Treat this as unresolved generic semantics vs induction/search.
 
-## Next task: T0017-LATTICE-REGION-PRIMITIVE-ABLATION
+## Next task: T0018-SCHEMA-V2-EXPRESSIBILITY-ORACLE-AUDIT
 
-Protocol: `lab/experiments/T0017-lattice-region-primitive-ablation.json`.
+No model calls. On permitted public-training pairs only, use bounded deterministic enumeration/search to test whether generic schema-v2 can represent exact training-consistent programs for `0607ce86` and `06df4c85` under the existing anti-overfit constraints.
 
-Primary change only: add a reusable lattice-region map/reduce primitive family with inferred regular cell partitions, region extraction/reassembly, peer equality/majority aggregation, and generic conditional writes. Strictly forbid task IDs, absolute task coordinates, task-specific color constants, or hand-entered target patterns.
+Do not credit any research-team/oracle program as a target-model solve. The audit is diagnostic only.
 
-Before target-model calls, implement and test the primitive generically and fail closed. Then run the matched two-task ablation against ARC-R030 using exactly `0607ce86` and `06df4c85`, NVIDIA NIM `deepseek-ai/deepseek-v4-flash-0731`, one attempt/test, temperature 0, top_p 1, no reasoning override, and 3072 candidate output tokens.
+Decision rule:
 
-Success: 2/2 parseable and >=1/2 mechanically verified exact candidate coverage. If 2/2 parseable remains 0/2 coverage, reject primitive-family sufficiency and shift attention toward induction/search or a different representation.
+- If no exact generic schema-v2 program exists for a task, classify representation/partition semantics as insufficient and isolate one generic missing or incorrect assumption before proposing another matched ablation.
+- If an exact generic schema-v2 program does exist, preserve it only as oracle evidence and classify ARC-R032 primarily as induction/search failure for that task; then predeclare a search/prompt intervention that leaves the DSL frozen.
 
-Do not increase token budget as a substitute; ARC-R030 already removed the serialization/length failure. Keep public evaluation sealed.
+Keep public evaluation sealed and do not increase token budget as a substitute for resolving this distinction.
