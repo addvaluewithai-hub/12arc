@@ -1,0 +1,69 @@
+name: T0019 variable-span partition ablation
+
+on:
+  push:
+    paths:
+      - 'lab/triggers/t0019-variable-span.request'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: t0019-variable-span
+  cancel-in-progress: false
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Validate claim and reservation
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          trigger = json.loads(Path('lab/triggers/t0019-variable-span.request').read_text())
+          queue = json.loads(Path('lab/registry/queue.json').read_text())
+          counter = json.loads(Path('lab/registry/run-counter.json').read_text())
+          assert trigger['schema_version'] == 1
+          assert trigger['task_id'] == 'T0019-VARIABLE-SPAN-PARTITION-ABLATION'
+          assert trigger['run'] == 'ARC-R034'
+          task = next(t for t in queue['tasks'] if t['id'] == trigger['task_id'])
+          assert task['status'] == 'claimed'
+          assert task['claim']['shift_id'] == trigger['shift_id']
+          assert task['claim']['run'] == trigger['run']
+          assert any(r['run'] == trigger['run'] and r['task_id'] == trigger['task_id'] for r in counter['active_reservations'])
+          PY
+      - name: Install and run implementation tests
+        run: |
+          python -m pip install -e '.[dev]'
+          pytest -q tests/test_lattice_region.py tests/test_schema_v2_oracle_audit.py tests/test_variable_span_partition_audit.py
+      - name: Fetch pinned public training task only
+        run: |
+          git init /tmp/arc-agi-2
+          git -C /tmp/arc-agi-2 remote add origin https://github.com/arcprize/ARC-AGI-2.git
+          git -C /tmp/arc-agi-2 sparse-checkout init --cone
+          git -C /tmp/arc-agi-2 sparse-checkout set data/training
+          git -C /tmp/arc-agi-2 fetch --depth=1 origin f3283f727488ad98fe575ea6a5ac981e4a188e49
+          git -C /tmp/arc-agi-2 checkout FETCH_HEAD
+          test ! -e /tmp/arc-agi-2/data/evaluation
+          test -f /tmp/arc-agi-2/data/training/0607ce86.json
+      - name: Run bounded variable-span oracle audit
+        run: |
+          python -m arc_lab.variable_span_partition_audit /tmp/arc-agi-2/data/training --output lab/results/ARC-R034-variable-span-partition.json
+          cat lab/results/ARC-R034-variable-span-partition.json
+      - name: Persist result
+        run: |
+          git config user.name 'arc-research-bot'
+          git config user.email 'arc-research-bot@users.noreply.github.com'
+          git add lab/results/ARC-R034-variable-span-partition.json
+          git commit -m 'ARC-R034: persist variable-span partition result'
+          git pull --rebase origin main
+          git push origin HEAD:main
