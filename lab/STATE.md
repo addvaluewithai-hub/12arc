@@ -2,8 +2,8 @@
 
 Updated: 2026-08-25
 Phase: **PHASE 2 — architecture research**
-Latest completed research run: **ARC-R029**
-Next unallocated research run: **ARC-R030**
+Latest completed research run: **ARC-R030**
+Next unallocated research run: **ARC-R031**
 
 ## Fixed comparator and model policy
 
@@ -19,47 +19,50 @@ ARC-R027 mechanically verified ARC-R020 and ARC-R021 candidate coverage at **1/8
 
 ARC-R028 converted that evidence into a falsifiable two-stage queue: T0014 infrastructure first, then a matched two-task T0015 serialization ablation.
 
-## ARC-R029 rule-first serialization harness
+ARC-R029 validated the rule-first infrastructure with zero target-model calls: compact generic program IR, deterministic fail-closed execution, exact candidate scoring, mechanical coverage and comparator-integrity enforcement.
 
-`T0014-RULE-FIRST-SERIALIZATION-HARNESS` is complete with outcome **INFRA_ONLY / PASS** and made **zero target-model calls**.
+## ARC-R030 rule-first overflow ablation
 
-Durable implementation:
+`T0015-RULE-FIRST-OVERFLOW-ABLATION` is complete with outcome **REJECT**.
 
-- `src/arc_lab/rule_first.py`: versioned compact generic program IR, bounded fail-closed validation, deterministic executor, exact candidate scoring, mechanical coverage and matched comparator enforcement;
-- `tests/test_rule_first.py`: deterministic execution/input immutability, invalid-program rejection, exact materialized-grid scoring, coverage semantics and comparator mismatch tests;
-- `.github/workflows/t0014-rule-first-ci.yml`: zero-model-call CI path;
-- `lab/validation/T0014-rule-first-harness.json`: passing validation marker;
-- `src/arc_lab/rule_first_ablation.py` and `.github/workflows/t0015-rule-first-overflow.yml`: authorized external execution path for the follow-up experiment.
+The matched diagnostic used exactly `0607ce86` and `06df4c85`, NVIDIA NIM `deepseek-ai/deepseek-v4-flash-0731`, one attempt per test input, `temperature=0.0`, `top_p=1.0`, no reasoning-effort override, and the frozen **3072-token** candidate-stage output budget. The only intended treatment was candidate serialization: compact executable programs instead of materialized full grids.
 
-GitHub Actions run **32789570942** completed **success** on head SHA `c67ac14cfea35c19b7188eb0201d78448993c77c`. The rule-first, comparator-integrity and scoring test command passed. `NVIDIA_API_KEY` was explicitly empty in the T0014 validation workflow, and the validation marker records `target_model_calls: 0`.
+Durable result:
 
-T0014 does not claim any research improvement. The bounded generic IR may still be semantically too weak; that is what T0015 must test.
+- comparator candidate coverage: **0/2**;
+- treatment candidate coverage: **0/2**;
+- parseability: **2/2**;
+- new coverage: **0**;
+- regressions: **0**;
+- live provider calls: **1**;
+- cache hits: **1**;
+- input tokens: **14,366**;
+- output tokens: **186**;
+- provider failures: **0**;
+- parse failures: **0**;
+- program validation failures: **0**;
+- public evaluation used: **false**.
 
-## Ready now: T0015-RULE-FIRST-OVERFLOW-ABLATION
+Execution status `lab/executions/ARC-R030.json` is `complete` with verdict `REJECT`. GitHub Actions run **32800687395** completed successfully on head SHA `2cb4ad651c2f729816d4658f2fdb6db67e9f7e8a` and persisted `lab/results/ARC-R030-rule-first-overflow.json`.
 
-Run the predeclared matched diagnostic on exactly `0607ce86` and `06df4c85` using the authorized push-trigger workflow.
+Interpretation: compact serialization removed the repeated length/parse failure but did **not** create any exact candidate. Therefore response-length overflow was a real operational symptom but is not a sufficient explanation of the candidate-coverage bottleneck. The strongest remaining uncertainty is **semantic program induction versus generic IR expressivity**, not output budget.
 
-Primary change: candidate response serialization only — exactly three compact executable rule/program hypotheses instead of materialized full grids.
+Adversarially, the two-task diagnostic does not show that rule-first representations are globally useless. The schema-v1 IR is intentionally small, and failure could arise because required transformations are not expressible, because the model fails to compose available primitives, or because the prompt collapses candidate diversity. Parseability alone is not reasoning progress.
 
-Frozen controls from ARC-R020 candidate generation remain unchanged, including:
+## Ready now: T0016-RULE-FIRST-SEMANTIC-PRIMITIVE-AUDIT
 
-- provider/model: NVIDIA NIM / `deepseek-ai/deepseek-v4-flash-0731`;
-- candidate-stage `max_output_tokens`: **3072**;
-- same deterministic public-training-derived task data;
-- one candidate-generation attempt per test input;
-- exact scoring only after deterministic execution;
-- mechanical comparator-integrity reporting against ARC-R020 on the identical task IDs.
+Highest-priority ready task: `T0016-RULE-FIRST-SEMANTIC-PRIMITIVE-AUDIT`.
 
-Success: **2/2 candidate stages parseable and >=1/2 exact candidate coverage** after deterministic execution. Failure/falsification: either task remains unparsable/length-terminated, or both parse but remain **0/2** exact coverage. Provider/transport failure should be reported separately rather than interpreted as hypothesis evidence.
+Role: **failure-analyst**.
 
-Execution path:
+This is a no-model audit using persisted ARC-R030 evidence plus permitted public-training examples only. It must classify each diagnostic failure into one of three falsifiable buckets:
 
-- workflow: `.github/workflows/t0015-rule-first-overflow.yml`
-- trigger: `lab/triggers/t0015-rule-first-overflow.request`
-- expected result: `lab/results/{run}-rule-first-overflow.json`
-- status: `lab/executions/{run}.json`
-- repository secret: `NVIDIA_API_KEY` inside Actions only
+1. missing generic DSL/IR expressivity;
+2. compositional search/induction failure despite adequate expressivity;
+3. prompt-induced candidate collapse/diversity failure.
 
-The next shift must claim T0015 and reserve **ARC-R030** before writing the trigger. After the trigger is durably written, stop and let GitHub Actions execute; do not start another substantive task in that shift.
+The audit must not encode task-specific solutions into the solver. It should produce a mechanically auditable generic primitive/representation gap report and predeclare exactly one matched follow-up ablation with frozen comparator/task IDs/success threshold.
+
+No active run reservation remains. Next unallocated run is **ARC-R031**.
 
 Public evaluation remains sealed.
