@@ -1,6 +1,6 @@
 # ARC Research Lab — Current State
 
-Updated: 2026-08-25
+Updated: 2026-08-26
 Phase: **PHASE 2 — architecture research**
 Latest completed research run: **ARC-R035**
 Next unallocated research run: **ARC-R036**
@@ -27,9 +27,13 @@ ARC-R035 changed only that alignment assumption. Peer reduction now operates ins
 
 No target-model calls were made in ARC-R035. GitHub Actions run `32847574881` passed claim/reservation validation, implementation tests, pinned-public-training fetch, bounded audit, and durable result persistence. Public evaluation remained sealed.
 
+## Active execution/recovery context
+
+`T0021-OVERLAP-SEMANTIC-CLOSURE-AUDIT` / `ARC-R036` is the active claimed diagnostic and must be resolved before starting another substantive queued task. The current purpose of T0021 remains unchanged: keep ARC-R035 semantics frozen and diagnose the 216 deeper-search failures plus near-miss reachable states.
+
 ## Next research direction
 
-Highest-priority follow-up: `T0021-OVERLAP-SEMANTIC-CLOSURE-AUDIT`.
+Highest-priority active follow-up: `T0021-OVERLAP-SEMANTIC-CLOSURE-AUDIT`.
 
 Do not add another primitive from intuition yet. Keep the entire ARC-R035 solver semantics frozen and mechanically diagnose the remaining bounded state graph for `0607ce86`:
 
@@ -41,5 +45,19 @@ Do not add another primitive from intuition yet. Keep the entire ARC-R035 solver
 The task succeeds only if one dominant, reproducible mechanism is supported strongly enough to predeclare exactly one matched follow-up ablation. If the evidence stays ambiguous, record that ambiguity rather than inventing a primitive.
 
 `06df4c85` remains a separate semantic-closure problem and should not be mixed into this diagnostic.
+
+## Strategic post-T0021 direction: multi-candidate critique/verify loop
+
+After the active T0021/ARC-R036 claim is resolved, the lab should intentionally explore a multi-candidate proposal architecture instead of relying on one model answer. The model should generate many candidate programs/rules, critique them, challenge the critique, and propose repairs; deterministic Python execution and exact scoring must remain the only judge.
+
+Predeclared artifacts:
+
+- `lab/design/MULTI-CANDIDATE-CRITIQUE-VERIFY.md`
+- `lab/experiments/T0022-multi-candidate-critique-verify-loop.json`
+- `lab/registry/proposed-tasks/T0022-MULTI-CANDIDATE-CRITIQUE-VERIFY-LOOP.json`
+
+The intended next queued task is `T0022-MULTI-CANDIDATE-CRITIQUE-VERIFY-LOOP`, blocked only by the active T0021 closure/queue integration. Prefer starting with `06df4c85`, because ARC-R032 executed lattice programs there but remained exact-wrong; use `0607ce86` only after T0021 produces durable failure taxonomy or freezes a compatible mechanism.
+
+This direction is not permission to invent results. Model critique is proposal-generation only. Evidence must come from Python parsing, deterministic execution, exact training-pair scoring, candidate deduplication, cell-error ranking, matched comparator deltas, and durable artifacts.
 
 Public evaluation remains sealed.
