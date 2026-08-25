@@ -96,18 +96,30 @@ def _peer_indices(ri: int, ci: int, nr: int, nc: int, axis: str) -> list[tuple[i
     return [(r, ci) for r in range(nr)]
 
 
+def _shared_overlap(regions: Sequence[Sequence[Grid]], peers: Sequence[tuple[int, int]]) -> tuple[int, int]:
+    """Return the top-left relative-coordinate domain shared by every peer."""
+    if not peers:
+        raise ValueError("peer set must be non-empty")
+    heights = [len(regions[pr][pc]) for pr, pc in peers]
+    widths = [len(regions[pr][pc][0]) for pr, pc in peers]
+    return min(heights), min(widths)
+
+
 def lattice_peer_reduce(grid: Grid, *, axis: str, reducer: str, write: str) -> Grid:
     lattice = infer_lattice(grid)
     regions = extract_regions(grid, lattice)
     nr, nc = len(regions), len(regions[0])
-    h, w = len(regions[0][0]), len(regions[0][0][0])
     bg = _background(grid)
     updated = deepcopy(regions)
     for ri in range(nr):
         for ci in range(nc):
             peers = _peer_indices(ri, ci, nr, nc, axis)
-            for r in range(h):
-                for c in range(w):
+            overlap_h, overlap_w = _shared_overlap(regions, peers)
+            # T0020 treatment: only relative coordinates shared by every selected
+            # peer participate in reduction. Cells outside that top-left overlap
+            # remain exactly as they were in the target region.
+            for r in range(overlap_h):
+                for c in range(overlap_w):
                     vals = [regions[pr][pc][r][c] for pr, pc in peers]
                     target = _reduce(vals, reducer, bg)
                     current = regions[ri][ci][r][c]
