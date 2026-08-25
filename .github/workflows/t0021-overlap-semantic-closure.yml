@@ -27,38 +27,49 @@ jobs:
       - name: Validate claim and reservation
         run: |
           set -euo pipefail
-          TASK='T0021-OVERLAP-SEMANTIC-CLOSURE-AUDIT'
-          RUN='ARC-R036'
-          TRIGGER='lab/triggers/t0021-overlap-semantic-closure.request'
-          QUEUE='lab/registry/queue.json'
-          COUNTER='lab/registry/run-counter.json'
+          python - <<'PY'
+          import json
+          from pathlib import Path
 
-          python -m json.tool "$TRIGGER" >/dev/null
-          python -m json.tool "$QUEUE" >/dev/null
-          python -m json.tool "$COUNTER" >/dev/null
+          TASK = 'T0021-OVERLAP-SEMANTIC-CLOSURE-AUDIT'
+          RUN = 'ARC-R036'
+          trigger = json.loads(Path('lab/triggers/t0021-overlap-semantic-closure.request').read_text())
+          queue = json.loads(Path('lab/registry/queue.json').read_text())
+          counter = json.loads(Path('lab/registry/run-counter.json').read_text())
 
-          trigger_task=$(jq -r '.task_id' "$TRIGGER")
-          trigger_run=$(jq -r '.run' "$TRIGGER")
-          trigger_shift=$(jq -r '.shift_id' "$TRIGGER")
-          trigger_schema=$(jq -r '.schema_version' "$TRIGGER")
-          task_count=$(jq --arg task "$TASK" '[.tasks[] | select(.id == $task)] | length' "$QUEUE")
-          task_status=$(jq -r --arg task "$TASK" '.tasks[] | select(.id == $task) | .status' "$QUEUE")
-          claim_shift=$(jq -r --arg task "$TASK" '.tasks[] | select(.id == $task) | .claim.shift_id' "$QUEUE")
-          reservation_count=$(jq --arg run "$RUN" --arg task "$TASK" '[.active_reservations[] | select(.run == $run and .task_id == $task)] | length' "$COUNTER")
-          reservation_shift=$(jq -r --arg run "$RUN" --arg task "$TASK" '.active_reservations[] | select(.run == $run and .task_id == $task) | .shift_id' "$COUNTER")
+          matches = [t for t in queue['tasks'] if t.get('id') == TASK]
+          reservations = [r for r in counter.get('active_reservations', []) if r.get('run') == RUN and r.get('task_id') == TASK]
 
-          printf 'trigger_schema=%s\ntrigger_task=%s\ntrigger_run=%s\ntrigger_shift=%s\ntask_count=%s\ntask_status=%s\nclaim_shift=%s\nreservation_count=%s\nreservation_shift=%s\n' \
-            "$trigger_schema" "$trigger_task" "$trigger_run" "$trigger_shift" "$task_count" "$task_status" "$claim_shift" "$reservation_count" "$reservation_shift"
+          observed = {
+              'trigger_schema': trigger.get('schema_version'),
+              'trigger_task': trigger.get('task_id'),
+              'trigger_run': trigger.get('run'),
+              'trigger_shift': trigger.get('shift_id'),
+              'task_count': len(matches),
+              'task_status': matches[0].get('status') if len(matches) == 1 else None,
+              'claim_shift': (matches[0].get('claim') or {}).get('shift_id') if len(matches) == 1 else None,
+              'reservation_count': len(reservations),
+              'reservation_shift': reservations[0].get('shift_id') if len(reservations) == 1 else None,
+          }
+          print(json.dumps(observed, indent=2, sort_keys=True))
 
-          test "$trigger_schema" = '1'
-          test "$trigger_task" = "$TASK"
-          test "$trigger_run" = "$RUN"
-          test -n "$trigger_shift"
-          test "$task_count" = '1'
-          test "$task_status" = 'claimed'
-          test "$claim_shift" = "$trigger_shift"
-          test "$reservation_count" = '1'
-          test "$reservation_shift" = "$trigger_shift"
+          expected_shift = trigger.get('shift_id')
+          checks = {
+              'schema_version': trigger.get('schema_version') == 1,
+              'task_id': trigger.get('task_id') == TASK,
+              'run': trigger.get('run') == RUN,
+              'shift_present': isinstance(expected_shift, str) and bool(expected_shift),
+              'single_task': len(matches) == 1,
+              'task_claimed': len(matches) == 1 and matches[0].get('status') == 'claimed',
+              'claim_shift_matches': len(matches) == 1 and (matches[0].get('claim') or {}).get('shift_id') == expected_shift,
+              'single_reservation': len(reservations) == 1,
+              'reservation_shift_matches': len(reservations) == 1 and reservations[0].get('shift_id') == expected_shift,
+          }
+          failed = [name for name, ok in checks.items() if not ok]
+          if failed:
+              raise SystemExit('claim/reservation validation failed: ' + ', '.join(failed))
+          print('claim/reservation validation passed')
+          PY
       - name: Install and run diagnostic tests
         run: |
           python -m pip install -e '.[dev]'
