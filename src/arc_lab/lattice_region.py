@@ -36,14 +36,11 @@ def _intervals(size: int, separators: Sequence[int]) -> list[tuple[int, int]]:
     spans = [(cuts[i] + 1, cuts[i + 1]) for i in range(len(cuts) - 1) if cuts[i] + 1 < cuts[i + 1]]
     if len(spans) < 2:
         raise ValueError("lattice inference requires at least two regions")
-    lengths = {b - a for a, b in spans}
-    if len(lengths) != 1:
-        raise ValueError("inferred lattice cells must have equal size")
     return spans
 
 
 def infer_lattice(grid: Grid) -> dict[str, Any]:
-    """Infer a regular separator-defined lattice; fail closed on ambiguity/non-regularity."""
+    """Infer a separator-defined lattice; region spans may have unequal sizes."""
     g = validate_grid(grid)
     rows = _uniform_rows(g)
     cols = _uniform_cols(g)
