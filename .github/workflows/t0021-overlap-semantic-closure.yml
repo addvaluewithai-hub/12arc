@@ -25,48 +25,59 @@ jobs:
         with:
           python-version: '3.11'
       - name: Validate claim and reservation
+        env:
+          EXPECTED_TASK: T0021-OVERLAP-SEMANTIC-CLOSURE-AUDIT
+          EXPECTED_RUN: ARC-R036
         run: |
           python - <<'PY'
           import json
+          import os
           from pathlib import Path
-          trigger = json.loads(Path('lab/triggers/t0021-overlap-semantic-closure.request').read_text())
-          queue = json.loads(Path('lab/registry/queue.json').read_text())
-          counter = json.loads(Path('lab/registry/run-counter.json').read_text())
 
-          if trigger.get('schema_version') != 1:
-              raise RuntimeError(f"trigger schema_version mismatch: {trigger.get('schema_version')!r}")
-          if trigger.get('task_id') != 'T0021-OVERLAP-SEMANTIC-CLOSURE-AUDIT':
-              raise RuntimeError(f"trigger task_id mismatch: {trigger.get('task_id')!r}")
-          if trigger.get('run') != 'ARC-R036':
-              raise RuntimeError(f"trigger run mismatch: {trigger.get('run')!r}")
+          trigger_path = Path('lab/triggers/t0021-overlap-semantic-closure.request')
+          queue_path = Path('lab/registry/queue.json')
+          counter_path = Path('lab/registry/run-counter.json')
+          trigger = json.loads(trigger_path.read_text(encoding='utf-8'))
+          queue = json.loads(queue_path.read_text(encoding='utf-8'))
+          counter = json.loads(counter_path.read_text(encoding='utf-8'))
 
-          matches = [t for t in queue.get('tasks', []) if t.get('id') == trigger['task_id']]
-          if len(matches) != 1:
-              raise RuntimeError(f"expected exactly one queue task, found {len(matches)}")
-          task = matches[0]
-          if task.get('status') != 'claimed':
-              raise RuntimeError(f"task status mismatch: {task.get('status')!r}")
+          expected_task = os.environ['EXPECTED_TASK']
+          expected_run = os.environ['EXPECTED_RUN']
+          checks = {
+              'schema_version': trigger.get('schema_version') == 1,
+              'task_id': trigger.get('task_id') == expected_task,
+              'run': trigger.get('run') == expected_run,
+              'shift_id_present': isinstance(trigger.get('shift_id'), str) and bool(trigger.get('shift_id')),
+          }
+          failed = [name for name, ok in checks.items() if not ok]
+          if failed:
+              raise RuntimeError(f'trigger validation failed: {failed}; trigger={trigger!r}')
+
+          task_matches = [t for t in queue.get('tasks', []) if t.get('id') == expected_task]
+          if len(task_matches) != 1:
+              raise RuntimeError(f'expected one queue task {expected_task}, found {len(task_matches)}')
+          task = task_matches[0]
           claim = task.get('claim') or {}
-          if claim.get('shift_id') != trigger.get('shift_id'):
-              raise RuntimeError(
-                  f"claim shift mismatch: queue={claim.get('shift_id')!r} trigger={trigger.get('shift_id')!r}"
-              )
+          if task.get('status') != 'claimed':
+              raise RuntimeError(f"task must remain claimed, found {task.get('status')!r}")
+          if claim.get('shift_id') != trigger['shift_id']:
+              raise RuntimeError(f"claim/trigger shift mismatch: {claim.get('shift_id')!r} != {trigger['shift_id']!r}")
 
-          reservations = [
+          reservation_matches = [
               r for r in counter.get('active_reservations', [])
-              if r.get('run') == trigger['run'] and r.get('task_id') == trigger['task_id']
+              if r.get('run') == expected_run and r.get('task_id') == expected_task
           ]
-          if len(reservations) != 1:
-              raise RuntimeError(f"expected exactly one matching reservation, found {len(reservations)}")
-          reservation = reservations[0]
-          if reservation.get('shift_id') != trigger.get('shift_id'):
-              raise RuntimeError(
-                  f"reservation shift mismatch: reservation={reservation.get('shift_id')!r} trigger={trigger.get('shift_id')!r}"
-              )
+          if len(reservation_matches) != 1:
+              raise RuntimeError(f'expected one active reservation for {expected_run}/{expected_task}, found {len(reservation_matches)}')
+          reservation = reservation_matches[0]
+          if reservation.get('shift_id') != trigger['shift_id']:
+              raise RuntimeError(f"reservation/trigger shift mismatch: {reservation.get('shift_id')!r} != {trigger['shift_id']!r}")
+
           print(json.dumps({
-              'validated_task': trigger['task_id'],
-              'validated_run': trigger['run'],
+              'validated_task': expected_task,
+              'validated_run': expected_run,
               'validated_shift_id': trigger['shift_id'],
+              'task_status': task.get('status'),
               'last_completed_run': counter.get('last_completed_run'),
               'next_run_number': counter.get('next_run_number'),
           }, sort_keys=True))
