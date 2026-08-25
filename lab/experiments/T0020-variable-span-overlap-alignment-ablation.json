@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "task_id": "T0020-VARIABLE-SPAN-OVERLAP-ALIGNMENT-ABLATION",
+  "hypothesis": "After variable-size separator spans are permitted, the remaining 0607ce86 blocker is the frozen peer reducer's assumption that every region shares identical relative-coordinate extents. Restricting peer reduction to the generic shared overlap domain while preserving non-overlap cells will yield valid transitions and may recover an exact training-consistent program.",
+  "baseline": "ARC-R034 variable-span partition ablation with frozen equal-relative-coordinate peer semantics",
+  "primary_change": "For each peer set, reduce only coordinates in the shared intersection of peer-region extents (minimum peer height and width), preserving cells outside that overlap unchanged. Do not change separator inference, reducer definitions, axes, write modes, search depth, or task set.",
+  "target_model": null,
+  "target_model_calls": 0,
+  "split": "permitted public ARC-AGI-2 training data only",
+  "task_ids": ["0607ce86"],
+  "search": {
+    "strategy": "deterministic BFS with state deduplication",
+    "max_depth": 4,
+    "operator_family": "existing schema-v2 lattice_peer_reduce",
+    "operator_count": 27
+  },
+  "frozen_controls": [
+    "variable-size separator-defined partition inference from ARC-R034",
+    "27 axis/reducer/write parameterizations",
+    "max search depth 4",
+    "state deduplication",
+    "0607ce86 public-training pairs only"
+  ],
+  "anti_overfit_constraints": [
+    "no task IDs in DSL semantics",
+    "no absolute task-specific coordinates",
+    "no task-specific color constants",
+    "no hand-entered target patterns"
+  ],
+  "primary_metric": "existence of an exact training-consistent program",
+  "secondary_diagnostics": [
+    "valid first-step transitions",
+    "programs expanded",
+    "operator applications",
+    "unique reachable states",
+    "execution failures"
+  ],
+  "success_threshold": "At least one valid first-step transition and an exact training-consistent program within depth 4.",
+  "partial_success": "At least one valid first-step transition but no exact program; classify shape-alignment blocker as removed while peer-reduction semantics remain insufficient.",
+  "falsification": "No valid first-step transition after overlap-domain alignment, falsifying shared-overlap alignment as the proximate remaining blocker.",
+  "public_evaluation_used": false
+}
