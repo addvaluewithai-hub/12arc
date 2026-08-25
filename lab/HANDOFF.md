@@ -2,55 +2,63 @@
 
 Start from `lab/RUNNER.md` and current Git state.
 
-## ARC-R029 closed — T0014 harness validated
+## ARC-R030 closed — T0015 rule-first overflow ablation rejected
 
-`T0014-RULE-FIRST-SERIALIZATION-HARNESS` is complete with **INFRA_ONLY / PASS**. This shift made **zero target-model calls** and did not use public evaluation.
+`T0015-RULE-FIRST-OVERFLOW-ABLATION` is complete with verdict **REJECT**. Public evaluation was not used.
 
-The durable rule-first path now consists of:
+Final durable external execution:
 
-- `src/arc_lab/rule_first.py` — compact schema-v1 generic program IR, deterministic executor, fail-closed validation, exact executed-grid scoring, mechanical coverage and comparator-integrity enforcement;
-- `tests/test_rule_first.py`;
-- `.github/workflows/t0014-rule-first-ci.yml`;
-- `lab/validation/T0014-rule-first-harness.json`;
-- `src/arc_lab/rule_first_ablation.py`;
-- `.github/workflows/t0015-rule-first-overflow.yml`.
+- status: `lab/executions/ARC-R030.json` = `complete`;
+- result: `lab/results/ARC-R030-rule-first-overflow.json`;
+- GitHub Actions run: **32800687395**, conclusion `success`;
+- model/provider: NVIDIA NIM / `deepseek-ai/deepseek-v4-flash-0731`;
+- diagnostic task IDs: `0607ce86`, `06df4c85`;
+- candidate-stage output budget: **3072 tokens**;
+- attempts: one per test input;
+- live calls: **1**;
+- cache hits: **1**;
+- tokens: **14,366 input / 186 output**;
+- provider failures: **0**;
+- parse failures: **0**;
+- program validation failures: **0**.
 
-GitHub Actions validation run **32789570942** completed **success** on SHA `c67ac14cfea35c19b7188eb0201d78448993c77c`. The T0014 workflow explicitly supplied an empty `NVIDIA_API_KEY`; validation records `target_model_calls: 0`.
+Matched result: comparator coverage **0/2**, treatment coverage **0/2**, new coverage **0**, regressions **0**. Both treatment candidate stages were parseable (**2/2**), so the previous length/serialization symptom was removed, but no exact candidate emerged after deterministic execution.
 
-No task-specific solution was encoded. The IR is deliberately bounded and generic, so semantic insufficiency remains a live failure mode.
+This falsifies the strong local hypothesis that compact serialization alone would recover candidate coverage. Do not repeat the same experiment with a larger token budget: the persisted outputs were tiny relative to the 3072-token cap and parseability is already solved.
 
-## Next eligible task: T0015-RULE-FIRST-OVERFLOW-ABLATION
+Adversarially, this does not falsify every rule-first architecture. The generic schema-v1 IR may be too weak, available primitives may be composable but poorly induced, or the prompt may collapse semantic diversity.
+
+## Next eligible task: T0016-RULE-FIRST-SEMANTIC-PRIMITIVE-AUDIT
 
 Execute exactly this task next.
 
-Role: **program-synthesis-researcher**.
+Role: **failure-analyst**.
 
-Protocol: `lab/experiments/T0015-rule-first-overflow-ablation.json`.
+Purpose: use only persisted ARC-R030 programs/results and permitted public-training examples for `0607ce86` and `06df4c85` to determine which bottleneck best explains 2/2 parseability with 0/2 coverage:
 
-Diagnostic task IDs: `0607ce86`, `06df4c85` only. ARC-R027 showed both repeatedly ending candidate generation with `finish_reason=length` under ARC-R020 and ARC-R021 full-grid serialization.
+1. missing generic DSL/IR expressivity;
+2. compositional search/induction failure despite adequate expressivity;
+3. prompt-induced candidate collapse/diversity failure.
 
-Frozen treatment rule: change only candidate response serialization to exactly three compact executable programs. Preserve matched ARC-R020 candidate-generation controls, including NVIDIA NIM `deepseek-ai/deepseek-v4-flash-0731` and **3072 max output tokens**. Execute programs deterministically, exact-score the materialized grids and compare coverage mechanically against ARC-R020 on the identical task set.
+Constraints:
 
-Success: **2/2 parseable and >=1/2 exact candidate coverage**. Falsification: either task remains unparsable/length-terminated, or both parse but remain **0/2** exact coverage. Treat provider/transport failure as operationally inconclusive rather than positive or negative hypothesis evidence.
+- no target-model calls are required;
+- public evaluation remains sealed;
+- do not encode task-specific solutions or hints into the solver;
+- distinguish generic primitive insufficiency from search failure mechanically where possible;
+- inspect the actual persisted candidate programs, not just aggregate scores;
+- produce a failure/primitive audit artifact;
+- propose only generic reusable primitive families or representation changes;
+- predeclare exactly one matched follow-up ablation with frozen comparator, exact task IDs, one primary change, success threshold, failure diagnostics and resource requirements.
 
-### Required lifecycle
+Required lifecycle for next shift:
 
-1. Claim `T0015-RULE-FIRST-OVERFLOW-ABLATION`.
-2. Reserve next run **ARC-R030**.
-3. Durably write both claim and reservation before substantive work.
-4. Write `lab/triggers/t0015-rule-first-overflow.request` with `schema_version=1`, the task ID, reserved run, claim `shift_id`, and `requested_at`.
-5. Stop the shift after the trigger is durable. The GitHub Actions workflow validates claim/reservation and uses repository `NVIDIA_API_KEY` inside Actions.
-6. A later shift should reconcile the durable execution/result and close the task only when evidence exists.
+1. Reconstruct truth from `lab/RUNNER.md`.
+2. Claim `T0016-RULE-FIRST-SEMANTIC-PRIMITIVE-AUDIT`.
+3. Reserve **ARC-R031**.
+4. Durably write claim and reservation before substantive audit work.
+5. Perform only T0016, persist its evidence/report/state/queue/handoff, release claim/reservation, then stop.
 
-Execution workflow: `.github/workflows/t0015-rule-first-overflow.yml`.
-Expected result: `lab/results/{run}-rule-first-overflow.json`.
-Execution status: `lab/executions/{run}.json`.
+Durable ARC-R030 report: `lab/runs/2026-08-25/ARC-R030.md`.
 
-Durable ARC-R029 evidence:
-
-- `lab/validation/T0014-rule-first-harness.json`
-- `lab/runs/2026-08-25/ARC-R029.md`
-
-After ARC-R029 closure, no active reservation should remain and next unallocated run is **ARC-R030**.
-
-Public evaluation remains sealed.
+After ARC-R030 closure, there are no active reservations and next unallocated run is **ARC-R031**.
