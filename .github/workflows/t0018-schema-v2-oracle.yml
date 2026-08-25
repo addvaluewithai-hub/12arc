@@ -3,9 +3,7 @@ name: t0018-schema-v2-oracle
 on:
   push:
     paths:
-      - 'src/arc_lab/schema_v2_oracle_audit.py'
-      - 'tests/test_schema_v2_oracle_audit.py'
-      - '.github/workflows/t0018-schema-v2-oracle.yml'
+      - 'lab/triggers/t0018-schema-v2-oracle.request'
 
 permissions:
   contents: write
@@ -22,16 +20,21 @@ jobs:
         with:
           python-version: '3.11'
       - run: python -m pip install -e '.[dev]'
-      - name: Validate durable claim and reservation
+      - name: Validate trigger, durable claim and reservation
         run: |
           python - <<'PY'
           import json
+          trigger=json.load(open('lab/triggers/t0018-schema-v2-oracle.request'))
           q=json.load(open('lab/registry/queue.json'))
           c=json.load(open('lab/registry/run-counter.json'))
-          t=next(t for t in q['tasks'] if t['id']=='T0018-SCHEMA-V2-EXPRESSIBILITY-ORACLE-AUDIT')
+          assert trigger['schema_version']==1
+          assert trigger['task_id']=='T0018-SCHEMA-V2-EXPRESSIBILITY-ORACLE-AUDIT'
+          assert trigger['run']=='ARC-R033'
+          t=next(t for t in q['tasks'] if t['id']==trigger['task_id'])
           assert t['status']=='claimed'
-          assert t['claim']['run']=='ARC-R033'
-          assert any(r['run']=='ARC-R033' and r['task_id']==t['id'] for r in c['active_reservations'])
+          assert t['claim']['run']==trigger['run']
+          assert t['claim']['shift_id']==trigger['shift_id']
+          assert any(r['run']==trigger['run'] and r['task_id']==t['id'] for r in c['active_reservations'])
           PY
       - name: Unit tests
         run: pytest -q tests/test_schema_v2_oracle_audit.py tests/test_lattice_region.py
