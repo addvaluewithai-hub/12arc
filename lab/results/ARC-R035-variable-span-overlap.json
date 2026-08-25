@@ -1,0 +1,36 @@
+{
+  "adversarial_interpretation": "Valid transitions would only show that the equal-shape indexing failure was removed. Without an exact program they do not establish sufficiency of the existing peer-reduction semantics; overlap anchoring itself may also be the wrong generic alignment relation.",
+  "benchmark_task_ids": [
+    "0607ce86"
+  ],
+  "frozen_operator_count": 27,
+  "max_depth": 4,
+  "primary_change": "shared-overlap relative-coordinate peer alignment; preserve non-overlap cells",
+  "public_evaluation_used": false,
+  "record": {
+    "depth": null,
+    "depth_counts": {
+      "0": 1,
+      "1": 12,
+      "2": 45,
+      "3": 179,
+      "4": 561
+    },
+    "execution_failures": 216,
+    "expressible": false,
+    "failure_types": {
+      "ValueError": 216
+    },
+    "first_step_valid_transitions": 27,
+    "operator_applications": 6399,
+    "oracle_program": null,
+    "programs_expanded": 237,
+    "unique_states": 798
+  },
+  "role": "program-synthesis-researcher",
+  "run": "ARC-R035",
+  "schema_version": 1,
+  "target_model_calls": 0,
+  "task_id": "T0020-VARIABLE-SPAN-OVERLAP-ALIGNMENT-ABLATION",
+  "verdict": "PARTIAL_ALIGNMENT_BLOCKER_REMOVED_SEMANTICS_INSUFFICIENT"
+}
