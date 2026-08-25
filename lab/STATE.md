@@ -2,8 +2,8 @@
 
 Updated: 2026-08-25
 Phase: **PHASE 2 — architecture research**
-Latest completed research run: **ARC-R032**
-Next unallocated research run: **ARC-R033**
+Latest completed research run: **ARC-R033**
+Next unallocated research run: **ARC-R034**
 
 ## Fixed comparator and model policy
 
@@ -17,16 +17,27 @@ ARC-R030 rejected compact serialization as a sufficient fix: on `0607ce86` and `
 
 ARC-R031 mechanically established that schema-v1 cannot express the selective region-level training mappings for either diagnostic task and predeclared a generic lattice-region primitive family.
 
-ARC-R032 tested that family under frozen ARC-R030 model/generation/scoring controls. The result was **REJECT**: 2/2 parseable but 0/2 exact candidate coverage, with 0 new coverage and 0 regressions. The run used 2 live NVIDIA calls, 14,526 input tokens, 419 output tokens, 57.807 s model runtime, 0 provider failures and 0 parse failures. Five normalized program ASTs were generated and `lattice_peer_reduce` appeared seven times, so the richer language was actually used.
+ARC-R032 tested that family under frozen ARC-R030 model/generation/scoring controls. The result was **REJECT**: 2/2 parseable but 0/2 exact candidate coverage, with actual `lattice_peer_reduce` use. `0607ce86` failed closed at equal-size lattice inference; `06df4c85` executed but remained exact-wrong.
 
-Failure evidence splits the uncertainty further. `0607ce86` failed closed at execution with `inferred lattice cells must have equal size`, identifying a partition-model/validation-boundary mismatch. `06df4c85` produced executable lattice-peer programs but no exact candidate, leaving wrong generic semantics vs induction/search unresolved.
+ARC-R033 then removed model induction from the loop with a bounded deterministic oracle search over the implemented schema-v2 operator family, using permitted public-training pairs only and zero target-model calls. Neither task was expressible within the bounded reachable state graph:
+
+- `0607ce86`: 27/27 first-step operator applications failed validation; only the initial state was reachable. The immediate blocker is the equal-size lattice-span restriction.
+- `06df4c85`: zero validation failures, 54 operator applications, two unique reachable states, no exact training-consistent program. Search depth is not the main issue because the reachable closure collapses quickly under the current peer-reduction semantics.
+
+This shifts the dominant uncertainty from model induction to representation semantics.
 
 ## Next research direction
 
-Highest-priority follow-up: `T0018-SCHEMA-V2-EXPRESSIBILITY-ORACLE-AUDIT`.
+Highest-priority follow-up: `T0019-VARIABLE-SPAN-PARTITION-ABLATION`.
 
-Use **no target-model calls**. On permitted public-training pairs only, mechanically determine whether bounded generic schema-v2 programs can exactly fit the two diagnostic mappings under the same anti-overfit constraints (no task IDs, absolute task-specific coordinates, task-specific colors, or hand-entered target patterns).
+Change exactly one structural assumption on `0607ce86`: permit generic variable-size separator-defined lattice spans while freezing the existing 27 schema-v2 peer-reduction parameterizations and max search depth 4. No target-model calls.
 
-Primary question: does an exact generic schema-v2 program exist for each training mapping? If no, representation semantics remain insufficient and the audit should isolate one generic missing/incorrect assumption. If yes, preserve that program only as oracle evidence and classify the live ARC-R032 failure primarily as induction/search rather than crediting a research-team program as a target-model solve.
+Decision rule:
+
+- exact training-consistent program found: partition restriction was sufficient to recover expressibility for this diagnostic;
+- valid transitions but no exact program: partition blocker is removed, but region semantics remain insufficient;
+- no valid transition: the partition-boundary diagnosis is falsified and another generic structural assumption must be isolated.
+
+`06df4c85` remains a separate semantic-closure problem and should not be mixed into this one-variable ablation.
 
 Public evaluation remains sealed.
