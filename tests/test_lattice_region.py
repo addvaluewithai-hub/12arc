@@ -49,7 +49,9 @@ def test_outliers_only_repairs_region_peer_disagreement():
         "steps": [{"op": "lattice_peer_reduce", "axis": "all", "reduce": "majority", "write": "outliers_only"}],
     }
     out = execute_program(program, grid)
-    assert out[4][4] == 0
+    # Relative cell (1,1) across the four lattice regions is [2, 0, 2, 7],
+    # so deterministic majority is 2; the injected 7 is the outlier to repair.
+    assert out[4][4] == 2
 
 
 def test_validation_fails_closed_and_has_no_task_specific_coordinate_or_color_fields():
