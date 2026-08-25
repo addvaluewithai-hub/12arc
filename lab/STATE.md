@@ -2,8 +2,8 @@
 
 Updated: 2026-08-25
 Phase: **PHASE 2 — architecture research**
-Latest completed research run: **ARC-R034**
-Next unallocated research run: **ARC-R035**
+Latest completed research run: **ARC-R035**
+Next unallocated research run: **ARC-R036**
 
 ## Fixed comparator and model policy
 
@@ -21,22 +21,25 @@ ARC-R032 tested that family under frozen ARC-R030 model/generation/scoring contr
 
 ARC-R033 removed model induction from the loop with bounded deterministic oracle search over the implemented schema-v2 operator family. Neither diagnostic was expressible within the bounded reachable state graph. On `0607ce86`, all 27 first-step applications failed the equal-size span validation boundary.
 
-ARC-R034 isolated that boundary by permitting variable-size separator-defined spans while freezing all 27 peer-reduction parameterizations and max depth 4. The hypothesis was **falsified**: `0607ce86` still had 0 valid first-step transitions. All 27 operator applications failed with `IndexError`, leaving one reachable state. This exposes a deeper equal-shape assumption in relative-coordinate peer alignment: the reducer indexes every peer at coordinates derived from a reference region even when peer extents differ.
+ARC-R034 permitted variable-size separator spans while freezing the 27 peer-reduction parameterizations and max depth 4. It still produced 0/27 valid first-step transitions: every operator failed with `IndexError`, exposing a second equal-shape assumption in relative-coordinate peer alignment.
 
-No target-model calls were made in ARC-R034. The dedicated GitHub Actions verification and oracle job succeeded, and public evaluation remained sealed.
+ARC-R035 changed only that alignment assumption. Peer reduction now operates inside the shared overlap domain (minimum peer height/width), preserving non-overlap cells. This **removed the proximate execution blocker**: all **27/27** first-step applications became valid. The deterministic depth-4 search expanded **237** programs and reached **798** unique states across **6,399** operator applications. However, no exact training-consistent program was found. There were **216 `ValueError` execution failures** during deeper search. Verdict: **PARTIAL_ALIGNMENT_BLOCKER_REMOVED_SEMANTICS_INSUFFICIENT**.
+
+No target-model calls were made in ARC-R035. GitHub Actions run `32847574881` passed claim/reservation validation, implementation tests, pinned-public-training fetch, bounded audit, and durable result persistence. Public evaluation remained sealed.
 
 ## Next research direction
 
-Highest-priority follow-up: `T0020-VARIABLE-SPAN-OVERLAP-ALIGNMENT-ABLATION`.
+Highest-priority follow-up: `T0021-OVERLAP-SEMANTIC-CLOSURE-AUDIT`.
 
-Keep variable-span separator inference, the existing 27 `lattice_peer_reduce` axis/reducer/write parameterizations, deterministic state-deduplicated BFS, max depth 4, and task `0607ce86` frozen. Change exactly one semantic assumption: peer reduction operates only on the shared overlap domain of the selected peer regions (minimum peer height/width), while cells outside that overlap remain unchanged.
+Do not add another primitive from intuition yet. Keep the entire ARC-R035 solver semantics frozen and mechanically diagnose the remaining bounded state graph for `0607ce86`:
 
-Decision rule:
+- classify all 216 execution failures by exact invariant/reason rather than exception class alone;
+- retain program paths for reachable states;
+- compute deterministic cell-error distance from each reachable multi-training state to the training targets;
+- identify whether near-misses and failures support separator destruction, wrong overlap anchoring, or a missing region-local conditional semantic.
 
-- valid first-step transition + exact training-consistent program: shared-overlap alignment is sufficient to restore expressibility for this diagnostic;
-- valid transitions but no exact program: shape-alignment blocker is removed, but peer-reduction semantics remain insufficient;
-- no valid first-step transition: shared-overlap alignment is falsified as the proximate remaining blocker.
+The task succeeds only if one dominant, reproducible mechanism is supported strongly enough to predeclare exactly one matched follow-up ablation. If the evidence stays ambiguous, record that ambiguity rather than inventing a primitive.
 
-`06df4c85` remains a separate semantic-closure problem and should not be mixed into this one-variable ablation.
+`06df4c85` remains a separate semantic-closure problem and should not be mixed into this diagnostic.
 
 Public evaluation remains sealed.
