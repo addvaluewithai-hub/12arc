@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "run": "ARC-R031",
+  "task_id": "T0016-RULE-FIRST-SEMANTIC-PRIMITIVE-AUDIT",
+  "role": "failure-analyst",
+  "public_evaluation_used": false,
+  "target_model_calls": 0,
+  "evidence": {
+    "treatment_result": "lab/results/ARC-R030-rule-first-overflow.json",
+    "ir_source": "src/arc_lab/rule_first.py",
+    "public_training_source": "arcprize/ARC-AGI-2@f3283f727488ad98fe575ea6a5ac981e4a188e49",
+    "task_ids": ["0607ce86", "06df4c85"]
+  },
+  "mechanical_ir_invariant": "schema-v1 programs are compositions of whole-grid dihedral permutations and global color substitutions. They cannot condition an edit on region membership, repeated-cell position, local neighborhood, or peer-cell agreement. In particular, absent a spatial crop/partition/conditional-write primitive, they cannot change only some occurrences of a color while retaining other occurrences of that same color at unchanged coordinates.",
+  "task_audits": {
+    "0607ce86": {
+      "classification": "missing_generic_dsl_expressivity",
+      "confidence": "high",
+      "observed_arc_r030_program_family": "parseable but non-covering; persisted treatment includes identity candidates",
+      "training_evidence": "Input/output pairs preserve a repeated large-scale lattice/template while selectively correcting noisy cells. Multiple occurrences of colors are retained while other occurrences are changed, so neither a global recolor nor a whole-grid dihedral transform can represent the demonstrated mapping.",
+      "search_or_prompt_secondary": "Candidate collapse may also exist, but no search over the current schema can recover the demonstrated conditional local repair mapping."
+    },
+    "06df4c85": {
+      "classification": "missing_generic_dsl_expressivity",
+      "confidence": "high",
+      "observed_arc_r030_program_family": "parseable but non-covering",
+      "training_evidence": "The task is organized as a separator-defined lattice of repeated cells. Outputs selectively populate previously empty cell interiors while leaving other zero cells and separator lines unchanged. A global recolor would alter all matching zeros; rotations/flips only permute existing cells. The required conditional region-level propagation is therefore outside schema-v1.",
+      "search_or_prompt_secondary": "Prompt diversity cannot overcome a representation that lacks region-selective read/write semantics."
+    }
+  },
+  "bucket_summary": {
+    "missing_generic_dsl_expressivity": 2,
+    "compositional_search_induction_failure_with_adequate_expressivity": 0,
+    "prompt_induced_candidate_collapse_as_primary": 0
+  },
+  "generic_primitive_family_proposal": {
+    "name": "lattice-region map/reduce",
+    "purpose": "Represent transformations over repeated separator- or periodicity-defined cells without task-specific coordinates or colors.",
+    "minimal_capabilities": [
+      "infer a regular cell lattice from repeated separator lines or periodic boundaries",
+      "extract cell payloads into a region grid",
+      "compute a reusable peer-derived payload by equality/majority over aligned cells",
+      "conditionally write a derived payload to selected cells using generic predicates such as empty/nonempty/equality-to-peer",
+      "reassemble the original canvas while preserving separators"
+    ],
+    "anti_overfit_rule": "No task IDs, absolute coordinates, fixed task colors, or hand-entered target patterns may appear in the primitive implementation or model prompt."
+  },
+  "adversarial_interpretation": "The audit proves schema-v1 insufficiency for these observed training mappings, not that a lattice primitive will be sufficient or that induction quality is healthy. A richer IR could remain unused, be mis-induced, or overfit the two diagnostics. Therefore the next experiment must change only expressivity and retain the same two-task matched comparator and model-generation controls.",
+  "verdict": "RESEARCH_DIRECTION",
+  "next_task": "T0017-LATTICE-REGION-PRIMITIVE-ABLATION"
+}
