@@ -1,0 +1,10 @@
+{
+  "expected_result": "lab/results/ARC-R032-lattice-region.json",
+  "run": "ARC-R032",
+  "schema_version": 1,
+  "started_at": "2026-08-25T07:14:42.243503+00:00",
+  "status": "running",
+  "task_id": "T0017-LATTICE-REGION-PRIMITIVE-ABLATION",
+  "workflow_run_id": "32820632448",
+  "workflow_url": "https://github.com/addvaluewithai-hub/12arc/actions/runs/32820632448"
+}
