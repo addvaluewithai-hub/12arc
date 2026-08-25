@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "task_id": "T0017-LATTICE-REGION-PRIMITIVE-ABLATION",
+  "hypothesis": "Adding one generic lattice-region map/reduce primitive family to the validated rule-first IR will recover exact candidate coverage on at least one of the two ARC-R030 diagnostic tasks without changing model, prompt budget, attempts, or scorer.",
+  "baseline": {
+    "run": "ARC-R030",
+    "task_ids": ["0607ce86", "06df4c85"],
+    "candidate_coverage": "0/2",
+    "ir": "schema-v1 global dihedral + global recolor only"
+  },
+  "primary_change": "Extend the rule-first IR with a generic lattice-region map/reduce family supporting inferred repeated-cell partitions, peer aggregation, generic conditional writes, and reassembly; no task-specific coordinates/colors/patterns.",
+  "frozen_controls": {
+    "provider": "nvidia-nim",
+    "model": "deepseek-ai/deepseek-v4-flash-0731",
+    "task_ids": ["0607ce86", "06df4c85"],
+    "attempts_per_test": 1,
+    "temperature": 0.0,
+    "top_p": 1.0,
+    "reasoning_effort": null,
+    "candidate_max_output_tokens": 3072,
+    "scoring": "deterministic execution + exact candidate-oracle coverage + comparator-integrity boundary",
+    "public_evaluation_used": false
+  },
+  "implementation_gate": "Before any target-model call, unit tests must prove lattice inference, region extraction/reassembly, peer aggregation, conditional-write semantics, fail-closed validation, and absence of task IDs/absolute task-specific constants in the primitive implementation.",
+  "success_threshold": "2/2 parseable and >=1/2 mechanically verified exact candidate coverage, with no comparator mismatch.",
+  "falsification_conditions": [
+    "2/2 parseable but 0/2 exact candidate coverage after the richer IR is available to the model",
+    "the primitive requires task-specific coordinates, colors, or target-pattern constants to pass tests",
+    "matched comparator integrity fails"
+  ],
+  "secondary_diagnostics": [
+    "which primitive operators appear in generated candidates",
+    "program validation failures",
+    "candidate diversity by normalized program AST",
+    "input/output tokens, calls, cache hits, runtime, provider failures",
+    "per-task exact coverage and executed-output diffs"
+  ],
+  "resource_requirements": [
+    "GitHub read/write",
+    "Python tests",
+    "permitted ARC public training data",
+    "authorized NVIDIA NIM execution path for the eventual matched model ablation"
+  ],
+  "anti_overfit_constraints": [
+    "no public evaluation",
+    "no task IDs in solver code or prompt",
+    "no fixed absolute coordinates for the two diagnostics",
+    "no task-specific color constants or hand-entered target patterns"
+  ]
+}
