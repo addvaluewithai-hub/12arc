@@ -2,8 +2,8 @@
 
 Updated: 2026-08-25
 Phase: **PHASE 2 — architecture research**
-Latest completed research run: **ARC-R033**
-Next unallocated research run: **ARC-R034**
+Latest completed research run: **ARC-R034**
+Next unallocated research run: **ARC-R035**
 
 ## Fixed comparator and model policy
 
@@ -19,24 +19,23 @@ ARC-R031 mechanically established that schema-v1 cannot express the selective re
 
 ARC-R032 tested that family under frozen ARC-R030 model/generation/scoring controls. The result was **REJECT**: 2/2 parseable but 0/2 exact candidate coverage, with actual `lattice_peer_reduce` use. `0607ce86` failed closed at equal-size lattice inference; `06df4c85` executed but remained exact-wrong.
 
-ARC-R033 then removed model induction from the loop with a bounded deterministic oracle search over the implemented schema-v2 operator family, using permitted public-training pairs only and zero target-model calls. Neither task was expressible within the bounded reachable state graph:
+ARC-R033 removed model induction from the loop with bounded deterministic oracle search over the implemented schema-v2 operator family. Neither diagnostic was expressible within the bounded reachable state graph. On `0607ce86`, all 27 first-step applications failed the equal-size span validation boundary.
 
-- `0607ce86`: 27/27 first-step operator applications failed validation; only the initial state was reachable. The immediate blocker is the equal-size lattice-span restriction.
-- `06df4c85`: zero validation failures, 54 operator applications, two unique reachable states, no exact training-consistent program. Search depth is not the main issue because the reachable closure collapses quickly under the current peer-reduction semantics.
+ARC-R034 isolated that boundary by permitting variable-size separator-defined spans while freezing all 27 peer-reduction parameterizations and max depth 4. The hypothesis was **falsified**: `0607ce86` still had 0 valid first-step transitions. All 27 operator applications failed with `IndexError`, leaving one reachable state. This exposes a deeper equal-shape assumption in relative-coordinate peer alignment: the reducer indexes every peer at coordinates derived from a reference region even when peer extents differ.
 
-This shifts the dominant uncertainty from model induction to representation semantics.
+No target-model calls were made in ARC-R034. The dedicated GitHub Actions verification and oracle job succeeded, and public evaluation remained sealed.
 
 ## Next research direction
 
-Highest-priority follow-up: `T0019-VARIABLE-SPAN-PARTITION-ABLATION`.
+Highest-priority follow-up: `T0020-VARIABLE-SPAN-OVERLAP-ALIGNMENT-ABLATION`.
 
-Change exactly one structural assumption on `0607ce86`: permit generic variable-size separator-defined lattice spans while freezing the existing 27 schema-v2 peer-reduction parameterizations and max search depth 4. No target-model calls.
+Keep variable-span separator inference, the existing 27 `lattice_peer_reduce` axis/reducer/write parameterizations, deterministic state-deduplicated BFS, max depth 4, and task `0607ce86` frozen. Change exactly one semantic assumption: peer reduction operates only on the shared overlap domain of the selected peer regions (minimum peer height/width), while cells outside that overlap remain unchanged.
 
 Decision rule:
 
-- exact training-consistent program found: partition restriction was sufficient to recover expressibility for this diagnostic;
-- valid transitions but no exact program: partition blocker is removed, but region semantics remain insufficient;
-- no valid transition: the partition-boundary diagnosis is falsified and another generic structural assumption must be isolated.
+- valid first-step transition + exact training-consistent program: shared-overlap alignment is sufficient to restore expressibility for this diagnostic;
+- valid transitions but no exact program: shape-alignment blocker is removed, but peer-reduction semantics remain insufficient;
+- no valid first-step transition: shared-overlap alignment is falsified as the proximate remaining blocker.
 
 `06df4c85` remains a separate semantic-closure problem and should not be mixed into this one-variable ablation.
 
