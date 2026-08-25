@@ -30,6 +30,23 @@ def test_lattice_inference_extract_and_reassemble_are_deterministic():
     assert reassemble_regions(grid, lattice, regions) == grid
 
 
+def test_lattice_inference_permits_variable_size_separator_spans():
+    grid = [
+        [1, 0, 9, 1, 0],
+        [0, 2, 9, 0, 0],
+        [9, 9, 9, 9, 9],
+        [1, 0, 9, 1, 0],
+        [0, 2, 9, 0, 0],
+        [1, 0, 9, 1, 0],
+    ]
+    lattice = infer_lattice(grid)
+    assert lattice["row_spans"] == [(0, 2), (3, 6)]
+    assert lattice["col_spans"] == [(0, 2), (3, 5)]
+    regions = extract_regions(grid, lattice)
+    assert [len(row[0]) for row in regions] == [2, 3]
+    assert reassemble_regions(grid, lattice, regions) == grid
+
+
 def test_background_only_peer_reduce_fills_from_inferred_peers_without_color_constants():
     program = {
         "schema_version": 2,
