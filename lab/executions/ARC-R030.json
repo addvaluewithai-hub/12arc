@@ -1,0 +1,10 @@
+{
+  "expected_result": "lab/results/ARC-R030-rule-first-overflow.json",
+  "run": "ARC-R030",
+  "schema_version": 1,
+  "started_at": "2026-08-25T00:33:15.287609+00:00",
+  "status": "running",
+  "task_id": "T0015-RULE-FIRST-OVERFLOW-ABLATION",
+  "workflow_run_id": "32794085475",
+  "workflow_url": "https://github.com/addvaluewithai-hub/12arc/actions/runs/32794085475"
+}
