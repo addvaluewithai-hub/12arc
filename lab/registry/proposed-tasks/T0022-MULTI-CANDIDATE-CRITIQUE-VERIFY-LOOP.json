@@ -1,0 +1,40 @@
+{
+  "id": "T0022-MULTI-CANDIDATE-CRITIQUE-VERIFY-LOOP",
+  "title": "Build multi-candidate generate/critique/repair loop with deterministic Python selection",
+  "type": "target-model-experiment",
+  "status": "proposed_blocked_by_active_T0021",
+  "priority": 63,
+  "depends_on": [
+    "T0021-OVERLAP-SEMANTIC-CLOSURE-AUDIT"
+  ],
+  "recommended_role": "reasoning-systems-inventor",
+  "success_test": "Implement or use a loop that generates 16-32 diverse candidate IR programs/rules, runs critique and critique-the-critique/repair passes, parses candidates fail-closed, scores all candidates with deterministic Python on permitted public training pairs, and ranks candidates by exact metrics rather than model confidence. Success requires at least 8 parseable non-duplicate candidates and either >=1 exact train-consistent candidate on the selected task or a dominant mechanically observed failure class that predeclares one next ablation. Protocol: lab/experiments/T0022-multi-candidate-critique-verify-loop.json.",
+  "required_resources": [
+    "GitHub read/write",
+    "validated rule/lattice IR executor and exact scorer",
+    "permitted public ARC training data only",
+    "authorized NVIDIA NIM execution path for target-model proposal generation",
+    "Python scoring and selector artifacts"
+  ],
+  "expected_artifacts": [
+    "candidate generation prompt/protocol",
+    "sanitized model response cache or hashes",
+    "normalized candidate IR manifest",
+    "critique and repair manifest",
+    "deterministic Python scoring artifact",
+    "selector ranking artifact",
+    "matched comparator delta report",
+    "failure-cluster analysis",
+    "queue/state/handoff updates"
+  ],
+  "evidence": "User/operator requested moving beyond a single model answer toward multiple reasoning/generation paths, model critique and critique-of-critique, with Python selecting the best candidate. This is supported by ARC-R030 and ARC-R032: parseability improved but exact candidate coverage stayed 0/2, implying that one-shot proposal quality remains a bottleneck. ARC-R035 further showed a large reachable search graph without exact fit, motivating broader proposal distributions plus deterministic verification.",
+  "initial_task_selection_policy": "Prefer 06df4c85 after T0021 resolves because ARC-R032 executed lattice programs there but remained exact-wrong. Use 0607ce86 only after T0021 produces durable failure taxonomy or explicitly freezes a compatible mechanism.",
+  "guardrails": [
+    "model critique is not evidence",
+    "Python exact execution/scoring is the judge",
+    "do not use public evaluation",
+    "do not invent model outputs, scores, CI success, or provider behavior",
+    "evolve one variable at a time if rejected"
+  ],
+  "claim": null
+}
