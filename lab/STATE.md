@@ -2,8 +2,8 @@
 
 Updated: 2026-08-25
 Phase: **PHASE 2 — architecture research**
-Latest completed research run: **ARC-R030**
-Next unallocated research run: **ARC-R031**
+Latest completed research run: **ARC-R031**
+Next unallocated research run: **ARC-R032**
 
 ## Fixed comparator and model policy
 
@@ -13,56 +13,22 @@ ARC-R016 direct-JSON baseline remains frozen at **45/174 = 25.8621%** exact accu
 
 ## Current evidence chain
 
-ARC-R026 rejected max-reasoning direct inference as the main bottleneck: first-attempt 37/174 and transport-recovered 41/174 remained below the frozen 45/174 comparator, while successful outputs did not approach the 16K cap.
+ARC-R030 rejected compact serialization as a sufficient fix: on `0607ce86` and `06df4c85`, treatment became 2/2 parseable but exact candidate coverage remained 0/2 versus comparator 0/2.
 
-ARC-R027 mechanically verified ARC-R020 and ARC-R021 candidate coverage at **1/8**, with only `0d3d703e` covered. It isolated repeated candidate-serialization overflow on `0607ce86` and `06df4c85`: both candidate stages ended with `finish_reason=length` in R020 and R021 before candidate verification.
+ARC-R031 audited the actual schema-v1 IR and permitted public-training mappings with zero target-model calls. Schema-v1 contains only identity, whole-grid rotations/flips, and global recolor. These compose into whole-grid spatial permutations plus global color substitutions and cannot express region-selective edits.
 
-ARC-R028 converted that evidence into a falsifiable two-stage queue: T0014 infrastructure first, then a matched two-task T0015 serialization ablation.
+For `0607ce86`, training outputs selectively repair noisy occurrences inside a repeated/lattice-like structure while retaining other occurrences of the same colors. For `06df4c85`, separator-defined cells are selectively populated/propagated while other zeros and separators remain unchanged. Both mappings therefore require conditional region-level read/write semantics unavailable to schema-v1.
 
-ARC-R029 validated the rule-first infrastructure with zero target-model calls: compact generic program IR, deterministic fail-closed execution, exact candidate scoring, mechanical coverage and comparator-integrity enforcement.
+ARC-R031 classification: **2/2 missing generic DSL/IR expressivity** with high confidence. Search/induction weakness or prompt collapse may coexist, but current-schema search is incapable of producing an exact program for the observed mappings.
 
-## ARC-R030 rule-first overflow ablation
+## Next research direction
 
-`T0015-RULE-FIRST-OVERFLOW-ABLATION` is complete with outcome **REJECT**.
+Predeclared follow-up: `T0017-LATTICE-REGION-PRIMITIVE-ABLATION`.
 
-The matched diagnostic used exactly `0607ce86` and `06df4c85`, NVIDIA NIM `deepseek-ai/deepseek-v4-flash-0731`, one attempt per test input, `temperature=0.0`, `top_p=1.0`, no reasoning-effort override, and the frozen **3072-token** candidate-stage output budget. The only intended treatment was candidate serialization: compact executable programs instead of materialized full grids.
+Primary change only: add one generic lattice-region map/reduce family to the rule-first IR, supporting inferred repeated-cell partitions, peer aggregation, generic conditional writes, and canvas reassembly. No task IDs, absolute task coordinates, task-specific colors, or hand-entered target patterns are permitted.
 
-Durable result:
+Frozen matched comparator remains ARC-R030 on exactly `0607ce86` and `06df4c85`, DeepSeek V4 Flash via NVIDIA NIM, one attempt/test, temperature 0, top_p 1, no reasoning override, 3072 candidate output tokens, deterministic execution, exact candidate-oracle scoring, and comparator-integrity enforcement.
 
-- comparator candidate coverage: **0/2**;
-- treatment candidate coverage: **0/2**;
-- parseability: **2/2**;
-- new coverage: **0**;
-- regressions: **0**;
-- live provider calls: **1**;
-- cache hits: **1**;
-- input tokens: **14,366**;
-- output tokens: **186**;
-- provider failures: **0**;
-- parse failures: **0**;
-- program validation failures: **0**;
-- public evaluation used: **false**.
-
-Execution status `lab/executions/ARC-R030.json` is `complete` with verdict `REJECT`. GitHub Actions run **32800687395** completed successfully on head SHA `2cb4ad651c2f729816d4658f2fdb6db67e9f7e8a` and persisted `lab/results/ARC-R030-rule-first-overflow.json`.
-
-Interpretation: compact serialization removed the repeated length/parse failure but did **not** create any exact candidate. Therefore response-length overflow was a real operational symptom but is not a sufficient explanation of the candidate-coverage bottleneck. The strongest remaining uncertainty is **semantic program induction versus generic IR expressivity**, not output budget.
-
-Adversarially, the two-task diagnostic does not show that rule-first representations are globally useless. The schema-v1 IR is intentionally small, and failure could arise because required transformations are not expressible, because the model fails to compose available primitives, or because the prompt collapses candidate diversity. Parseability alone is not reasoning progress.
-
-## Ready now: T0016-RULE-FIRST-SEMANTIC-PRIMITIVE-AUDIT
-
-Highest-priority ready task: `T0016-RULE-FIRST-SEMANTIC-PRIMITIVE-AUDIT`.
-
-Role: **failure-analyst**.
-
-This is a no-model audit using persisted ARC-R030 evidence plus permitted public-training examples only. It must classify each diagnostic failure into one of three falsifiable buckets:
-
-1. missing generic DSL/IR expressivity;
-2. compositional search/induction failure despite adequate expressivity;
-3. prompt-induced candidate collapse/diversity failure.
-
-The audit must not encode task-specific solutions into the solver. It should produce a mechanically auditable generic primitive/representation gap report and predeclare exactly one matched follow-up ablation with frozen comparator/task IDs/success threshold.
-
-No active run reservation remains. Next unallocated run is **ARC-R031**.
+Success threshold: **2/2 parseable and >=1/2 exact candidate coverage**. If richer-IR outputs are 2/2 parseable but remain 0/2 coverage, the primitive-family sufficiency hypothesis is rejected and the bottleneck shifts toward induction/search or a different representation family.
 
 Public evaluation remains sealed.
