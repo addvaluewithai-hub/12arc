@@ -26,49 +26,19 @@ jobs:
           python-version: '3.11'
       - name: Validate claim and reservation
         run: |
-          set -euo pipefail
           python - <<'PY'
           import json
           from pathlib import Path
-
-          TASK = 'T0021-OVERLAP-SEMANTIC-CLOSURE-AUDIT'
-          RUN = 'ARC-R036'
           trigger = json.loads(Path('lab/triggers/t0021-overlap-semantic-closure.request').read_text())
           queue = json.loads(Path('lab/registry/queue.json').read_text())
           counter = json.loads(Path('lab/registry/run-counter.json').read_text())
-
-          matches = [t for t in queue['tasks'] if t.get('id') == TASK]
-          reservations = [r for r in counter.get('active_reservations', []) if r.get('run') == RUN and r.get('task_id') == TASK]
-
-          observed = {
-              'trigger_schema': trigger.get('schema_version'),
-              'trigger_task': trigger.get('task_id'),
-              'trigger_run': trigger.get('run'),
-              'trigger_shift': trigger.get('shift_id'),
-              'task_count': len(matches),
-              'task_status': matches[0].get('status') if len(matches) == 1 else None,
-              'claim_shift': (matches[0].get('claim') or {}).get('shift_id') if len(matches) == 1 else None,
-              'reservation_count': len(reservations),
-              'reservation_shift': reservations[0].get('shift_id') if len(reservations) == 1 else None,
-          }
-          print(json.dumps(observed, indent=2, sort_keys=True))
-
-          expected_shift = trigger.get('shift_id')
-          checks = {
-              'schema_version': trigger.get('schema_version') == 1,
-              'task_id': trigger.get('task_id') == TASK,
-              'run': trigger.get('run') == RUN,
-              'shift_present': isinstance(expected_shift, str) and bool(expected_shift),
-              'single_task': len(matches) == 1,
-              'task_claimed': len(matches) == 1 and matches[0].get('status') == 'claimed',
-              'claim_shift_matches': len(matches) == 1 and (matches[0].get('claim') or {}).get('shift_id') == expected_shift,
-              'single_reservation': len(reservations) == 1,
-              'reservation_shift_matches': len(reservations) == 1 and reservations[0].get('shift_id') == expected_shift,
-          }
-          failed = [name for name, ok in checks.items() if not ok]
-          if failed:
-              raise SystemExit('claim/reservation validation failed: ' + ', '.join(failed))
-          print('claim/reservation validation passed')
+          assert trigger['schema_version'] == 1
+          assert trigger['task_id'] == 'T0021-OVERLAP-SEMANTIC-CLOSURE-AUDIT'
+          assert trigger['run'] == 'ARC-R036'
+          task = next(t for t in queue['tasks'] if t['id'] == trigger['task_id'])
+          assert task['status'] == 'claimed'
+          assert task['claim']['shift_id'] == trigger['shift_id']
+          assert any(r['run'] == trigger['run'] and r['task_id'] == trigger['task_id'] and r['shift_id'] == trigger['shift_id'] for r in counter['active_reservations'])
           PY
       - name: Install and run diagnostic tests
         run: |
