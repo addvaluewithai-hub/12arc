@@ -1,7 +1,9 @@
 {
   "schema_version": 1,
   "task_id": "T0015-RULE-FIRST-OVERFLOW-ABLATION",
-  "status": "blocked_pending_T0014",
+  "status": "completed",
+  "completed_run": "ARC-R030",
+  "verdict": "REJECT",
   "hypothesis": "Replacing full-grid candidate serialization with compact rule/program hypotheses on 0607ce86 and 06df4c85 will make both candidate stages parseable under the same candidate-output-token budget and yield at least one exact candidate after deterministic execution.",
   "baseline": {
     "run": "ARC-R020",
@@ -37,5 +39,14 @@
   "resources": {
     "requires": ["T0014 validated harness", "authorized GitHub Actions push-trigger execution path", "repository secret NVIDIA_API_KEY"],
     "execution_path": "must be declared in queue before T0015 can become ready"
+  },
+  "result": {
+    "path": "lab/results/ARC-R030-rule-first-overflow.json",
+    "execution_status": "lab/executions/ARC-R030.json",
+    "mechanical_coverage": "0/2",
+    "parseable_tasks": "2/2",
+    "new_coverage": 0,
+    "regressions": 0,
+    "interpretation": "Compact serialization removed length/parse failure but did not recover exact candidate coverage; semantic program induction versus generic IR expressivity is the next unresolved bottleneck."
   }
 }
