@@ -25,63 +25,40 @@ jobs:
         with:
           python-version: '3.11'
       - name: Validate claim and reservation
-        env:
-          EXPECTED_TASK: T0021-OVERLAP-SEMANTIC-CLOSURE-AUDIT
-          EXPECTED_RUN: ARC-R036
         run: |
-          python - <<'PY'
-          import json
-          import os
-          from pathlib import Path
+          set -euo pipefail
+          TASK='T0021-OVERLAP-SEMANTIC-CLOSURE-AUDIT'
+          RUN='ARC-R036'
+          TRIGGER='lab/triggers/t0021-overlap-semantic-closure.request'
+          QUEUE='lab/registry/queue.json'
+          COUNTER='lab/registry/run-counter.json'
 
-          trigger_path = Path('lab/triggers/t0021-overlap-semantic-closure.request')
-          queue_path = Path('lab/registry/queue.json')
-          counter_path = Path('lab/registry/run-counter.json')
-          trigger = json.loads(trigger_path.read_text(encoding='utf-8'))
-          queue = json.loads(queue_path.read_text(encoding='utf-8'))
-          counter = json.loads(counter_path.read_text(encoding='utf-8'))
+          python -m json.tool "$TRIGGER" >/dev/null
+          python -m json.tool "$QUEUE" >/dev/null
+          python -m json.tool "$COUNTER" >/dev/null
 
-          expected_task = os.environ['EXPECTED_TASK']
-          expected_run = os.environ['EXPECTED_RUN']
-          checks = {
-              'schema_version': trigger.get('schema_version') == 1,
-              'task_id': trigger.get('task_id') == expected_task,
-              'run': trigger.get('run') == expected_run,
-              'shift_id_present': isinstance(trigger.get('shift_id'), str) and bool(trigger.get('shift_id')),
-          }
-          failed = [name for name, ok in checks.items() if not ok]
-          if failed:
-              raise RuntimeError(f'trigger validation failed: {failed}; trigger={trigger!r}')
+          trigger_task=$(jq -r '.task_id' "$TRIGGER")
+          trigger_run=$(jq -r '.run' "$TRIGGER")
+          trigger_shift=$(jq -r '.shift_id' "$TRIGGER")
+          trigger_schema=$(jq -r '.schema_version' "$TRIGGER")
+          task_count=$(jq --arg task "$TASK" '[.tasks[] | select(.id == $task)] | length' "$QUEUE")
+          task_status=$(jq -r --arg task "$TASK" '.tasks[] | select(.id == $task) | .status' "$QUEUE")
+          claim_shift=$(jq -r --arg task "$TASK" '.tasks[] | select(.id == $task) | .claim.shift_id' "$QUEUE")
+          reservation_count=$(jq --arg run "$RUN" --arg task "$TASK" '[.active_reservations[] | select(.run == $run and .task_id == $task)] | length' "$COUNTER")
+          reservation_shift=$(jq -r --arg run "$RUN" --arg task "$TASK" '.active_reservations[] | select(.run == $run and .task_id == $task) | .shift_id' "$COUNTER")
 
-          task_matches = [t for t in queue.get('tasks', []) if t.get('id') == expected_task]
-          if len(task_matches) != 1:
-              raise RuntimeError(f'expected one queue task {expected_task}, found {len(task_matches)}')
-          task = task_matches[0]
-          claim = task.get('claim') or {}
-          if task.get('status') != 'claimed':
-              raise RuntimeError(f"task must remain claimed, found {task.get('status')!r}")
-          if claim.get('shift_id') != trigger['shift_id']:
-              raise RuntimeError(f"claim/trigger shift mismatch: {claim.get('shift_id')!r} != {trigger['shift_id']!r}")
+          printf 'trigger_schema=%s\ntrigger_task=%s\ntrigger_run=%s\ntrigger_shift=%s\ntask_count=%s\ntask_status=%s\nclaim_shift=%s\nreservation_count=%s\nreservation_shift=%s\n' \
+            "$trigger_schema" "$trigger_task" "$trigger_run" "$trigger_shift" "$task_count" "$task_status" "$claim_shift" "$reservation_count" "$reservation_shift"
 
-          reservation_matches = [
-              r for r in counter.get('active_reservations', [])
-              if r.get('run') == expected_run and r.get('task_id') == expected_task
-          ]
-          if len(reservation_matches) != 1:
-              raise RuntimeError(f'expected one active reservation for {expected_run}/{expected_task}, found {len(reservation_matches)}')
-          reservation = reservation_matches[0]
-          if reservation.get('shift_id') != trigger['shift_id']:
-              raise RuntimeError(f"reservation/trigger shift mismatch: {reservation.get('shift_id')!r} != {trigger['shift_id']!r}")
-
-          print(json.dumps({
-              'validated_task': expected_task,
-              'validated_run': expected_run,
-              'validated_shift_id': trigger['shift_id'],
-              'task_status': task.get('status'),
-              'last_completed_run': counter.get('last_completed_run'),
-              'next_run_number': counter.get('next_run_number'),
-          }, sort_keys=True))
-          PY
+          test "$trigger_schema" = '1'
+          test "$trigger_task" = "$TASK"
+          test "$trigger_run" = "$RUN"
+          test -n "$trigger_shift"
+          test "$task_count" = '1'
+          test "$task_status" = 'claimed'
+          test "$claim_shift" = "$trigger_shift"
+          test "$reservation_count" = '1'
+          test "$reservation_shift" = "$trigger_shift"
       - name: Install and run diagnostic tests
         run: |
           python -m pip install -e '.[dev]'
