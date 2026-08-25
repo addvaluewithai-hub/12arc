@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "task_id": "T0021-OVERLAP-SEMANTIC-CLOSURE-AUDIT",
+  "hypothesis": "ARC-R035 removed the unequal-shape execution blocker but the frozen 27 peer-reduction operators still cannot express 0607ce86 within depth 4. A mechanical audit of the 798 reachable states and 216 post-transition validation failures can isolate whether the remaining limitation is separator destruction, overlap anchoring, or missing region-local conditional semantics.",
+  "baseline": "ARC-R035 shared-overlap alignment audit",
+  "primary_change": "No solver semantic change. Add diagnostics that classify every execution failure by exact invariant/reason and rank reachable states by deterministic cell-error distance to all public-training targets, preserving program paths.",
+  "target_model": null,
+  "target_model_calls": 0,
+  "split": "permitted public ARC-AGI-2 training data only",
+  "task_ids": ["0607ce86"],
+  "frozen_controls": [
+    "ARC-R035 variable-span separator inference",
+    "ARC-R035 shared-overlap alignment",
+    "same 27 lattice_peer_reduce parameterizations",
+    "max search depth 4",
+    "state deduplication",
+    "0607ce86 public-training pairs only"
+  ],
+  "primary_metric": "mechanically supported remaining failure class and closest reachable-state error profile",
+  "success_threshold": "Identify one dominant, reproducible remaining semantic/invariant failure class with concrete program/state evidence sufficient to predeclare exactly one matched follow-up ablation.",
+  "falsification": "If failure reasons and near-miss states do not isolate a dominant mechanism, report the ambiguity and do not add a semantic primitive without further evidence.",
+  "public_evaluation_used": false
+}
