@@ -32,13 +32,44 @@ jobs:
           trigger = json.loads(Path('lab/triggers/t0021-overlap-semantic-closure.request').read_text())
           queue = json.loads(Path('lab/registry/queue.json').read_text())
           counter = json.loads(Path('lab/registry/run-counter.json').read_text())
-          assert trigger['schema_version'] == 1
-          assert trigger['task_id'] == 'T0021-OVERLAP-SEMANTIC-CLOSURE-AUDIT'
-          assert trigger['run'] == 'ARC-R036'
-          task = next(t for t in queue['tasks'] if t['id'] == trigger['task_id'])
-          assert task['status'] == 'claimed'
-          assert task['claim']['shift_id'] == trigger['shift_id']
-          assert any(r['run'] == trigger['run'] and r['task_id'] == trigger['task_id'] and r['shift_id'] == trigger['shift_id'] for r in counter['active_reservations'])
+
+          if trigger.get('schema_version') != 1:
+              raise RuntimeError(f"trigger schema_version mismatch: {trigger.get('schema_version')!r}")
+          if trigger.get('task_id') != 'T0021-OVERLAP-SEMANTIC-CLOSURE-AUDIT':
+              raise RuntimeError(f"trigger task_id mismatch: {trigger.get('task_id')!r}")
+          if trigger.get('run') != 'ARC-R036':
+              raise RuntimeError(f"trigger run mismatch: {trigger.get('run')!r}")
+
+          matches = [t for t in queue.get('tasks', []) if t.get('id') == trigger['task_id']]
+          if len(matches) != 1:
+              raise RuntimeError(f"expected exactly one queue task, found {len(matches)}")
+          task = matches[0]
+          if task.get('status') != 'claimed':
+              raise RuntimeError(f"task status mismatch: {task.get('status')!r}")
+          claim = task.get('claim') or {}
+          if claim.get('shift_id') != trigger.get('shift_id'):
+              raise RuntimeError(
+                  f"claim shift mismatch: queue={claim.get('shift_id')!r} trigger={trigger.get('shift_id')!r}"
+              )
+
+          reservations = [
+              r for r in counter.get('active_reservations', [])
+              if r.get('run') == trigger['run'] and r.get('task_id') == trigger['task_id']
+          ]
+          if len(reservations) != 1:
+              raise RuntimeError(f"expected exactly one matching reservation, found {len(reservations)}")
+          reservation = reservations[0]
+          if reservation.get('shift_id') != trigger.get('shift_id'):
+              raise RuntimeError(
+                  f"reservation shift mismatch: reservation={reservation.get('shift_id')!r} trigger={trigger.get('shift_id')!r}"
+              )
+          print(json.dumps({
+              'validated_task': trigger['task_id'],
+              'validated_run': trigger['run'],
+              'validated_shift_id': trigger['shift_id'],
+              'last_completed_run': counter.get('last_completed_run'),
+              'next_run_number': counter.get('next_run_number'),
+          }, sort_keys=True))
           PY
       - name: Install and run diagnostic tests
         run: |
@@ -84,7 +115,7 @@ jobs:
         run: |
           git config user.name 'arc-research-bot'
           git config user.email 'arc-research-bot@users.noreply.github.com'
-          git pull --rebase origin main
           git add lab/results/ARC-R036-overlap-semantic-closure.json lab/executions/ARC-R036.json
           git commit -m 'ARC-R036: persist semantic-closure diagnostic'
+          git pull --rebase origin main
           git push origin HEAD:main
