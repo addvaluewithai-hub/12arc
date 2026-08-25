@@ -28,17 +28,55 @@ jobs:
         run: |
           python - <<'PY'
           import json
+          import sys
           from pathlib import Path
+
+          TASK_ID = 'T0021-OVERLAP-SEMANTIC-CLOSURE-AUDIT'
+          RUN = 'ARC-R036'
+
           trigger = json.loads(Path('lab/triggers/t0021-overlap-semantic-closure.request').read_text())
           queue = json.loads(Path('lab/registry/queue.json').read_text())
           counter = json.loads(Path('lab/registry/run-counter.json').read_text())
-          assert trigger['schema_version'] == 1
-          assert trigger['task_id'] == 'T0021-OVERLAP-SEMANTIC-CLOSURE-AUDIT'
-          assert trigger['run'] == 'ARC-R036'
-          task = next(t for t in queue['tasks'] if t['id'] == trigger['task_id'])
-          assert task['status'] == 'claimed'
-          assert task['claim']['shift_id'] == trigger['shift_id']
-          assert any(r['run'] == trigger['run'] and r['task_id'] == trigger['task_id'] and r['shift_id'] == trigger['shift_id'] for r in counter['active_reservations'])
+          task = next((t for t in queue.get('tasks', []) if t.get('id') == TASK_ID), None)
+          reservations = [r for r in counter.get('active_reservations', []) if r.get('run') == RUN]
+
+          observed = {
+              'trigger': trigger,
+              'task_status': None if task is None else task.get('status'),
+              'task_claim': None if task is None else task.get('claim'),
+              'matching_run_reservations': reservations,
+          }
+          print('T0021 validation observed state:')
+          print(json.dumps(observed, indent=2, sort_keys=True))
+
+          errors = []
+          if trigger.get('schema_version') != 1:
+              errors.append('trigger.schema_version != 1')
+          if trigger.get('task_id') != TASK_ID:
+              errors.append('trigger.task_id mismatch')
+          if trigger.get('run') != RUN:
+              errors.append('trigger.run mismatch')
+          if task is None:
+              errors.append('task missing from queue')
+          else:
+              if task.get('status') != 'claimed':
+                  errors.append(f"task.status={task.get('status')!r}, expected 'claimed'")
+              claim = task.get('claim') or {}
+              if claim.get('shift_id') != trigger.get('shift_id'):
+                  errors.append('task claim shift_id mismatch')
+          matching = [
+              r for r in reservations
+              if r.get('task_id') == TASK_ID and r.get('shift_id') == trigger.get('shift_id')
+          ]
+          if len(matching) != 1:
+              errors.append(f'expected exactly one matching active reservation, found {len(matching)}')
+
+          if errors:
+              print('Validation errors:', file=sys.stderr)
+              for error in errors:
+                  print(f'- {error}', file=sys.stderr)
+              raise SystemExit(1)
+          print('Claim/reservation validation passed.')
           PY
       - name: Install and run diagnostic tests
         run: |
