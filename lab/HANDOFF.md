@@ -26,7 +26,7 @@ Thus shared-overlap alignment removes the specific unequal-shape `IndexError` bl
 
 GitHub Actions run `32847574881` completed successfully and persisted the result. An earlier attempt `32847394781` failed before tests because the task-claim write had left `queue.json` malformed; that registry syntax was repaired on the same ARC-R035 reservation without changing experimental semantics.
 
-## Next task: T0021-OVERLAP-SEMANTIC-CLOSURE-AUDIT
+## Active task: T0021-OVERLAP-SEMANTIC-CLOSURE-AUDIT
 
 This is a no-model diagnostic on `0607ce86`. Keep all ARC-R035 semantics frozen.
 
@@ -43,3 +43,21 @@ Required work:
 If the evidence remains mixed, report ambiguity rather than inventing a semantic primitive.
 
 Keep `06df4c85` separate. Public evaluation remains sealed.
+
+## Post-T0021 direction: T0022 multi-candidate critique/verify loop
+
+The operator has explicitly requested that the lab stop relying on one single answer from the model and explore multiple reasoning/generation paths, critique, critique-of-critique, repair, and Python-based selection. This is now documented as a predeclared direction, not a completed result.
+
+New durable planning artifacts:
+
+- `lab/design/MULTI-CANDIDATE-CRITIQUE-VERIFY.md`
+- `lab/experiments/T0022-multi-candidate-critique-verify-loop.json`
+- `lab/registry/proposed-tasks/T0022-MULTI-CANDIDATE-CRITIQUE-VERIFY-LOOP.json`
+
+After T0021 is resolved and the queue is safe to update, convert the proposed task into the active queue unless T0021 produces stronger contrary evidence. The experiment should test a generate -> critique -> critique-the-critique -> repair -> Python verify/select loop.
+
+Core rule: the model proposes; Python judges. Model critique is not evidence. Selection must be based on deterministic parsing, execution, exact training-pair scoring, cell-error distance, structural preservation, normalized-IR deduplication, and matched comparator deltas.
+
+Preferred first target: `06df4c85`, because ARC-R032 already showed lattice programs executing there while remaining exact-wrong. Use `0607ce86` only after T0021 produces durable failure taxonomy or freezes a compatible mechanism.
+
+If the first loop variant fails, keep evolving the same area one variable at a time: candidate diversity prompt, critic prompt, repair budget, IR translation constraints, or deterministic selector ranking. Do not repeat the same prompt and do not invent outputs, scores, CI success, provider behavior, or public-evaluation feedback.
