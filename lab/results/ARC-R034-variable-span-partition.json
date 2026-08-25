@@ -1,0 +1,32 @@
+{
+  "adversarial_interpretation": "If valid transitions remain absent, removing equal-span validation exposed a deeper shape-alignment assumption in the frozen peer-reduction semantics rather than proving variable-span partitioning irrelevant in a richer DSL.",
+  "benchmark_task_ids": [
+    "0607ce86"
+  ],
+  "frozen_operator_count": 27,
+  "max_depth": 4,
+  "primary_change": "variable-size separator-defined lattice spans only",
+  "public_evaluation_used": false,
+  "record": {
+    "depth": null,
+    "depth_counts": {
+      "0": 1
+    },
+    "execution_failures": 27,
+    "expressible": false,
+    "failure_types": {
+      "IndexError": 27
+    },
+    "first_step_valid_transitions": 0,
+    "operator_applications": 27,
+    "oracle_program": null,
+    "programs_expanded": 1,
+    "unique_states": 1
+  },
+  "role": "program-synthesis-researcher",
+  "run": "ARC-R034",
+  "schema_version": 1,
+  "target_model_calls": 0,
+  "task_id": "T0019-VARIABLE-SPAN-PARTITION-ABLATION",
+  "verdict": "FALSIFIED_NO_VALID_FIRST_STEP"
+}
