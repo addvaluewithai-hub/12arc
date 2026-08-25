@@ -1,0 +1,92 @@
+name: ARC-R034 durable closure
+
+on:
+  push:
+    paths:
+      - 'lab/triggers/r034-close.request'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: arc-r034-close
+  cancel-in-progress: false
+
+jobs:
+  close:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Validate evidence and close queue/run state
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          result_path = Path('lab/results/ARC-R034-variable-span-partition.json')
+          report_path = Path('lab/runs/2026-08-25/ARC-R034.md')
+          protocol_path = Path('lab/experiments/T0020-variable-span-overlap-alignment-ablation.json')
+          assert result_path.exists() and report_path.exists() and protocol_path.exists()
+          result = json.loads(result_path.read_text())
+          assert result['run'] == 'ARC-R034'
+          assert result['task_id'] == 'T0019-VARIABLE-SPAN-PARTITION-ABLATION'
+          assert result['target_model_calls'] == 0
+          assert result['public_evaluation_used'] is False
+          assert result['verdict'] == 'FALSIFIED_NO_VALID_FIRST_STEP'
+
+          queue_path = Path('lab/registry/queue.json')
+          queue = json.loads(queue_path.read_text())
+          t19 = next(t for t in queue['tasks'] if t['id'] == 'T0019-VARIABLE-SPAN-PARTITION-ABLATION')
+          assert t19['status'] == 'claimed'
+          assert t19['claim']['run'] == 'ARC-R034'
+          t19['status'] = 'done'
+          t19['completed_run'] = 'ARC-R034'
+          t19['progress'] = ('REJECT / FALSIFIED_NO_VALID_FIRST_STEP. Variable-size separator spans removed the ARC-R033 '
+                             'equal-size validation boundary, but 0/27 first-step operators executed successfully: all 27 '
+                             'failed with IndexError from the frozen common-relative-coordinate peer semantics. One unique '
+                             'state remained reachable. Zero target-model calls; public evaluation sealed. Next isolate '
+                             'generic variable-region overlap alignment in T0020.')
+          t19['claim'] = None
+
+          if not any(t['id'] == 'T0020-VARIABLE-SPAN-OVERLAP-ALIGNMENT-ABLATION' for t in queue['tasks']):
+              queue['tasks'].append({
+                  'id': 'T0020-VARIABLE-SPAN-OVERLAP-ALIGNMENT-ABLATION',
+                  'title': 'Align variable-size peer regions on their shared overlap and rerun bounded oracle search',
+                  'type': 'infrastructure-research',
+                  'status': 'ready',
+                  'priority': 65,
+                  'depends_on': ['T0019-VARIABLE-SPAN-PARTITION-ABLATION'],
+                  'recommended_role': 'program-synthesis-researcher',
+                  'success_test': ('Keep ARC-R034 variable-span inference, the same 27 schema-v2 peer-reduction parameterizations, '
+                                   'task 0607ce86 and max depth 4 frozen. Change only peer coordinate alignment to reduce within '
+                                   'the shared overlap domain while preserving non-overlap cells. Success requires at least one '
+                                   'valid first-step transition and an exact training-consistent program; partial success is valid '
+                                   'transitions without exact fit; failure is no valid transition. Protocol: '
+                                   'lab/experiments/T0020-variable-span-overlap-alignment-ablation.json.'),
+                  'required_resources': ['GitHub read/write', 'Python tests/search', 'permitted public ARC training data', 'no target-model calls'],
+                  'expected_artifacts': ['overlap-alignment implementation/tests', 'bounded oracle result', 'failure classification', 'queue/state/handoff updates'],
+                  'evidence': ('ARC-R034 removed equal-size span validation but all 27 frozen peer reductions failed with IndexError, '
+                               'mechanically isolating a second equal-shape assumption in relative-coordinate peer alignment.'),
+                  'claim': None,
+              })
+          queue_path.write_text(json.dumps(queue, separators=(',', ':')) + '\n')
+
+          counter_path = Path('lab/registry/run-counter.json')
+          counter = json.loads(counter_path.read_text())
+          assert any(r['run'] == 'ARC-R034' and r['task_id'] == 'T0019-VARIABLE-SPAN-PARTITION-ABLATION'
+                     for r in counter['active_reservations'])
+          counter['last_completed_run'] = 'ARC-R034'
+          counter['active_reservations'] = [r for r in counter['active_reservations'] if r['run'] != 'ARC-R034']
+          assert counter['next_run_number'] == 35
+          counter_path.write_text(json.dumps(counter, separators=(',', ':')) + '\n')
+          PY
+      - name: Persist closure
+        run: |
+          git config user.name 'arc-research-bot'
+          git config user.email 'arc-research-bot@users.noreply.github.com'
+          git add lab/registry/queue.json lab/registry/run-counter.json
+          git commit -m 'ARC-R034: close T0019 and queue T0020'
+          git pull --rebase origin main
+          git push origin HEAD:main
