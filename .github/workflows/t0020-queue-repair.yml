@@ -1,0 +1,42 @@
+name: T0020 queue syntax repair
+
+on:
+  push:
+    paths:
+      - 'lab/triggers/t0020-queue-repair.request'
+
+permissions:
+  contents: write
+
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Repair and validate queue
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p = Path('lab/registry/queue.json')
+          text = p.read_text()
+          if text.rstrip().endswith('}}}]}'):
+              text = text.rstrip()[:-5] + '}}]}' + '\n'
+          data = json.loads(text)
+          task = next(t for t in data['tasks'] if t['id'] == 'T0020-VARIABLE-SPAN-OVERLAP-ALIGNMENT-ABLATION')
+          assert task['status'] == 'claimed'
+          assert task['claim']['shift_id'] == 'ARC-SHIFT-20260825T121758Z'
+          p.write_text(json.dumps(data, separators=(',', ':')) + '\n')
+          counter = json.loads(Path('lab/registry/run-counter.json').read_text())
+          assert any(r['run'] == 'ARC-R035' and r['task_id'] == task['id'] for r in counter['active_reservations'])
+          PY
+      - name: Persist repair
+        run: |
+          git config user.name 'arc-research-bot'
+          git config user.email 'arc-research-bot@users.noreply.github.com'
+          git add lab/registry/queue.json
+          git commit -m 'T0020: repair queue registry JSON'
+          git pull --rebase origin main
+          git push origin HEAD:main
