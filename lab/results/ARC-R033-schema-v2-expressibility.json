@@ -1,0 +1,43 @@
+{
+  "anti_overfit_constraints": [
+    "no task IDs in DSL semantics",
+    "no absolute task-specific coordinates",
+    "no task-specific color constants",
+    "no hand-entered target patterns"
+  ],
+  "max_depth": 4,
+  "operator_count": 27,
+  "public_evaluation_used": false,
+  "records": {
+    "0607ce86": {
+      "depth": null,
+      "depth_counts": {
+        "0": 1
+      },
+      "expressible": false,
+      "operator_applications": 27,
+      "oracle_program": null,
+      "programs_expanded": 1,
+      "unique_states": 1,
+      "validation_failures": 27
+    },
+    "06df4c85": {
+      "depth": null,
+      "depth_counts": {
+        "0": 1,
+        "1": 1
+      },
+      "expressible": false,
+      "operator_applications": 54,
+      "oracle_program": null,
+      "programs_expanded": 2,
+      "unique_states": 2,
+      "validation_failures": 0
+    }
+  },
+  "role": "program-synthesis-researcher",
+  "run": "ARC-R033",
+  "schema_version": 1,
+  "target_model_calls": 0,
+  "task_id": "T0018-SCHEMA-V2-EXPRESSIBILITY-ORACLE-AUDIT"
+}
