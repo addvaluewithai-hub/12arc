@@ -91,7 +91,6 @@ jobs:
         env:
           RUN: ${{ steps.freeze.outputs.run }}
         run: |
-          git pull --rebase origin "$GITHUB_REF_NAME"
           python - <<'PY'
           import json, os
           from datetime import datetime, timezone
