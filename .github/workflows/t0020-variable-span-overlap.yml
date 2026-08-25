@@ -38,8 +38,7 @@ jobs:
           task = next(t for t in queue['tasks'] if t['id'] == trigger['task_id'])
           assert task['status'] == 'claimed'
           assert task['claim']['shift_id'] == trigger['shift_id']
-          assert task['claim']['run'] == trigger['run']
-          assert any(r['run'] == trigger['run'] and r['task_id'] == trigger['task_id'] for r in counter['active_reservations'])
+          assert any(r['run'] == trigger['run'] and r['task_id'] == trigger['task_id'] and r['shift_id'] == trigger['shift_id'] for r in counter['active_reservations'])
           PY
       - name: Install and run implementation tests
         run: |
