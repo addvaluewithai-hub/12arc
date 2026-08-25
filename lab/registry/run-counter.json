@@ -1,1 +1,1 @@
-{"schema_version":1,"next_run_number":30,"last_completed_run":"ARC-R029","active_reservations":[]}
+{"schema_version":1,"next_run_number":31,"last_completed_run":"ARC-R029","active_reservations":[{"run":"ARC-R030","task_id":"T0015-RULE-FIRST-OVERFLOW-ABLATION","shift_id":"t0015-20260825T033032+0300","reserved_at":"2026-08-25T00:30:32Z"}]}
