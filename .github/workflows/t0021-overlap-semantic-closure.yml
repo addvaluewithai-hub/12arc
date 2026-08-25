@@ -25,59 +25,36 @@ jobs:
         with:
           python-version: '3.11'
       - name: Validate claim and reservation
+        shell: bash
         run: |
-          python - <<'PY'
-          import json
-          import sys
-          from pathlib import Path
+          set -euo pipefail
+          TRIGGER='lab/triggers/t0021-overlap-semantic-closure.request'
+          QUEUE='lab/registry/queue.json'
+          COUNTER='lab/registry/run-counter.json'
+          TASK_ID='T0021-OVERLAP-SEMANTIC-CLOSURE-AUDIT'
+          RUN_ID='ARC-R036'
 
-          TASK_ID = 'T0021-OVERLAP-SEMANTIC-CLOSURE-AUDIT'
-          RUN = 'ARC-R036'
+          jq -e . "$TRIGGER" >/dev/null
+          jq -e . "$QUEUE" >/dev/null
+          jq -e . "$COUNTER" >/dev/null
 
-          trigger = json.loads(Path('lab/triggers/t0021-overlap-semantic-closure.request').read_text())
-          queue = json.loads(Path('lab/registry/queue.json').read_text())
-          counter = json.loads(Path('lab/registry/run-counter.json').read_text())
-          task = next((t for t in queue.get('tasks', []) if t.get('id') == TASK_ID), None)
-          reservations = [r for r in counter.get('active_reservations', []) if r.get('run') == RUN]
+          schema_version="$(jq -r '.schema_version' "$TRIGGER")"
+          trigger_task="$(jq -r '.task_id' "$TRIGGER")"
+          trigger_run="$(jq -r '.run' "$TRIGGER")"
+          trigger_shift="$(jq -r '.shift_id' "$TRIGGER")"
+          task_status="$(jq -r --arg id "$TASK_ID" '.tasks[] | select(.id == $id) | .status' "$QUEUE")"
+          claim_shift="$(jq -r --arg id "$TASK_ID" '.tasks[] | select(.id == $id) | .claim.shift_id' "$QUEUE")"
+          reservation_count="$(jq -r --arg run "$RUN_ID" --arg task "$TASK_ID" --arg shift "$trigger_shift" '[.active_reservations[] | select(.run == $run and .task_id == $task and .shift_id == $shift)] | length' "$COUNTER")"
 
-          observed = {
-              'trigger': trigger,
-              'task_status': None if task is None else task.get('status'),
-              'task_claim': None if task is None else task.get('claim'),
-              'matching_run_reservations': reservations,
-          }
-          print('T0021 validation observed state:')
-          print(json.dumps(observed, indent=2, sort_keys=True))
+          printf 'schema_version=%s\ntrigger_task=%s\ntrigger_run=%s\ntrigger_shift=%s\ntask_status=%s\nclaim_shift=%s\nreservation_count=%s\n' \
+            "$schema_version" "$trigger_task" "$trigger_run" "$trigger_shift" "$task_status" "$claim_shift" "$reservation_count"
 
-          errors = []
-          if trigger.get('schema_version') != 1:
-              errors.append('trigger.schema_version != 1')
-          if trigger.get('task_id') != TASK_ID:
-              errors.append('trigger.task_id mismatch')
-          if trigger.get('run') != RUN:
-              errors.append('trigger.run mismatch')
-          if task is None:
-              errors.append('task missing from queue')
-          else:
-              if task.get('status') != 'claimed':
-                  errors.append(f"task.status={task.get('status')!r}, expected 'claimed'")
-              claim = task.get('claim') or {}
-              if claim.get('shift_id') != trigger.get('shift_id'):
-                  errors.append('task claim shift_id mismatch')
-          matching = [
-              r for r in reservations
-              if r.get('task_id') == TASK_ID and r.get('shift_id') == trigger.get('shift_id')
-          ]
-          if len(matching) != 1:
-              errors.append(f'expected exactly one matching active reservation, found {len(matching)}')
-
-          if errors:
-              print('Validation errors:', file=sys.stderr)
-              for error in errors:
-                  print(f'- {error}', file=sys.stderr)
-              raise SystemExit(1)
-          print('Claim/reservation validation passed.')
-          PY
+          test "$schema_version" = '1'
+          test "$trigger_task" = "$TASK_ID"
+          test "$trigger_run" = "$RUN_ID"
+          test "$task_status" = 'claimed'
+          test "$claim_shift" = "$trigger_shift"
+          test "$reservation_count" = '1'
       - name: Install and run diagnostic tests
         run: |
           python -m pip install -e '.[dev]'
