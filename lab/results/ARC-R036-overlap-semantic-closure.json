@@ -1,0 +1,6741 @@
+{
+  "adversarial_interpretation": "A dominant execution invariant does not by itself prove that fixing it will make the task expressible. Near-miss ranking can also be misleading when cell-error distance does not reflect semantic proximity. Any follow-up must change exactly one mechanism and preserve ARC-R035 controls.",
+  "benchmark_task_ids": [
+    "0607ce86"
+  ],
+  "frozen_operator_count": 27,
+  "max_depth": 4,
+  "primary_change": "diagnostics only; ARC-R035 solver semantics frozen",
+  "public_evaluation_used": false,
+  "record": {
+    "best_cell_error": 134,
+    "closest_reachable_states": [
+      {
+        "depth": 0,
+        "per_training_pair": [
+          52,
+          39,
+          43
+        ],
+        "program": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "op": "identity"
+            }
+          ]
+        },
+        "total_cell_error": 134
+      },
+      {
+        "depth": 1,
+        "per_training_pair": [
+          76,
+          39,
+          49
+        ],
+        "program": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "total_cell_error": 164
+      },
+      {
+        "depth": 2,
+        "per_training_pair": [
+          76,
+          39,
+          49
+        ],
+        "program": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            },
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "first_nonbackground",
+              "write": "all"
+            }
+          ]
+        },
+        "total_cell_error": 164
+      },
+      {
+        "depth": 2,
+        "per_training_pair": [
+          76,
+          39,
+          51
+        ],
+        "program": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            },
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "background_only"
+            }
+          ]
+        },
+        "total_cell_error": 166
+      },
+      {
+        "depth": 2,
+        "per_training_pair": [
+          76,
+          39,
+          55
+        ],
+        "program": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            },
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "all"
+            }
+          ]
+        },
+        "total_cell_error": 170
+      },
+      {
+        "depth": 1,
+        "per_training_pair": [
+          52,
+          80,
+          40
+        ],
+        "program": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "total_cell_error": 172
+      },
+      {
+        "depth": 2,
+        "per_training_pair": [
+          84,
+          39,
+          49
+        ],
+        "program": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "background_only"
+            }
+          ]
+        },
+        "total_cell_error": 172
+      },
+      {
+        "depth": 3,
+        "per_training_pair": [
+          84,
+          39,
+          49
+        ],
+        "program": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "background_only"
+            },
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "first_nonbackground",
+              "write": "all"
+            }
+          ]
+        },
+        "total_cell_error": 172
+      },
+      {
+        "depth": 3,
+        "per_training_pair": [
+          84,
+          39,
+          51
+        ],
+        "program": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "background_only"
+            },
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "background_only"
+            }
+          ]
+        },
+        "total_cell_error": 174
+      },
+      {
+        "depth": 2,
+        "per_training_pair": [
+          90,
+          39,
+          49
+        ],
+        "program": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            },
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "background_only"
+            }
+          ]
+        },
+        "total_cell_error": 178
+      },
+      {
+        "depth": 3,
+        "per_training_pair": [
+          84,
+          39,
+          55
+        ],
+        "program": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "background_only"
+            },
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "all"
+            }
+          ]
+        },
+        "total_cell_error": 178
+      },
+      {
+        "depth": 3,
+        "per_training_pair": [
+          90,
+          39,
+          49
+        ],
+        "program": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "background_only"
+            },
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "background_only"
+            }
+          ]
+        },
+        "total_cell_error": 178
+      },
+      {
+        "depth": 3,
+        "per_training_pair": [
+          90,
+          39,
+          49
+        ],
+        "program": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            },
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "background_only"
+            },
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "first_nonbackground",
+              "write": "all"
+            }
+          ]
+        },
+        "total_cell_error": 178
+      },
+      {
+        "depth": 1,
+        "per_training_pair": [
+          52,
+          81,
+          46
+        ],
+        "program": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "background_only"
+            }
+          ]
+        },
+        "total_cell_error": 179
+      },
+      {
+        "depth": 3,
+        "per_training_pair": [
+          90,
+          39,
+          51
+        ],
+        "program": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            },
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "background_only"
+            },
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "background_only"
+            }
+          ]
+        },
+        "total_cell_error": 180
+      },
+      {
+        "depth": 3,
+        "per_training_pair": [
+          90,
+          39,
+          55
+        ],
+        "program": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            },
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "background_only"
+            },
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "all"
+            }
+          ]
+        },
+        "total_cell_error": 184
+      },
+      {
+        "depth": 4,
+        "per_training_pair": [
+          90,
+          58,
+          43
+        ],
+        "program": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            },
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "first_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            },
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "total_cell_error": 191
+      },
+      {
+        "depth": 1,
+        "per_training_pair": [
+          76,
+          80,
+          40
+        ],
+        "program": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "total_cell_error": 196
+      },
+      {
+        "depth": 4,
+        "per_training_pair": [
+          90,
+          63,
+          43
+        ],
+        "program": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            },
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "first_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "total_cell_error": 196
+      },
+      {
+        "depth": 1,
+        "per_training_pair": [
+          52,
+          101,
+          46
+        ],
+        "program": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "first_nonbackground",
+              "write": "all"
+            }
+          ]
+        },
+        "total_cell_error": 199
+      }
+    ],
+    "dominant_failure_fraction": 1.0,
+    "dominant_failure_reason": "separator_structure_lost",
+    "execution_failures": 216,
+    "expressible": false,
+    "failure_message_counts": {
+      "ValueError: lattice inference requires at least two regions": 216
+    },
+    "failure_reason_counts": {
+      "separator_structure_lost": 216
+    },
+    "failure_records": [
+      {
+        "attempted_op": {
+          "axis": "all",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority",
+          "write": "all"
+        },
+        "depth_before": 1,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "all",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority",
+          "write": "background_only"
+        },
+        "depth_before": 1,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "all",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority",
+          "write": "outliers_only"
+        },
+        "depth_before": 1,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "all",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority_nonbackground",
+          "write": "all"
+        },
+        "depth_before": 1,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "all",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority_nonbackground",
+          "write": "background_only"
+        },
+        "depth_before": 1,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "all",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority_nonbackground",
+          "write": "outliers_only"
+        },
+        "depth_before": 1,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "all",
+          "op": "lattice_peer_reduce",
+          "reduce": "first_nonbackground",
+          "write": "all"
+        },
+        "depth_before": 1,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "all",
+          "op": "lattice_peer_reduce",
+          "reduce": "first_nonbackground",
+          "write": "background_only"
+        },
+        "depth_before": 1,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "all",
+          "op": "lattice_peer_reduce",
+          "reduce": "first_nonbackground",
+          "write": "outliers_only"
+        },
+        "depth_before": 1,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "row",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority",
+          "write": "all"
+        },
+        "depth_before": 1,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "row",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority",
+          "write": "background_only"
+        },
+        "depth_before": 1,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "row",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority",
+          "write": "outliers_only"
+        },
+        "depth_before": 1,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "row",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority_nonbackground",
+          "write": "all"
+        },
+        "depth_before": 1,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "row",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority_nonbackground",
+          "write": "background_only"
+        },
+        "depth_before": 1,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "row",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority_nonbackground",
+          "write": "outliers_only"
+        },
+        "depth_before": 1,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "row",
+          "op": "lattice_peer_reduce",
+          "reduce": "first_nonbackground",
+          "write": "all"
+        },
+        "depth_before": 1,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "row",
+          "op": "lattice_peer_reduce",
+          "reduce": "first_nonbackground",
+          "write": "background_only"
+        },
+        "depth_before": 1,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "row",
+          "op": "lattice_peer_reduce",
+          "reduce": "first_nonbackground",
+          "write": "outliers_only"
+        },
+        "depth_before": 1,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "col",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority",
+          "write": "all"
+        },
+        "depth_before": 1,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "col",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority",
+          "write": "background_only"
+        },
+        "depth_before": 1,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "col",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority",
+          "write": "outliers_only"
+        },
+        "depth_before": 1,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "col",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority_nonbackground",
+          "write": "all"
+        },
+        "depth_before": 1,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "col",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority_nonbackground",
+          "write": "background_only"
+        },
+        "depth_before": 1,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "col",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority_nonbackground",
+          "write": "outliers_only"
+        },
+        "depth_before": 1,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "col",
+          "op": "lattice_peer_reduce",
+          "reduce": "first_nonbackground",
+          "write": "all"
+        },
+        "depth_before": 1,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "col",
+          "op": "lattice_peer_reduce",
+          "reduce": "first_nonbackground",
+          "write": "background_only"
+        },
+        "depth_before": 1,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "col",
+          "op": "lattice_peer_reduce",
+          "reduce": "first_nonbackground",
+          "write": "outliers_only"
+        },
+        "depth_before": 1,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "all",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority",
+          "write": "all"
+        },
+        "depth_before": 1,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "all",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority",
+          "write": "background_only"
+        },
+        "depth_before": 1,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "all",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority",
+          "write": "outliers_only"
+        },
+        "depth_before": 1,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "all",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority_nonbackground",
+          "write": "all"
+        },
+        "depth_before": 1,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "all",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority_nonbackground",
+          "write": "background_only"
+        },
+        "depth_before": 1,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "all",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority_nonbackground",
+          "write": "outliers_only"
+        },
+        "depth_before": 1,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "all",
+          "op": "lattice_peer_reduce",
+          "reduce": "first_nonbackground",
+          "write": "all"
+        },
+        "depth_before": 1,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "all",
+          "op": "lattice_peer_reduce",
+          "reduce": "first_nonbackground",
+          "write": "background_only"
+        },
+        "depth_before": 1,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "all",
+          "op": "lattice_peer_reduce",
+          "reduce": "first_nonbackground",
+          "write": "outliers_only"
+        },
+        "depth_before": 1,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "row",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority",
+          "write": "all"
+        },
+        "depth_before": 1,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "row",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority",
+          "write": "background_only"
+        },
+        "depth_before": 1,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "row",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority",
+          "write": "outliers_only"
+        },
+        "depth_before": 1,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "row",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority_nonbackground",
+          "write": "all"
+        },
+        "depth_before": 1,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "row",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority_nonbackground",
+          "write": "background_only"
+        },
+        "depth_before": 1,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "row",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority_nonbackground",
+          "write": "outliers_only"
+        },
+        "depth_before": 1,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "row",
+          "op": "lattice_peer_reduce",
+          "reduce": "first_nonbackground",
+          "write": "all"
+        },
+        "depth_before": 1,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "row",
+          "op": "lattice_peer_reduce",
+          "reduce": "first_nonbackground",
+          "write": "background_only"
+        },
+        "depth_before": 1,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "row",
+          "op": "lattice_peer_reduce",
+          "reduce": "first_nonbackground",
+          "write": "outliers_only"
+        },
+        "depth_before": 1,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "col",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority",
+          "write": "all"
+        },
+        "depth_before": 1,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "col",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority",
+          "write": "background_only"
+        },
+        "depth_before": 1,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "col",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority",
+          "write": "outliers_only"
+        },
+        "depth_before": 1,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "col",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority_nonbackground",
+          "write": "all"
+        },
+        "depth_before": 1,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "col",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority_nonbackground",
+          "write": "background_only"
+        },
+        "depth_before": 1,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "col",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority_nonbackground",
+          "write": "outliers_only"
+        },
+        "depth_before": 1,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "col",
+          "op": "lattice_peer_reduce",
+          "reduce": "first_nonbackground",
+          "write": "all"
+        },
+        "depth_before": 1,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "col",
+          "op": "lattice_peer_reduce",
+          "reduce": "first_nonbackground",
+          "write": "background_only"
+        },
+        "depth_before": 1,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "col",
+          "op": "lattice_peer_reduce",
+          "reduce": "first_nonbackground",
+          "write": "outliers_only"
+        },
+        "depth_before": 1,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "all",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority",
+          "write": "all"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "all",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority",
+          "write": "background_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "all",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority",
+          "write": "outliers_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "all",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority_nonbackground",
+          "write": "all"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "all",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority_nonbackground",
+          "write": "background_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "all",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority_nonbackground",
+          "write": "outliers_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "all",
+          "op": "lattice_peer_reduce",
+          "reduce": "first_nonbackground",
+          "write": "all"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "all",
+          "op": "lattice_peer_reduce",
+          "reduce": "first_nonbackground",
+          "write": "background_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "all",
+          "op": "lattice_peer_reduce",
+          "reduce": "first_nonbackground",
+          "write": "outliers_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "row",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority",
+          "write": "all"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "row",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority",
+          "write": "background_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "row",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority",
+          "write": "outliers_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "row",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority_nonbackground",
+          "write": "all"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "row",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority_nonbackground",
+          "write": "background_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "row",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority_nonbackground",
+          "write": "outliers_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "row",
+          "op": "lattice_peer_reduce",
+          "reduce": "first_nonbackground",
+          "write": "all"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "row",
+          "op": "lattice_peer_reduce",
+          "reduce": "first_nonbackground",
+          "write": "background_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "row",
+          "op": "lattice_peer_reduce",
+          "reduce": "first_nonbackground",
+          "write": "outliers_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "col",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority",
+          "write": "all"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "col",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority",
+          "write": "background_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "col",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority",
+          "write": "outliers_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "col",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority_nonbackground",
+          "write": "all"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "col",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority_nonbackground",
+          "write": "background_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "col",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority_nonbackground",
+          "write": "outliers_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "col",
+          "op": "lattice_peer_reduce",
+          "reduce": "first_nonbackground",
+          "write": "all"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "col",
+          "op": "lattice_peer_reduce",
+          "reduce": "first_nonbackground",
+          "write": "background_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "col",
+          "op": "lattice_peer_reduce",
+          "reduce": "first_nonbackground",
+          "write": "outliers_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "all",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority",
+          "write": "all"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "first_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "all",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority",
+          "write": "background_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "first_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "all",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority",
+          "write": "outliers_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "first_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "all",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority_nonbackground",
+          "write": "all"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "first_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "all",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority_nonbackground",
+          "write": "background_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "first_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "all",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority_nonbackground",
+          "write": "outliers_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "first_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "all",
+          "op": "lattice_peer_reduce",
+          "reduce": "first_nonbackground",
+          "write": "all"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "first_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "all",
+          "op": "lattice_peer_reduce",
+          "reduce": "first_nonbackground",
+          "write": "background_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "first_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "all",
+          "op": "lattice_peer_reduce",
+          "reduce": "first_nonbackground",
+          "write": "outliers_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "first_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "row",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority",
+          "write": "all"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "first_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "row",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority",
+          "write": "background_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "first_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "row",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority",
+          "write": "outliers_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "first_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "row",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority_nonbackground",
+          "write": "all"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "first_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "row",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority_nonbackground",
+          "write": "background_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "first_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "row",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority_nonbackground",
+          "write": "outliers_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "first_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "row",
+          "op": "lattice_peer_reduce",
+          "reduce": "first_nonbackground",
+          "write": "all"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "first_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "row",
+          "op": "lattice_peer_reduce",
+          "reduce": "first_nonbackground",
+          "write": "background_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "first_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "row",
+          "op": "lattice_peer_reduce",
+          "reduce": "first_nonbackground",
+          "write": "outliers_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "first_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "col",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority",
+          "write": "all"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "first_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "col",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority",
+          "write": "background_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "first_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "col",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority",
+          "write": "outliers_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "first_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "col",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority_nonbackground",
+          "write": "all"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "first_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "col",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority_nonbackground",
+          "write": "background_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "first_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "col",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority_nonbackground",
+          "write": "outliers_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "first_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "col",
+          "op": "lattice_peer_reduce",
+          "reduce": "first_nonbackground",
+          "write": "all"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "first_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "col",
+          "op": "lattice_peer_reduce",
+          "reduce": "first_nonbackground",
+          "write": "background_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "first_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "col",
+          "op": "lattice_peer_reduce",
+          "reduce": "first_nonbackground",
+          "write": "outliers_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "first_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "all",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority",
+          "write": "all"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "all",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority",
+          "write": "background_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "all",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority",
+          "write": "outliers_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "all",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority_nonbackground",
+          "write": "all"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "all",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority_nonbackground",
+          "write": "background_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "all",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority_nonbackground",
+          "write": "outliers_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "all",
+          "op": "lattice_peer_reduce",
+          "reduce": "first_nonbackground",
+          "write": "all"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "all",
+          "op": "lattice_peer_reduce",
+          "reduce": "first_nonbackground",
+          "write": "background_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "all",
+          "op": "lattice_peer_reduce",
+          "reduce": "first_nonbackground",
+          "write": "outliers_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "row",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority",
+          "write": "all"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "row",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority",
+          "write": "background_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "row",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority",
+          "write": "outliers_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "row",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority_nonbackground",
+          "write": "all"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "row",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority_nonbackground",
+          "write": "background_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "row",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority_nonbackground",
+          "write": "outliers_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "row",
+          "op": "lattice_peer_reduce",
+          "reduce": "first_nonbackground",
+          "write": "all"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "row",
+          "op": "lattice_peer_reduce",
+          "reduce": "first_nonbackground",
+          "write": "background_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "row",
+          "op": "lattice_peer_reduce",
+          "reduce": "first_nonbackground",
+          "write": "outliers_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "col",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority",
+          "write": "all"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "col",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority",
+          "write": "background_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "col",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority",
+          "write": "outliers_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "col",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority_nonbackground",
+          "write": "all"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "col",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority_nonbackground",
+          "write": "background_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "col",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority_nonbackground",
+          "write": "outliers_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "col",
+          "op": "lattice_peer_reduce",
+          "reduce": "first_nonbackground",
+          "write": "all"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "col",
+          "op": "lattice_peer_reduce",
+          "reduce": "first_nonbackground",
+          "write": "background_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "col",
+          "op": "lattice_peer_reduce",
+          "reduce": "first_nonbackground",
+          "write": "outliers_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "all",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority",
+          "write": "all"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "background_only"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "all",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority",
+          "write": "background_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "background_only"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "all",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority",
+          "write": "outliers_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "background_only"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "all",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority_nonbackground",
+          "write": "all"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "background_only"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "all",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority_nonbackground",
+          "write": "background_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "background_only"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "all",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority_nonbackground",
+          "write": "outliers_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "background_only"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "all",
+          "op": "lattice_peer_reduce",
+          "reduce": "first_nonbackground",
+          "write": "all"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "background_only"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "all",
+          "op": "lattice_peer_reduce",
+          "reduce": "first_nonbackground",
+          "write": "background_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "background_only"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "all",
+          "op": "lattice_peer_reduce",
+          "reduce": "first_nonbackground",
+          "write": "outliers_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "background_only"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "row",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority",
+          "write": "all"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "background_only"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "row",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority",
+          "write": "background_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "background_only"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "row",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority",
+          "write": "outliers_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "background_only"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "row",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority_nonbackground",
+          "write": "all"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "background_only"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "row",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority_nonbackground",
+          "write": "background_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "background_only"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "row",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority_nonbackground",
+          "write": "outliers_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "background_only"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "row",
+          "op": "lattice_peer_reduce",
+          "reduce": "first_nonbackground",
+          "write": "all"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "background_only"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "row",
+          "op": "lattice_peer_reduce",
+          "reduce": "first_nonbackground",
+          "write": "background_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "background_only"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "row",
+          "op": "lattice_peer_reduce",
+          "reduce": "first_nonbackground",
+          "write": "outliers_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "background_only"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "col",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority",
+          "write": "all"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "background_only"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "col",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority",
+          "write": "background_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "background_only"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "col",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority",
+          "write": "outliers_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "background_only"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "col",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority_nonbackground",
+          "write": "all"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "background_only"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "col",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority_nonbackground",
+          "write": "background_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "background_only"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "col",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority_nonbackground",
+          "write": "outliers_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "background_only"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "col",
+          "op": "lattice_peer_reduce",
+          "reduce": "first_nonbackground",
+          "write": "all"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "background_only"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "col",
+          "op": "lattice_peer_reduce",
+          "reduce": "first_nonbackground",
+          "write": "background_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "background_only"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "col",
+          "op": "lattice_peer_reduce",
+          "reduce": "first_nonbackground",
+          "write": "outliers_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "background_only"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "all",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority",
+          "write": "all"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "background_only"
+            },
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "all",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority",
+          "write": "background_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "background_only"
+            },
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "all",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority",
+          "write": "outliers_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "background_only"
+            },
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "all",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority_nonbackground",
+          "write": "all"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "background_only"
+            },
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "all",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority_nonbackground",
+          "write": "background_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "background_only"
+            },
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "all",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority_nonbackground",
+          "write": "outliers_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "background_only"
+            },
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "all",
+          "op": "lattice_peer_reduce",
+          "reduce": "first_nonbackground",
+          "write": "all"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "background_only"
+            },
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "all",
+          "op": "lattice_peer_reduce",
+          "reduce": "first_nonbackground",
+          "write": "background_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "background_only"
+            },
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "all",
+          "op": "lattice_peer_reduce",
+          "reduce": "first_nonbackground",
+          "write": "outliers_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "background_only"
+            },
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "row",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority",
+          "write": "all"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "background_only"
+            },
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "row",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority",
+          "write": "background_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "background_only"
+            },
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "row",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority",
+          "write": "outliers_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "background_only"
+            },
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "row",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority_nonbackground",
+          "write": "all"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "background_only"
+            },
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "row",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority_nonbackground",
+          "write": "background_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "background_only"
+            },
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "row",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority_nonbackground",
+          "write": "outliers_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "background_only"
+            },
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "row",
+          "op": "lattice_peer_reduce",
+          "reduce": "first_nonbackground",
+          "write": "all"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "background_only"
+            },
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "row",
+          "op": "lattice_peer_reduce",
+          "reduce": "first_nonbackground",
+          "write": "background_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "background_only"
+            },
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "row",
+          "op": "lattice_peer_reduce",
+          "reduce": "first_nonbackground",
+          "write": "outliers_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "background_only"
+            },
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "col",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority",
+          "write": "all"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "background_only"
+            },
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "col",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority",
+          "write": "background_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "background_only"
+            },
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "col",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority",
+          "write": "outliers_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "background_only"
+            },
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "col",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority_nonbackground",
+          "write": "all"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "background_only"
+            },
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "col",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority_nonbackground",
+          "write": "background_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "background_only"
+            },
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "col",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority_nonbackground",
+          "write": "outliers_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "background_only"
+            },
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "col",
+          "op": "lattice_peer_reduce",
+          "reduce": "first_nonbackground",
+          "write": "all"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "background_only"
+            },
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "col",
+          "op": "lattice_peer_reduce",
+          "reduce": "first_nonbackground",
+          "write": "background_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "background_only"
+            },
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "col",
+          "op": "lattice_peer_reduce",
+          "reduce": "first_nonbackground",
+          "write": "outliers_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority_nonbackground",
+              "write": "background_only"
+            },
+            {
+              "axis": "row",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "all",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority",
+          "write": "all"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "first_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "all",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority",
+          "write": "background_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "first_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "all",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority",
+          "write": "outliers_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "first_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "all",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority_nonbackground",
+          "write": "all"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "first_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "all",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority_nonbackground",
+          "write": "background_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "first_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "all",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority_nonbackground",
+          "write": "outliers_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "first_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "all",
+          "op": "lattice_peer_reduce",
+          "reduce": "first_nonbackground",
+          "write": "all"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "first_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "all",
+          "op": "lattice_peer_reduce",
+          "reduce": "first_nonbackground",
+          "write": "background_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "first_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "all",
+          "op": "lattice_peer_reduce",
+          "reduce": "first_nonbackground",
+          "write": "outliers_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "first_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "row",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority",
+          "write": "all"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "first_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "row",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority",
+          "write": "background_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "first_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "row",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority",
+          "write": "outliers_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "first_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "row",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority_nonbackground",
+          "write": "all"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "first_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "row",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority_nonbackground",
+          "write": "background_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "first_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "row",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority_nonbackground",
+          "write": "outliers_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "first_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "row",
+          "op": "lattice_peer_reduce",
+          "reduce": "first_nonbackground",
+          "write": "all"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "first_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "row",
+          "op": "lattice_peer_reduce",
+          "reduce": "first_nonbackground",
+          "write": "background_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "first_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "row",
+          "op": "lattice_peer_reduce",
+          "reduce": "first_nonbackground",
+          "write": "outliers_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "first_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "col",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority",
+          "write": "all"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "first_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "col",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority",
+          "write": "background_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "first_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "col",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority",
+          "write": "outliers_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "first_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "col",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority_nonbackground",
+          "write": "all"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "first_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "col",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority_nonbackground",
+          "write": "background_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "first_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "col",
+          "op": "lattice_peer_reduce",
+          "reduce": "majority_nonbackground",
+          "write": "outliers_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "first_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "col",
+          "op": "lattice_peer_reduce",
+          "reduce": "first_nonbackground",
+          "write": "all"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "first_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "col",
+          "op": "lattice_peer_reduce",
+          "reduce": "first_nonbackground",
+          "write": "background_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "first_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      },
+      {
+        "attempted_op": {
+          "axis": "col",
+          "op": "lattice_peer_reduce",
+          "reduce": "first_nonbackground",
+          "write": "outliers_only"
+        },
+        "depth_before": 2,
+        "exception_type": "ValueError",
+        "message": "lattice inference requires at least two regions",
+        "program_prefix": {
+          "schema_version": 2,
+          "steps": [
+            {
+              "axis": "col",
+              "op": "lattice_peer_reduce",
+              "reduce": "first_nonbackground",
+              "write": "all"
+            },
+            {
+              "axis": "all",
+              "op": "lattice_peer_reduce",
+              "reduce": "majority",
+              "write": "all"
+            }
+          ]
+        },
+        "reason": "separator_structure_lost",
+        "training_pair_index": 2
+      }
+    ],
+    "first_step_valid_transitions": 27,
+    "initial_cell_error": 134,
+    "operator_applications": 6399,
+    "programs_expanded": 237,
+    "unique_states": 798
+  },
+  "role": "failure-analyst",
+  "run": "ARC-R036",
+  "schema_version": 1,
+  "target_model_calls": 0,
+  "task_id": "T0021-OVERLAP-SEMANTIC-CLOSURE-AUDIT",
+  "verdict": "DOMINANT_FAILURE_MECHANISM_IDENTIFIED"
+}

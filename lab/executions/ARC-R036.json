@@ -1,0 +1,12 @@
+{
+  "completed_at": "2026-08-25T23:14:14.654811+00:00",
+  "expected_result": "lab/results/ARC-R036-overlap-semantic-closure.json",
+  "public_evaluation_used": false,
+  "run": "ARC-R036",
+  "schema_version": 1,
+  "status": "complete",
+  "target_model_calls": 0,
+  "task_id": "T0021-OVERLAP-SEMANTIC-CLOSURE-AUDIT",
+  "workflow": ".github/workflows/t0021-overlap-semantic-closure.yml",
+  "workflow_run_id": "32909817585"
+}
