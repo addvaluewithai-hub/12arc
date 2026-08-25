@@ -2,8 +2,8 @@
 
 Updated: 2026-08-25
 Phase: **PHASE 2 — architecture research**
-Latest completed research run: **ARC-R031**
-Next unallocated research run: **ARC-R032**
+Latest completed research run: **ARC-R032**
+Next unallocated research run: **ARC-R033**
 
 ## Fixed comparator and model policy
 
@@ -15,20 +15,18 @@ ARC-R016 direct-JSON baseline remains frozen at **45/174 = 25.8621%** exact accu
 
 ARC-R030 rejected compact serialization as a sufficient fix: on `0607ce86` and `06df4c85`, treatment became 2/2 parseable but exact candidate coverage remained 0/2 versus comparator 0/2.
 
-ARC-R031 audited the actual schema-v1 IR and permitted public-training mappings with zero target-model calls. Schema-v1 contains only identity, whole-grid rotations/flips, and global recolor. These compose into whole-grid spatial permutations plus global color substitutions and cannot express region-selective edits.
+ARC-R031 mechanically established that schema-v1 cannot express the selective region-level training mappings for either diagnostic task and predeclared a generic lattice-region primitive family.
 
-For `0607ce86`, training outputs selectively repair noisy occurrences inside a repeated/lattice-like structure while retaining other occurrences of the same colors. For `06df4c85`, separator-defined cells are selectively populated/propagated while other zeros and separators remain unchanged. Both mappings therefore require conditional region-level read/write semantics unavailable to schema-v1.
+ARC-R032 tested that family under frozen ARC-R030 model/generation/scoring controls. The result was **REJECT**: 2/2 parseable but 0/2 exact candidate coverage, with 0 new coverage and 0 regressions. The run used 2 live NVIDIA calls, 14,526 input tokens, 419 output tokens, 57.807 s model runtime, 0 provider failures and 0 parse failures. Five normalized program ASTs were generated and `lattice_peer_reduce` appeared seven times, so the richer language was actually used.
 
-ARC-R031 classification: **2/2 missing generic DSL/IR expressivity** with high confidence. Search/induction weakness or prompt collapse may coexist, but current-schema search is incapable of producing an exact program for the observed mappings.
+Failure evidence splits the uncertainty further. `0607ce86` failed closed at execution with `inferred lattice cells must have equal size`, identifying a partition-model/validation-boundary mismatch. `06df4c85` produced executable lattice-peer programs but no exact candidate, leaving wrong generic semantics vs induction/search unresolved.
 
 ## Next research direction
 
-Predeclared follow-up: `T0017-LATTICE-REGION-PRIMITIVE-ABLATION`.
+Highest-priority follow-up: `T0018-SCHEMA-V2-EXPRESSIBILITY-ORACLE-AUDIT`.
 
-Primary change only: add one generic lattice-region map/reduce family to the rule-first IR, supporting inferred repeated-cell partitions, peer aggregation, generic conditional writes, and canvas reassembly. No task IDs, absolute task coordinates, task-specific colors, or hand-entered target patterns are permitted.
+Use **no target-model calls**. On permitted public-training pairs only, mechanically determine whether bounded generic schema-v2 programs can exactly fit the two diagnostic mappings under the same anti-overfit constraints (no task IDs, absolute task-specific coordinates, task-specific colors, or hand-entered target patterns).
 
-Frozen matched comparator remains ARC-R030 on exactly `0607ce86` and `06df4c85`, DeepSeek V4 Flash via NVIDIA NIM, one attempt/test, temperature 0, top_p 1, no reasoning override, 3072 candidate output tokens, deterministic execution, exact candidate-oracle scoring, and comparator-integrity enforcement.
-
-Success threshold: **2/2 parseable and >=1/2 exact candidate coverage**. If richer-IR outputs are 2/2 parseable but remain 0/2 coverage, the primitive-family sufficiency hypothesis is rejected and the bottleneck shifts toward induction/search or a different representation family.
+Primary question: does an exact generic schema-v2 program exist for each training mapping? If no, representation semantics remain insufficient and the audit should isolate one generic missing/incorrect assumption. If yes, preserve that program only as oracle evidence and classify the live ARC-R032 failure primarily as induction/search rather than crediting a research-team program as a target-model solve.
 
 Public evaluation remains sealed.
