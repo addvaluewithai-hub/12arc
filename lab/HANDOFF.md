@@ -2,30 +2,35 @@
 
 Start from `lab/RUNNER.md` and current Git state.
 
-## ARC-R032 closed — lattice-region primitive sufficiency rejected
+## ARC-R033 closed — schema-v2 expressibility audit
 
-`T0017-LATTICE-REGION-PRIMITIVE-ABLATION` completed under the frozen ARC-R030 comparator controls. Public evaluation was not used.
+`T0018-SCHEMA-V2-EXPRESSIBILITY-ORACLE-AUDIT` completed with zero target-model calls using permitted public ARC-AGI-2 training data only. Public evaluation was not used.
 
-Durable evidence: `lab/results/ARC-R032-lattice-region.json`, `lab/executions/ARC-R032.json`, and `lab/runs/2026-08-25/ARC-R032.md`.
+Durable evidence: `lab/results/ARC-R033-schema-v2-expressibility.json` and `lab/runs/2026-08-25/ARC-R033.md`.
 
-Result: **REJECT**. The treatment was 2/2 parseable but 0/2 exact candidate coverage, identical to comparator 0/2, so the predeclared success threshold was missed and the explicit falsification condition was met. There were 2 live NVIDIA calls, 0 cache hits, 14,526 input tokens, 419 output tokens, 57.807 s model runtime, 0 provider failures and 0 parse failures.
+Result: **RESEARCH_DIRECTION / REPRESENTATION_INSUFFICIENT**.
 
-The new representation was actually used: five normalized program ASTs were generated and `lattice_peer_reduce` appeared seven times. This rules out the trivial explanation that DeepSeek never emitted the new operator.
+The bounded deterministic search enumerated the implemented 27 `lattice_peer_reduce` parameterizations to max depth 4 with state deduplication.
 
-Per-task evidence differs:
+- `0607ce86`: not expressible under current schema-v2. All 27 first-step applications fail at the same generic validation boundary because inferred separator-defined lattice cells are required to have equal size. No deeper program can be reached under the current semantics.
+- `06df4c85`: not expressible under current schema-v2. There were zero validation failures, but only two unique reachable states after 54 operator applications and no exact training-consistent program. The current peer-reduction semantics therefore have an extremely small closure for this task; increasing BFS depth alone is not a credible fix.
 
-- `0607ce86`: response parsed, then executor failed closed with `inferred lattice cells must have equal size`. Treat this as a partition-model / validation-boundary signal.
-- `06df4c85`: response parsed and executed lattice-peer reductions, but all candidates were exact-wrong. Treat this as unresolved generic semantics vs induction/search.
+Do not credit any oracle/research-team program as a target-model solve. No such program was found here anyway.
 
-## Next task: T0018-SCHEMA-V2-EXPRESSIBILITY-ORACLE-AUDIT
+## Next task: T0019-VARIABLE-SPAN-PARTITION-ABLATION
 
-No model calls. On permitted public-training pairs only, use bounded deterministic enumeration/search to test whether generic schema-v2 can represent exact training-consistent programs for `0607ce86` and `06df4c85` under the existing anti-overfit constraints.
+This is a no-model, one-variable ablation focused only on `0607ce86`.
 
-Do not credit any research-team/oracle program as a target-model solve. The audit is diagnostic only.
+Change only `infer_lattice` partition validation to permit variable-size separator-defined spans. Freeze the existing 27 `lattice_peer_reduce` parameterizations and max search depth 4. Keep all anti-overfit constraints: no task IDs in DSL semantics, no absolute task-specific coordinates, no task-specific colors, no hand-entered target patterns.
+
+Protocol: `lab/experiments/T0019-variable-span-partition-ablation.json`.
 
 Decision rule:
 
-- If no exact generic schema-v2 program exists for a task, classify representation/partition semantics as insufficient and isolate one generic missing or incorrect assumption before proposing another matched ablation.
-- If an exact generic schema-v2 program does exist, preserve it only as oracle evidence and classify ARC-R032 primarily as induction/search failure for that task; then predeclare a search/prompt intervention that leaves the DSL frozen.
+- valid first-step transition + exact training-consistent program: partition restriction was sufficient for expressibility;
+- valid first-step transition but no exact fit: partition blocker is real but region semantics are still insufficient;
+- no valid first-step transition: falsify the equal-size restriction as the proximate blocker.
 
-Keep public evaluation sealed and do not increase token budget as a substitute for resolving this distinction.
+Keep `06df4c85` out of T0019. Its failure mechanism is different and should get a later isolated semantic/operator ablation rather than contaminating this partition test.
+
+Public evaluation remains sealed.
