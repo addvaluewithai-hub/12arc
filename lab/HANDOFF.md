@@ -2,42 +2,44 @@
 
 Start from `lab/RUNNER.md` and current Git state.
 
-## ARC-R034 closed — variable-span partition ablation
+## ARC-R035 closed — shared-overlap alignment ablation
 
-`T0019-VARIABLE-SPAN-PARTITION-ABLATION` completed with zero target-model calls using permitted public ARC-AGI-2 training data only. Public evaluation was not used.
+`T0020-VARIABLE-SPAN-OVERLAP-ALIGNMENT-ABLATION` completed with zero target-model calls using permitted public ARC-AGI-2 training data only. Public evaluation was not used.
 
-Durable evidence: `lab/results/ARC-R034-variable-span-partition.json` and `lab/runs/2026-08-25/ARC-R034.md`.
+Durable evidence: `lab/results/ARC-R035-variable-span-overlap.json` and `lab/runs/2026-08-25/ARC-R035.md`.
 
-Result: **REJECT / FALSIFIED_NO_VALID_FIRST_STEP**.
+Result: **PARTIAL_ALIGNMENT_BLOCKER_REMOVED_SEMANTICS_INSUFFICIENT**.
 
-T0019 changed only lattice partition inference to permit variable-size separator-defined spans while freezing the existing 27 `lattice_peer_reduce` parameterizations and max search depth 4 on `0607ce86`.
+T0020 kept ARC-R034 variable-span separator inference, all 27 `lattice_peer_reduce` parameterizations, task `0607ce86`, deterministic state-deduplicated BFS, and max depth 4 frozen. The only semantic change was peer-coordinate alignment: reduce inside the shared minimum-height/minimum-width overlap and preserve non-overlap cells.
 
-The equal-size validation error disappeared, but no valid transition became reachable:
+Mechanical result:
 
-- valid first-step transitions: 0;
-- operator applications: 27;
-- execution failures: 27/27, all `IndexError`;
-- unique reachable states: 1;
-- exact training-consistent program: none.
+- valid first-step transitions: **27/27**, versus 0/27 in ARC-R034;
+- exact training-consistent program: none;
+- unique reachable states: **798**;
+- programs expanded: **237**;
+- operator applications: **6,399**;
+- execution failures: **216**, all surfaced as `ValueError`;
+- target-model calls: **0**.
 
-This reveals a deeper generic structural assumption in the frozen peer reducer: it indexes every peer region with common relative coordinates derived from one region, which is invalid when separator-defined regions have unequal extents. Do not interpret ARC-R034 as evidence against variable-span partitioning in every richer representation; it rejects the claim that relaxing the partition check alone is sufficient.
+Thus shared-overlap alignment removes the specific unequal-shape `IndexError` blocker but is not sufficient for bounded expressibility. Do not revert this to a claim that variable spans failed; the representation now executes broadly and the remaining problem is semantic/invariant closure.
 
-Dedicated GitHub Actions run `32841175739` / job `97780790181` completed successfully, including claim/reservation validation, implementation tests, pinned-public-training fetch, bounded audit, and durable result persistence.
+GitHub Actions run `32847574881` completed successfully and persisted the result. An earlier attempt `32847394781` failed before tests because the task-claim write had left `queue.json` malformed; that registry syntax was repaired on the same ARC-R035 reservation without changing experimental semantics.
 
-## Next task: T0020-VARIABLE-SPAN-OVERLAP-ALIGNMENT-ABLATION
+## Next task: T0021-OVERLAP-SEMANTIC-CLOSURE-AUDIT
 
-This is a no-model one-variable ablation focused only on `0607ce86`.
+This is a no-model diagnostic on `0607ce86`. Keep all ARC-R035 semantics frozen.
 
-Keep the ARC-R034 variable-span partition inference, all 27 peer-reduction axis/reducer/write parameterizations, deterministic BFS/state deduplication, and max depth 4 frozen. Change only coordinate alignment: for each peer set, reduce over the shared overlap domain defined by minimum peer height/width, and preserve cells outside that overlap unchanged.
+Protocol: `lab/experiments/T0021-OVERLAP-SEMANTIC-CLOSURE-AUDIT.json`.
 
-Protocol: `lab/experiments/T0020-variable-span-overlap-alignment-ablation.json`.
+Required work:
 
-Decision rule:
+- classify each of the 216 deeper-search failures by exact cause/invariant;
+- retain program paths for all reachable states;
+- rank reachable multi-training states by deterministic cell-error distance to the training outputs;
+- determine whether evidence isolates separator destruction, wrong overlap anchoring, or missing region-local conditional semantics;
+- predeclare exactly one matched ablation only if one mechanism dominates reproducibly.
 
-- valid first-step transition + exact training-consistent program: overlap alignment is sufficient for bounded expressibility;
-- valid first-step transition but no exact fit: alignment blocker is removed but semantics remain insufficient;
-- no valid first-step transition: falsify shared-overlap alignment as the proximate remaining blocker.
+If the evidence remains mixed, report ambiguity rather than inventing a semantic primitive.
 
-Keep `06df4c85` out of T0020. Its failure mechanism remains the separate semantic-closure problem established by ARC-R033.
-
-Public evaluation remains sealed.
+Keep `06df4c85` separate. Public evaluation remains sealed.
