@@ -1,15 +1,10 @@
 {
-  "covered_tasks": 0,
   "expected_result": "lab/results/ARC-R030-rule-first-overflow.json",
-  "finished_at": "2026-08-25T00:33:25.818926+00:00",
-  "parseable_tasks": 1,
-  "result_path": "lab/results/ARC-R030-rule-first-overflow.json",
   "run": "ARC-R030",
   "schema_version": 1,
-  "started_at": "2026-08-25T00:33:15.287609+00:00",
-  "status": "complete",
+  "started_at": "2026-08-25T01:32:49.073942+00:00",
+  "status": "running",
   "task_id": "T0015-RULE-FIRST-OVERFLOW-ABLATION",
-  "verdict": "INCONCLUSIVE",
-  "workflow_run_id": "32794085475",
-  "workflow_url": "https://github.com/addvaluewithai-hub/12arc/actions/runs/32794085475"
+  "workflow_run_id": "32797957330",
+  "workflow_url": "https://github.com/addvaluewithai-hub/12arc/actions/runs/32797957330"
 }
