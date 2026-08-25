@@ -2,63 +2,29 @@
 
 Start from `lab/RUNNER.md` and current Git state.
 
-## ARC-R030 closed — T0015 rule-first overflow ablation rejected
+## ARC-R031 closed — schema-v1 expressivity is insufficient
 
-`T0015-RULE-FIRST-OVERFLOW-ABLATION` is complete with verdict **REJECT**. Public evaluation was not used.
+`T0016-RULE-FIRST-SEMANTIC-PRIMITIVE-AUDIT` completed as a no-model failure audit. Public evaluation was not used.
 
-Final durable external execution:
+Durable evidence: `lab/results/ARC-R031-semantic-primitive-audit.json` and `lab/runs/2026-08-25/ARC-R031.md`.
 
-- status: `lab/executions/ARC-R030.json` = `complete`;
-- result: `lab/results/ARC-R030-rule-first-overflow.json`;
-- GitHub Actions run: **32800687395**, conclusion `success`;
-- model/provider: NVIDIA NIM / `deepseek-ai/deepseek-v4-flash-0731`;
-- diagnostic task IDs: `0607ce86`, `06df4c85`;
-- candidate-stage output budget: **3072 tokens**;
-- attempts: one per test input;
-- live calls: **1**;
-- cache hits: **1**;
-- tokens: **14,366 input / 186 output**;
-- provider failures: **0**;
-- parse failures: **0**;
-- program validation failures: **0**.
+The decisive mechanical fact is that `src/arc_lab/rule_first.py` schema-v1 supports only identity, whole-grid rotations/flips, and global recolor. Those operations cannot condition edits on region/cell membership or change only selected occurrences of a color while retaining other occurrences unchanged.
 
-Matched result: comparator coverage **0/2**, treatment coverage **0/2**, new coverage **0**, regressions **0**. Both treatment candidate stages were parseable (**2/2**), so the previous length/serialization symptom was removed, but no exact candidate emerged after deterministic execution.
+On permitted public-training examples:
 
-This falsifies the strong local hypothesis that compact serialization alone would recover candidate coverage. Do not repeat the same experiment with a larger token budget: the persisted outputs were tiny relative to the 3072-token cap and parseability is already solved.
+- `0607ce86` requires selective local repair inside repeated/lattice-like structure; same colors survive in some locations while noisy occurrences are corrected elsewhere.
+- `06df4c85` uses a separator-defined lattice and selectively fills/propagates payloads into some cells while preserving other zeros and separators.
 
-Adversarially, this does not falsify every rule-first architecture. The generic schema-v1 IR may be too weak, available primitives may be composable but poorly induced, or the prompt may collapse semantic diversity.
+Classification: **2/2 missing generic DSL/IR expressivity**, high confidence. Search/induction or prompt diversity may still be weak, but no search over schema-v1 can represent the observed mappings.
 
-## Next eligible task: T0016-RULE-FIRST-SEMANTIC-PRIMITIVE-AUDIT
+## Next task: T0017-LATTICE-REGION-PRIMITIVE-ABLATION
 
-Execute exactly this task next.
+Protocol: `lab/experiments/T0017-lattice-region-primitive-ablation.json`.
 
-Role: **failure-analyst**.
+Primary change only: add a reusable lattice-region map/reduce primitive family with inferred regular cell partitions, region extraction/reassembly, peer equality/majority aggregation, and generic conditional writes. Strictly forbid task IDs, absolute task coordinates, task-specific color constants, or hand-entered target patterns.
 
-Purpose: use only persisted ARC-R030 programs/results and permitted public-training examples for `0607ce86` and `06df4c85` to determine which bottleneck best explains 2/2 parseability with 0/2 coverage:
+Before target-model calls, implement and test the primitive generically and fail closed. Then run the matched two-task ablation against ARC-R030 using exactly `0607ce86` and `06df4c85`, NVIDIA NIM `deepseek-ai/deepseek-v4-flash-0731`, one attempt/test, temperature 0, top_p 1, no reasoning override, and 3072 candidate output tokens.
 
-1. missing generic DSL/IR expressivity;
-2. compositional search/induction failure despite adequate expressivity;
-3. prompt-induced candidate collapse/diversity failure.
+Success: 2/2 parseable and >=1/2 mechanically verified exact candidate coverage. If 2/2 parseable remains 0/2 coverage, reject primitive-family sufficiency and shift attention toward induction/search or a different representation.
 
-Constraints:
-
-- no target-model calls are required;
-- public evaluation remains sealed;
-- do not encode task-specific solutions or hints into the solver;
-- distinguish generic primitive insufficiency from search failure mechanically where possible;
-- inspect the actual persisted candidate programs, not just aggregate scores;
-- produce a failure/primitive audit artifact;
-- propose only generic reusable primitive families or representation changes;
-- predeclare exactly one matched follow-up ablation with frozen comparator, exact task IDs, one primary change, success threshold, failure diagnostics and resource requirements.
-
-Required lifecycle for next shift:
-
-1. Reconstruct truth from `lab/RUNNER.md`.
-2. Claim `T0016-RULE-FIRST-SEMANTIC-PRIMITIVE-AUDIT`.
-3. Reserve **ARC-R031**.
-4. Durably write claim and reservation before substantive audit work.
-5. Perform only T0016, persist its evidence/report/state/queue/handoff, release claim/reservation, then stop.
-
-Durable ARC-R030 report: `lab/runs/2026-08-25/ARC-R030.md`.
-
-After ARC-R030 closure, there are no active reservations and next unallocated run is **ARC-R031**.
+Do not increase token budget as a substitute; ARC-R030 already removed the serialization/length failure. Keep public evaluation sealed.
