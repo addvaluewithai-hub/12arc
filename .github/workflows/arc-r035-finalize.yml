@@ -1,0 +1,86 @@
+name: ARC-R035 finalize registries
+
+on:
+  push:
+    paths:
+      - 'lab/triggers/arc-r035-finalize.request'
+
+permissions:
+  contents: write
+
+jobs:
+  finalize:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Validate evidence and finalize registries
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          result = json.loads(Path('lab/results/ARC-R035-variable-span-overlap.json').read_text())
+          assert result['run'] == 'ARC-R035'
+          assert result['task_id'] == 'T0020-VARIABLE-SPAN-OVERLAP-ALIGNMENT-ABLATION'
+          assert result['verdict'] == 'PARTIAL_ALIGNMENT_BLOCKER_REMOVED_SEMANTICS_INSUFFICIENT'
+          assert result['target_model_calls'] == 0
+          assert result['public_evaluation_used'] is False
+          assert Path('lab/runs/2026-08-25/ARC-R035.md').exists()
+          assert Path('lab/experiments/T0021-OVERLAP-SEMANTIC-CLOSURE-AUDIT.json').exists()
+
+          qpath = Path('lab/registry/queue.json')
+          queue = json.loads(qpath.read_text())
+          t20 = next(t for t in queue['tasks'] if t['id'] == 'T0020-VARIABLE-SPAN-OVERLAP-ALIGNMENT-ABLATION')
+          assert t20['status'] == 'claimed'
+          assert t20['claim']['shift_id'] == 'ARC-SHIFT-20260825T121758Z'
+          t20['status'] = 'done'
+          t20['completed_run'] = 'ARC-R035'
+          t20['progress'] = ('PARTIAL_ALIGNMENT_BLOCKER_REMOVED_SEMANTICS_INSUFFICIENT. Shared-overlap alignment restored '
+                             '27/27 valid first-step transitions versus ARC-R034 0/27, reaching 798 unique states across '
+                             '6399 operator applications, but no exact training-consistent program within depth 4. '
+                             '216 deeper execution failures were ValueError. Zero target-model calls; public evaluation sealed.')
+          t20['claim'] = None
+
+          if not any(t['id'] == 'T0021-OVERLAP-SEMANTIC-CLOSURE-AUDIT' for t in queue['tasks']):
+              queue['tasks'].append({
+                  'id': 'T0021-OVERLAP-SEMANTIC-CLOSURE-AUDIT',
+                  'title': 'Diagnose semantic closure after shared-overlap alignment',
+                  'type': 'research',
+                  'status': 'ready',
+                  'priority': 64,
+                  'depends_on': ['T0020-VARIABLE-SPAN-OVERLAP-ALIGNMENT-ABLATION'],
+                  'recommended_role': 'failure-analyst',
+                  'success_test': ('Keep ARC-R035 semantics frozen. Classify all 216 deeper-search failures by exact cause, '
+                                   'retain program paths, and rank 798 reachable states by deterministic cell-error distance. '
+                                   'Success requires one dominant reproducible mechanism sufficient to predeclare exactly one matched ablation; '
+                                   'otherwise record ambiguity. Protocol: lab/experiments/T0021-OVERLAP-SEMANTIC-CLOSURE-AUDIT.json.'),
+                  'required_resources': ['GitHub read/write', 'Python diagnostics', 'permitted public ARC training data', 'no target-model calls'],
+                  'expected_artifacts': ['failure-reason taxonomy', 'near-miss reachable-state analysis', 'one matched follow-up protocol or explicit ambiguity', 'queue/state/handoff updates'],
+                  'evidence': ('ARC-R035 restored 27/27 valid first-step transitions and 798 reachable states but found no exact program; '
+                               '216 deeper transitions failed with ValueError, leaving semantic/invariant closure unresolved.'),
+                  'claim': None
+              })
+          qpath.write_text(json.dumps(queue, separators=(',', ':')) + '\n')
+
+          cpath = Path('lab/registry/run-counter.json')
+          counter = json.loads(cpath.read_text())
+          assert any(r['run'] == 'ARC-R035' and r['task_id'] == t20['id'] for r in counter['active_reservations'])
+          counter['active_reservations'] = [r for r in counter['active_reservations'] if r['run'] != 'ARC-R035']
+          counter['last_completed_run'] = 'ARC-R035'
+          counter['next_run_number'] = 36
+          cpath.write_text(json.dumps(counter, separators=(',', ':')) + '\n')
+
+          # Parse round-trip is the final fail-closed check.
+          json.loads(qpath.read_text())
+          json.loads(cpath.read_text())
+          PY
+      - name: Persist finalization
+        run: |
+          git config user.name 'arc-research-bot'
+          git config user.email 'arc-research-bot@users.noreply.github.com'
+          git add lab/registry/queue.json lab/registry/run-counter.json
+          git commit -m 'ARC-R035: close T0020 and queue T0021'
+          git pull --rebase origin main
+          git push origin HEAD:main
