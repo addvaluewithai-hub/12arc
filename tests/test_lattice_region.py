@@ -19,6 +19,17 @@ def lattice_grid():
     ]
 
 
+def variable_lattice_grid():
+    return [
+        [1, 0, 9, 1, 0],
+        [0, 2, 9, 0, 0],
+        [9, 9, 9, 9, 9],
+        [1, 0, 9, 1, 0],
+        [0, 2, 9, 0, 0],
+        [1, 7, 9, 8, 6],
+    ]
+
+
 def test_lattice_inference_extract_and_reassemble_are_deterministic():
     grid = lattice_grid()
     lattice = infer_lattice(grid)
@@ -31,14 +42,7 @@ def test_lattice_inference_extract_and_reassemble_are_deterministic():
 
 
 def test_lattice_inference_permits_variable_size_separator_spans():
-    grid = [
-        [1, 0, 9, 1, 0],
-        [0, 2, 9, 0, 0],
-        [9, 9, 9, 9, 9],
-        [1, 0, 9, 1, 0],
-        [0, 2, 9, 0, 0],
-        [1, 0, 9, 1, 0],
-    ]
+    grid = variable_lattice_grid()
     lattice = infer_lattice(grid)
     assert lattice["row_spans"] == [(0, 2), (3, 6)]
     assert lattice["col_spans"] == [(0, 2), (3, 5)]
@@ -69,6 +73,19 @@ def test_outliers_only_repairs_region_peer_disagreement():
     # Relative cell (1,1) across the four lattice regions is [2, 0, 2, 7],
     # so deterministic majority is 2; the injected 7 is the outlier to repair.
     assert out[4][4] == 2
+
+
+def test_variable_size_peer_reduce_uses_shared_overlap_and_preserves_nonoverlap():
+    grid = variable_lattice_grid()
+    program = {
+        "schema_version": 2,
+        "steps": [{"op": "lattice_peer_reduce", "axis": "all", "reduce": "majority", "write": "all"}],
+    }
+    out = execute_program(program, grid)
+    # All four peers share only a 2x2 relative-coordinate domain. The third row
+    # of the lower regions is outside that overlap and must remain untouched.
+    assert out[5] == grid[5]
+    assert out[2] == grid[2]
 
 
 def test_validation_fails_closed_and_has_no_task_specific_coordinate_or_color_fields():
