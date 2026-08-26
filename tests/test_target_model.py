@@ -9,8 +9,10 @@ from arc_lab.target_model import (
     CachedTargetClient,
     GenerationConfig,
     NvidiaNIMProvider,
+    TargetProviderError,
     TargetRequest,
     TargetResponse,
+    classify_provider_failure,
 )
 
 
@@ -219,6 +221,30 @@ def test_nvidia_provider_requires_environment_secret(monkeypatch):
     monkeypatch.delenv("NVIDIA_API_KEY", raising=False)
     with pytest.raises(RuntimeError, match="NVIDIA_API_KEY"):
         NvidiaNIMProvider()
+
+
+def test_provider_failure_classifier_separates_terminal_model_unavailability():
+    message = "NVIDIA NIM HTTP 404: Function id abc: specified function is not found"
+    error = TargetProviderError(message, status_code=404, retryable=False)
+    assert error.error_category == "model_or_endpoint_unavailable"
+    assert classify_provider_failure(429, "too many requests") == "rate_limited"
+    assert classify_provider_failure(529, "overloaded") == "transient_provider"
+
+
+def test_nvidia_safe_error_payload_extracts_nested_function_detail():
+    nested = {
+        "message": json.dumps(
+            {
+                "status": 404,
+                "title": "Not Found",
+                "detail": "Function id 'abc' version 'null': Specified function is not found",
+            }
+        )
+    }
+    payload = NvidiaNIMProvider._safe_error_payload(json.dumps(nested))
+    assert payload is not None
+    assert payload["nested_title"] == "Not Found"
+    assert "Function id" in payload["nested_detail"]
 
 
 def _smoke_response(*, cache_hit: bool, text: str = "available") -> TargetResponse:
