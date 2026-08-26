@@ -1,0 +1,18 @@
+{
+  "cache_hit": false,
+  "input_tokens": 5925,
+  "model_requested": "deepseek-ai/deepseek-v4-flash-0731",
+  "model_resolved": "deepseek-ai/deepseek-v4-flash-0731",
+  "output_tokens": 7,
+  "provider_metadata": {
+    "endpoint": "https://integrate.api.nvidia.com/v1/chat/completions",
+    "finish_reason": "stop",
+    "provider": "nvidia-nim",
+    "rate_limit_headers": {},
+    "reasoning_chars": 0,
+    "usage_details": {}
+  },
+  "runtime_seconds": 99.29467689,
+  "text": "{\"challenges\": []}",
+  "total_tokens": 5932
+}

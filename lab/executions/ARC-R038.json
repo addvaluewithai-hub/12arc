@@ -1,0 +1,11 @@
+{
+  "completed_at": "2026-08-26T04:16:31.568150+00:00",
+  "expected_result": "lab/results/ARC-R038-multi-candidate.json",
+  "result_path": "lab/results/ARC-R038-multi-candidate.json",
+  "run": "ARC-R038",
+  "schema_version": 1,
+  "started_at": "2026-08-26T04:08:45.375580+00:00",
+  "status": "complete",
+  "task_id": "T0022-MULTI-CANDIDATE-CRITIQUE-VERIFY-LOOP",
+  "workflow": "t0022-multi-candidate.yml"
+}
