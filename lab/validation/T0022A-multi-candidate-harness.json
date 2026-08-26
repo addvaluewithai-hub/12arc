@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "task_id": "T0022A-MULTI-CANDIDATE-CRITIQUE-VERIFY-HARNESS",
+  "run": "ARC-R037",
+  "verdict": "INFRA_ONLY_PASS",
+  "validated_commit": "378103e667752b8250ed88495b05838d8aa34969",
+  "github_actions_run": 32918156374,
+  "github_actions_job": 98026103360,
+  "ci_conclusion": "success",
+  "checks": {
+    "pytest": "success",
+    "policy_validation": "success",
+    "development_split_reproduction": "success",
+    "public_training_only_validation": "success"
+  },
+  "implemented": [
+    "fail-closed schema-v1/schema-v2 candidate parsing",
+    "normalized-IR fingerprints and deduplication",
+    "deterministic Python execution and ranking",
+    "cell-error and structural-preservation diagnostics",
+    "critique/repair provenance validation",
+    "request/cache/token/runtime accounting",
+    "resumable cached T0022 runner",
+    "claim/reservation-validating push-triggered NVIDIA workflow"
+  ],
+  "target_model_calls": 0,
+  "public_evaluation_used": false
+}
