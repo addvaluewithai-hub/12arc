@@ -70,7 +70,7 @@ jobs:
             --task-id 06df4c85 \
             --cache-dir lab/cache/nvidia \
             --output "lab/results/${RUN}-multi-candidate.json"
-      - name: Complete execution status and persist
+      - name: Complete execution status
         run: |
           python - <<'PY'
           import json
@@ -78,7 +78,7 @@ jobs:
           from pathlib import Path
           t=json.loads(Path('lab/triggers/t0022-multi-candidate.request').read_text())
           result=Path('lab/results')/f"{t['run']}-multi-candidate.json"
-          assert result.exists()
+          assert result.exists(), f'missing result: {result}'
           payload=json.loads(result.read_text())
           status='failed' if payload.get('status')=='provider_failure' else 'complete'
           p=Path('lab/executions')/f"{t['run']}.json"
@@ -86,9 +86,24 @@ jobs:
           state.update({'status':status,'completed_at':datetime.now(timezone.utc).isoformat(),'result_path':str(result)})
           p.write_text(json.dumps(state,indent=2,sort_keys=True)+'\n')
           PY
+      - name: Upload recovery artifact before Git persistence
+        uses: actions/upload-artifact@v4
+        with:
+          name: ARC-R038-t0022-recovery-evidence
+          path: |
+            lab/results/ARC-R038-multi-candidate.json
+            lab/executions/ARC-R038.json
+            lab/cache/nvidia
+          if-no-files-found: error
+          retention-days: 30
+      - name: Persist result and status to Git
+        run: |
+          RUN=$(python -c "import json; print(json.load(open('lab/triggers/t0022-multi-candidate.request'))['run'])")
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-          git add lab/results lab/executions lab/cache/nvidia || true
-          git commit -m "Persist T0022 external result" || true
+          git add -f "lab/results/${RUN}-multi-candidate.json" "lab/executions/${RUN}.json" lab/cache/nvidia
+          git diff --cached --name-only
+          git diff --cached --quiet && { echo 'No T0022 evidence staged; refusing false persistence success'; exit 1; }
+          git commit -m "Persist T0022 external result"
           git pull --rebase origin main
           git push origin HEAD:main
