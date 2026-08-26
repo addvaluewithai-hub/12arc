@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "run": "ARC-R041",
+  "task_id": "T0022D-CRITIQUE-CONTRACT-HARDENING",
+  "verdict": "INFRA_ONLY",
+  "gate": "PASS",
+  "role": "reasoning-systems-inventor",
+  "target_model_calls": 0,
+  "input_tokens": 0,
+  "output_tokens": 0,
+  "total_tokens": 0,
+  "public_evaluation_used": false,
+  "regression_source": "lab/results/ARC-R040-multi-candidate.json",
+  "regression_observation": {
+    "arc_r040_failure_stage": "critique_parse_or_retry",
+    "raw_critic_and_retry_records_fail_strict_contract": true,
+    "recovered_generation_submitted_candidates": 16,
+    "recovered_generation_parseable_candidates": 16,
+    "recovered_generation_unique_candidates_at_offline_gate": 16
+  },
+  "treatment": {
+    "critique_top_level_keys": ["critiques"],
+    "critique_record_keys": ["candidate_id", "likely_failure", "violated_training_pair", "forbidden_constant_risk", "separator_or_unchanged_region_risk", "repair_suggestion"],
+    "challenge_top_level_keys": ["challenges"],
+    "challenge_record_keys": ["candidate_id", "critique_valid", "reason", "smallest_general_repair"],
+    "candidate_id_constraint": "64-character lowercase hexadecimal fingerprint",
+    "unknown_or_duplicate_candidate_ids_fail_closed": true,
+    "critique_training_pair_index_range_check_available": true,
+    "challenge_boolean_type_enforced": true,
+    "extra_keys_and_empty_text_fail_closed": true,
+    "candidate_executor_semantics_changed": false,
+    "deterministic_selector_changed": false
+  },
+  "mocked_end_to_end_gate": {
+    "persisted_r040_generation_replayed": true,
+    "strict_mocked_critique_validated": true,
+    "strict_mocked_critique_the_critique_validated": true,
+    "repair_candidate_contract_validated": true,
+    "deterministic_python_selection_reached": true,
+    "minimum_unique_candidate_requirement": 8
+  },
+  "verification": {
+    "ci_run_id": 32962601395,
+    "ci_commit": "ccf73e05393c3a2f693ee2d2a2e5f71c9a5bbe15",
+    "ci_conclusion": "success",
+    "tests_at_success": "full repository pytest plus registry/policy/split/public-training CI workflow"
+  },
+  "follow_up_protocol": "lab/experiments/T0022E-hardened-phase-contract-rerun.json",
+  "adversarial_interpretation": "This gate proves machine-contract enforceability and offline loop traversability only. It does not show that Nemotron will obey the hardened contract live, improve candidate quality, solve 06df4c85, or reproduce a DeepSeek-matched effect."
+}
