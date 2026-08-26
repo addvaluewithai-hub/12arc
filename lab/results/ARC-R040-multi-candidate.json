@@ -1,0 +1,12 @@
+{
+  "provider_failure": {
+    "message": "NVIDIA NIM HTTP 404: {'message': '{\"status\":404,\"title\":\"Not Found\",\"detail\":\"Function id \\'281478d0-f307-49f4-9e0f-080b63b16c47\\' version \\'null\\': Specified function in account \\'P160xoeOlSGMESrBIe5ztcafYHStayZs0HWaJmVhefk\\' is not found\"}'}",
+    "rate_limit_headers": {},
+    "retryable": false,
+    "status_code": 404
+  },
+  "public_evaluation_used": false,
+  "schema_version": 1,
+  "status": "provider_failure",
+  "task_id": "06df4c85"
+}
