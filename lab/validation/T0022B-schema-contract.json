@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "task_id": "T0022B-MULTI-CANDIDATE-SCHEMA-CONTRACT-REPAIR",
+  "run": "ARC-R039",
+  "verdict": "PASS",
+  "target_model_calls": 0,
+  "public_evaluation_used": false,
+  "validated_commit": "a0b9287d40f01f5b6f445d828cd03dcb0392f3fe",
+  "github_actions": {
+    "workflow": "ci",
+    "run_id": 32937412114,
+    "conclusion": "success",
+    "pytest": "success",
+    "policy_validation": "success",
+    "frozen_split_reproduction": "success",
+    "pinned_public_training_validation": "success"
+  },
+  "offline_contract_gate": {
+    "representative_candidates": 10,
+    "parseable_candidates": 10,
+    "unique_candidates": 10,
+    "duplicate_candidates": 0,
+    "minimum_required": 8,
+    "deterministic_python_scoring": "all 10 candidates entered ranked scoring",
+    "schema_versions_represented": [1, 2]
+  },
+  "arc_r038_negative_regressions": {
+    "natural_language_instructions_form": "fails closed",
+    "string_schema_version_plus_pseudocode_program_form": "fails closed",
+    "extra_top_level_prose_key": "fails closed"
+  },
+  "frozen_components": [
+    "multi_candidate canonical parser semantics",
+    "rule_first schema-v1 parser/executor",
+    "lattice_region schema-v2 parser/executor",
+    "normalization and deduplication",
+    "deterministic Python ranking"
+  ],
+  "changed_component": "model-facing generation/repair executable-IR prompt/output contract and contract-validation instrumentation only",
+  "next_protocol": "lab/experiments/T0022C-multi-candidate-contract-matched-rerun.json"
+}
