@@ -2,32 +2,29 @@
 
 Start from `lab/RUNNER.md` and current Git state.
 
-## ARC-R039 closed — T0022B executable-IR contract gate passed
+## ARC-R040 closed — T0022C remains architecturally inconclusive
 
-`T0022B-MULTI-CANDIDATE-SCHEMA-CONTRACT-REPAIR` completed as **INFRA_ONLY / PASS** with zero target-model calls and no public evaluation.
+`T0022C-MULTI-CANDIDATE-CONTRACT-MATCHED-RERUN` is closed as **INCONCLUSIVE / OPERATIONAL_PHASE_CONTRACT_FAILURE**.
 
 Durable evidence:
-- `src/arc_lab/multi_candidate_contract.py`
-- `tests/test_multi_candidate_contract.py`
-- `lab/experiments/T0022-executable-candidate-contract.json`
-- `lab/validation/T0022B-schema-contract.json`
-- `lab/experiments/T0022C-multi-candidate-contract-matched-rerun.json`
-- `lab/runs/2026-08-26/ARC-R039.md`
+- `lab/results/ARC-R040-multi-candidate.json`
+- `lab/executions/ARC-R040.json`
+- `lab/runs/2026-08-26/ARC-R040.md`
 
-The repair changes only the model-facing generation/repair contract. It supplies exact executable schema-v1/v2 shapes, legal operators/parameters, valid examples, and explicit forbidden ARC-R038 forms. Existing parser/verifier semantics and Python ranking are unchanged.
+ARC-R040 used NVIDIA NIM `nvidia/nemotron-3-ultra-550b-a55b` under the repository's temporary provider/model failover policy, not the frozen DeepSeek V4 Flash comparator. Do not describe it as a matched DeepSeek rerun or attribute its delta solely to the ARC-R039 executable-IR contract repair.
 
-Offline gate: **10/10 parseable, 10 unique** representative candidates entered deterministic Python scoring. ARC-R038 natural-language `instructions`, string-valued schema versions with pseudocode `program`, and extra prose keys all fail closed. CI run `32937412114` passed the complete repository verification path.
+Observed accounting: 4 requests, 0 cache hits, 36,532 input tokens, 15,059 output tokens, 51,591 total tokens, 378.378 seconds runtime, 0 provider failures, no public evaluation.
 
-This is infrastructure evidence only: it does not show the target model will obey the contract.
+The repaired generation boundary did move useful data farther through the loop: the critique stage received 14 candidates, versus ARC-R038's zero executable candidates reaching critique. But the critic output itself failed the required JSON-object contract (`JsonContractError`, `failure_stage=critique_parse_or_retry`) after the recovery path. Critique-the-critique, repair and final deterministic selection did not complete, so there is no valid exact candidate-coverage/new-solve/regression claim and the multi-candidate reasoning hypothesis remains untested end-to-end.
 
-## Next task: T0022C matched contract rerun
+## Next task: T0022D critique contract hardening
 
-`T0022C-MULTI-CANDIDATE-CONTRACT-MATCHED-RERUN` is ready. Protocol: `lab/experiments/T0022C-multi-candidate-contract-matched-rerun.json`.
+`T0022D-CRITIQUE-CONTRACT-HARDENING` is the highest-priority ready task and requires no target-model calls.
 
-Use exactly `06df4c85`, NVIDIA NIM `deepseek-ai/deepseek-v4-flash-0731`, and the frozen ARC-R038 four-phase generation settings and request budgets. The only treatment change is the repaired executable-IR contract. Trigger through `.github/workflows/t0022-multi-candidate.yml` after claim/reservation.
+Use the persisted ARC-R040 raw phase failure as the regression fixture. Define exact machine-checkable schemas for critique and critique-the-critique; preserve fail-closed behavior; verify representative valid fixtures traverse critique -> critique-the-critique -> repair -> deterministic selection; do not loosen candidate/executor semantics or accept arbitrary prose. Persist an offline validation artifact and predeclare at most one target-model follow-up after the gate passes.
 
-Do not interpret the architecture unless >=8 parseable non-duplicate candidates survive. If the contract gate passes but no exact candidate appears, use Python near-miss/failure clustering to evolve one component at a time. If the model still violates the explicit contract, treat that as an interface/constrained-generation problem rather than a reasoning rejection.
+Because DeepSeek is currently unavailable on the authorized NVIDIA path, keep current `lab/config.json` failover policy authoritative. Any Nemotron follow-up must be labeled provider/model failover unless a deliberate new comparator protocol is established.
 
-`T0023` remains blocked. Public evaluation remains sealed.
+`T0023` remains blocked until the multi-candidate direction has a complete interpretable architecture run or operator reprioritization occurs. Public evaluation remains sealed.
 
-Run registry after closure: latest completed **ARC-R039**, no active reservations, next run **ARC-R040**.
+Run registry after closure: latest completed **ARC-R040**, no active reservations, next run **ARC-R041**.
