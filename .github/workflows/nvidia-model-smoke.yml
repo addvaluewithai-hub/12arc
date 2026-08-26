@@ -39,7 +39,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-      - name: Probe DeepSeek aliases and controls
+      - name: Probe DeepSeek family and controls
         shell: bash
         run: |
           mkdir -p artifacts lab/recon
@@ -58,8 +58,8 @@ jobs:
           models = [
               "deepseek-ai/deepseek-v4-flash-0731",
               "deepseek-ai/deepseek-v4-flash",
+              "deepseek-ai/deepseek-v4-pro",
               "nvidia/nemotron-3-ultra-550b-a55b",
-              "openai/gpt-oss-120b",
           ]
 
           def persist(report, label):
@@ -73,8 +73,8 @@ jobs:
                   subprocess.run(["git", "push", "origin", "HEAD:main"], check=True)
 
           report = {
-              "schema_version": 2,
-              "purpose": "NVIDIA hosted-model availability smoke test; non-ARC; prove whether DeepSeek versioned ID or alias is callable",
+              "schema_version": 3,
+              "purpose": "NVIDIA hosted-model availability smoke test; non-ARC; find a callable DeepSeek-family model or prove only control models work",
               "created_at": datetime.now(timezone.utc).isoformat(),
               "endpoint": endpoint,
               "secret_persisted": False,
@@ -133,7 +133,7 @@ jobs:
               if isinstance(data, dict):
                   response_model = data.get("model")
                   usage = data.get("usage")
-                  provider_message = data.get("message")
+                  provider_message = data.get("message") or data.get("detail")
                   choices = data.get("choices") or []
                   if choices:
                       first = choices[0] or {}
@@ -168,6 +168,7 @@ jobs:
           report["successes"] = successes
           report["deepseek_versioned_available"] = any(item["model_requested"] == "deepseek-ai/deepseek-v4-flash-0731" and item["request_succeeded"] for item in report["models"])
           report["deepseek_alias_available"] = any(item["model_requested"] == "deepseek-ai/deepseek-v4-flash" and item["request_succeeded"] for item in report["models"])
+          report["deepseek_pro_available"] = any(item["model_requested"] == "deepseek-ai/deepseek-v4-pro" and item["request_succeeded"] for item in report["models"])
           persist(report, "probe complete")
           print(json.dumps(report, indent=2, sort_keys=True))
           PY
