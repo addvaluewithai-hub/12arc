@@ -50,6 +50,26 @@
       "response_model": null,
       "transport_error": "HTTP 410",
       "usage": null
+    },
+    {
+      "api_error": null,
+      "content_chars": 2,
+      "content_preview": "OK",
+      "finish_reason": "stop",
+      "http_status": 200,
+      "latency_seconds": 2.727,
+      "model_requested": "nvidia/nemotron-3-ultra-550b-a55b",
+      "provider_message_preview": null,
+      "raw_body_preview": null,
+      "reasoning_chars": 91,
+      "request_succeeded": true,
+      "response_model": "nvidia/nemotron-3-ultra-550b-a55b",
+      "transport_error": null,
+      "usage": {
+        "completion_tokens": 24,
+        "prompt_tokens": 21,
+        "total_tokens": 45
+      }
     }
   ],
   "purpose": "NVIDIA hosted-model availability smoke test; non-ARC; find a callable DeepSeek-family model or prove only control models work",
