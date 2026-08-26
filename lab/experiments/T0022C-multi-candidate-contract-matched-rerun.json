@@ -1,0 +1,83 @@
+{
+  "schema_version": 1,
+  "task_id": "T0022C-MULTI-CANDIDATE-CONTRACT-MATCHED-RERUN",
+  "title": "Matched rerun of multi-candidate critique/repair after executable-IR contract repair",
+  "type": "target-model-experiment",
+  "hypothesis": "Making the existing schema-v1/v2 executable IR contract explicit in generation and repair prompts will restore candidate flow through the frozen deterministic verifier, allowing the multi-candidate critique/repair hypothesis to be tested rather than failing at the interface boundary.",
+  "primary_variable": "Prompt/output executable-IR contract only, as implemented and offline-validated in ARC-R039/T0022B.",
+  "frozen_comparator": {
+    "run": "ARC-R038",
+    "task_id": "06df4c85",
+    "provider": "nvidia-nim",
+    "model": "deepseek-ai/deepseek-v4-flash-0731",
+    "attempts": 4,
+    "generation": {"temperature": 0.7, "top_p": 0.95, "top_k": 64, "max_output_tokens": 4096},
+    "critique": {"temperature": 0.2, "top_p": 0.95, "top_k": 64, "max_output_tokens": 3072},
+    "candidate_target": 16,
+    "repair_candidate_max": 8,
+    "candidate_coverage": false,
+    "parseable_candidates": 0,
+    "submitted_candidates": 24
+  },
+  "frozen_components": [
+    "exact task 06df4c85",
+    "public ARC-AGI-2 training data only",
+    "DeepSeek V4 Flash on NVIDIA NIM",
+    "four phases: generate, critique, critique-the-critique, repair",
+    "four-request maximum",
+    "generation and critique settings",
+    "T0022A parser/verifier semantics",
+    "normalized-IR deduplication",
+    "deterministic Python ranking",
+    "exact scoring and structural diagnostics"
+  ],
+  "treatment_change": "Inject the exact parser-supported candidate contract, legal field/value domains, valid schema-v1/v2 examples, and explicit ARC-R038 malformed-form prohibitions into generation and repair prompts; record mechanical contract validation separately from response-level JSON parsing.",
+  "provider": "nvidia-nim",
+  "model": "deepseek-ai/deepseek-v4-flash-0731",
+  "solver_version": "t0022-multi-candidate-v2-contract",
+  "split": "permitted public ARC-AGI-2 training data only",
+  "task_ids": ["06df4c85"],
+  "attempts_search_budget": {
+    "maximum_model_requests": 4,
+    "generate_candidates": 16,
+    "repair_candidates_max": 8
+  },
+  "success_criteria": {
+    "operational_gate": "At least 8 parseable non-duplicate executable candidates across the final batch.",
+    "research_progress": "After the operational gate, either at least one exact training-consistent candidate or a dominant mechanically observed failure class/near-miss improvement supporting exactly one next ablation.",
+    "architecture_success": "At least one exact training-consistent candidate on 06df4c85, mechanically verified by Python."
+  },
+  "falsification": "If the operational gate passes but candidate diversity/scoring produces neither exact coverage nor a mechanically stronger near-miss/failure signal than the matched comparator context, reject this loop variant and evolve exactly one component. If the operational gate fails again, classify the remaining contract failure rather than treating it as reasoning evidence.",
+  "required_accounting": [
+    "provider/model/version",
+    "exact prompts/protocol",
+    "generation settings",
+    "output-token budgets",
+    "attempt count",
+    "request count",
+    "cache hits",
+    "input/output/total tokens",
+    "runtime",
+    "submitted/parseable/unique/duplicate candidates",
+    "candidate-IR parse failures",
+    "provider failures",
+    "rate-limit/timeout observations",
+    "exact score/coverage",
+    "new coverage",
+    "regressions",
+    "failure clusters",
+    "adversarial interpretation"
+  ],
+  "execution_path": {
+    "kind": "github-actions-push-trigger",
+    "workflow": ".github/workflows/t0022-multi-candidate.yml",
+    "trigger_file": "lab/triggers/t0022-multi-candidate.request",
+    "expected_result": "lab/results/{run}-multi-candidate.json",
+    "status_file": "lab/executions/{run}.json",
+    "max_wait_minutes": 180,
+    "required_secret": "NVIDIA_API_KEY",
+    "on_trigger": "write JSON with schema_version=1, task_id, reserved run, claim shift_id, and requested_at; then stop the shift and let GitHub Actions execute"
+  },
+  "leakage_policy": "Public evaluation remains sealed. The workflow fetches only pinned public training task 06df4c85.",
+  "public_evaluation_used": false
+}
