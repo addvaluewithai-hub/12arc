@@ -33,6 +33,25 @@
       "response_model": null,
       "transport_error": "HTTP 404",
       "usage": null
+    },
+    {
+      "api_error": null,
+      "content_chars": 2,
+      "content_preview": "OK",
+      "finish_reason": "stop",
+      "http_status": 200,
+      "latency_seconds": 0.588,
+      "model_requested": "openai/gpt-oss-120b",
+      "reasoning_chars": 171,
+      "request_succeeded": true,
+      "response_model": "openai/gpt-oss-120b",
+      "transport_error": null,
+      "usage": {
+        "completion_tokens": 51,
+        "prompt_tokens": 70,
+        "prompt_tokens_details": null,
+        "total_tokens": 121
+      }
     }
   ],
   "purpose": "NVIDIA API key / hosted-model availability smoke test; non-ARC",
