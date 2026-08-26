@@ -1,13 +1,13 @@
 {
-  "completed_at": "2026-08-26T09:15:31.441139+00:00",
+  "completed_at": "2026-08-26T09:47:46.576991+00:00",
   "expected_result": "lab/results/ARC-R040-multi-candidate.json",
   "provider_failover_from": "deepseek-ai/deepseek-v4-flash-0731",
   "provider_failover_model": "nvidia/nemotron-3-ultra-550b-a55b",
   "result_path": "lab/results/ARC-R040-multi-candidate.json",
   "run": "ARC-R040",
   "schema_version": 1,
-  "started_at": "2026-08-26T09:11:28.244170+00:00",
-  "status": "complete",
+  "started_at": "2026-08-26T09:47:46.021173+00:00",
+  "status": "failed",
   "task_id": "T0022C-MULTI-CANDIDATE-CONTRACT-MATCHED-RERUN",
   "workflow": "t0022-multi-candidate.yml"
 }
