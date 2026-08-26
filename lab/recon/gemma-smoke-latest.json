@@ -22,7 +22,7 @@
               {
                 "has_text": true,
                 "has_thought_signature": false,
-                "text_chars": 732,
+                "text_chars": 520,
                 "thought": true
               },
               {
@@ -38,15 +38,15 @@
         "usage": {
           "candidates_token_count": 5,
           "prompt_token_count": 25,
-          "thoughts_token_count": 162,
-          "total_token_count": 192
+          "thoughts_token_count": 123,
+          "total_token_count": 153
         }
       }
     },
-    "runtime_seconds": 4.069232481,
+    "runtime_seconds": 3.106205294999995,
     "text": "<redacted-non-benchmark-response>",
     "text_nonempty": true,
-    "total_tokens": 192
+    "total_tokens": 153
   },
   "generation": {
     "max_output_tokens": 256,
@@ -80,7 +80,7 @@
               {
                 "has_text": true,
                 "has_thought_signature": false,
-                "text_chars": 732,
+                "text_chars": 520,
                 "thought": true
               },
               {
@@ -96,20 +96,20 @@
         "usage": {
           "candidates_token_count": 5,
           "prompt_token_count": 25,
-          "thoughts_token_count": 162,
-          "total_token_count": 192
+          "thoughts_token_count": 123,
+          "total_token_count": 153
         }
       }
     },
-    "runtime_seconds": 4.069232481,
+    "runtime_seconds": 3.106205294999995,
     "text": "<redacted-cached-response>",
     "text_nonempty": true,
-    "total_tokens": 192
+    "total_tokens": 153
   },
   "verified_live_call": true,
   "workflow": {
-    "run_id": "32948286286",
+    "run_id": "32948361880",
     "smoke_outcome": "success",
-    "source_sha": "4c6ad6c9d9c0d5c86c6d2e567cd21b4ca5a67036"
+    "source_sha": "41008616759b04a0098c4d1b39b81f3008c0cdcc"
   }
 }
