@@ -2,7 +2,24 @@
   "complete": false,
   "created_at": "2026-08-26T08:55:15.016818+00:00",
   "endpoint": "https://integrate.api.nvidia.com/v1/chat/completions",
-  "models": [],
+  "models": [
+    {
+      "api_error": null,
+      "content_chars": 0,
+      "content_preview": "",
+      "finish_reason": null,
+      "http_status": 404,
+      "latency_seconds": 0.1,
+      "model_requested": "deepseek-ai/deepseek-v4-flash-0731",
+      "provider_message_preview": null,
+      "raw_body_preview": "{\"status\":404,\"title\":\"Not Found\",\"detail\":\"Function id '281478d0-f307-49f4-9e0f-080b63b16c47' version 'null': Specified function in account 'P160xoeOlSGMESrBIe5ztcafYHStayZs0HWaJmVhefk' is not found\"}",
+      "reasoning_chars": 0,
+      "request_succeeded": false,
+      "response_model": null,
+      "transport_error": "HTTP 404",
+      "usage": null
+    }
+  ],
   "purpose": "NVIDIA hosted-model availability smoke test; non-ARC; prove whether DeepSeek versioned ID or alias is callable",
   "schema_version": 2,
   "secret_persisted": false
