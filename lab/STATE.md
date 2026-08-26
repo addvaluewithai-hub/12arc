@@ -2,8 +2,8 @@
 
 Updated: 2026-08-26
 Phase: **PHASE 2 — architecture research**
-Latest completed research run: **ARC-R035**
-Next unallocated research run: **ARC-R036**
+Latest completed research run: **ARC-R036**
+Next unallocated research run: **ARC-R037**
 
 ## Fixed comparator and model policy
 
@@ -19,45 +19,40 @@ ARC-R031 mechanically established that schema-v1 cannot express the selective re
 
 ARC-R032 tested that family under frozen ARC-R030 model/generation/scoring controls. The result was **REJECT**: 2/2 parseable but 0/2 exact candidate coverage, with actual `lattice_peer_reduce` use. `0607ce86` failed closed at equal-size lattice inference; `06df4c85` executed but remained exact-wrong.
 
-ARC-R033 removed model induction from the loop with bounded deterministic oracle search over the implemented schema-v2 operator family. Neither diagnostic was expressible within the bounded reachable state graph. On `0607ce86`, all 27 first-step applications failed the equal-size span validation boundary.
+ARC-R033 removed model induction from the loop with bounded deterministic oracle search over the implemented schema-v2 operator family. Neither diagnostic was expressible within the bounded reachable state graph.
 
-ARC-R034 permitted variable-size separator spans while freezing the 27 peer-reduction parameterizations and max depth 4. It still produced 0/27 valid first-step transitions: every operator failed with `IndexError`, exposing a second equal-shape assumption in relative-coordinate peer alignment.
+ARC-R034 permitted variable-size separator spans but exposed a second equal-shape assumption in peer alignment.
 
-ARC-R035 changed only that alignment assumption. Peer reduction now operates inside the shared overlap domain (minimum peer height/width), preserving non-overlap cells. This **removed the proximate execution blocker**: all **27/27** first-step applications became valid. The deterministic depth-4 search expanded **237** programs and reached **798** unique states across **6,399** operator applications. However, no exact training-consistent program was found. There were **216 `ValueError` execution failures** during deeper search. Verdict: **PARTIAL_ALIGNMENT_BLOCKER_REMOVED_SEMANTICS_INSUFFICIENT**.
+ARC-R035 changed only alignment to shared overlap. This restored 27/27 valid first-step transitions and reached 798 unique states across 6,399 operator applications, but found no exact program and produced 216 deeper `ValueError` failures.
 
-No target-model calls were made in ARC-R035. GitHub Actions run `32847574881` passed claim/reservation validation, implementation tests, pinned-public-training fetch, bounded audit, and durable result persistence. Public evaluation remained sealed.
+ARC-R036 kept ARC-R035 semantics frozen and diagnosed those failures. Result: **DOMINANT_FAILURE_MECHANISM_IDENTIFIED**. All **216/216** deeper failures were `ValueError: lattice inference requires at least two regions`, mechanically classified as `separator_structure_lost`. The closest reachable state by total training-pair cell error was the depth-0 identity state itself at **134** errors; the best depth-1 transformed state was worse at **164**. No target-model calls were made and public evaluation remained sealed.
 
-## Active execution/recovery context
+Interpretation: ARC-R035 removed the shape/alignment blocker, but repeated lattice inference is not closed under its own mutations because some operations destroy separator topology before later steps. This explains transition termination, but not solution sufficiency; the near-miss ranking is adverse evidence that the current operator family may remain semantically wrong even after topology persistence.
 
-`T0021-OVERLAP-SEMANTIC-CLOSURE-AUDIT` / `ARC-R036` is the active claimed diagnostic and must be resolved before starting another substantive queued task. The current purpose of T0021 remains unchanged: keep ARC-R035 semantics frozen and diagnose the 216 deeper-search failures plus near-miss reachable states.
+## Next active research direction
 
-## Next research direction
+Promote `T0022-MULTI-CANDIDATE-CRITIQUE-VERIFY-LOOP` into the active queue as the next architecture experiment.
 
-Highest-priority active follow-up: `T0021-OVERLAP-SEMANTIC-CLOSURE-AUDIT`.
+The goal is to stop relying on one model proposal. Use the target model as a diverse proposal engine: generate many candidate rules/programs, critique them, critique the critique, repair candidates, then parse/execute/score every candidate in deterministic Python. Python is the judge; model confidence or critique text is not evidence.
 
-Do not add another primitive from intuition yet. Keep the entire ARC-R035 solver semantics frozen and mechanically diagnose the remaining bounded state graph for `0607ce86`:
+Preferred first task: `06df4c85`, because ARC-R032 already showed lattice programs executing there while remaining exact-wrong. This separates candidate-generation/search uncertainty from the `0607ce86` separator-topology issue.
 
-- classify all 216 execution failures by exact invariant/reason rather than exception class alone;
-- retain program paths for reachable states;
-- compute deterministic cell-error distance from each reachable multi-training state to the training targets;
-- identify whether near-misses and failures support separator destruction, wrong overlap anchoring, or a missing region-local conditional semantic.
-
-The task succeeds only if one dominant, reproducible mechanism is supported strongly enough to predeclare exactly one matched follow-up ablation. If the evidence stays ambiguous, record that ambiguity rather than inventing a primitive.
-
-`06df4c85` remains a separate semantic-closure problem and should not be mixed into this diagnostic.
-
-## Strategic post-T0021 direction: multi-candidate critique/verify loop
-
-After the active T0021/ARC-R036 claim is resolved, the lab should intentionally explore a multi-candidate proposal architecture instead of relying on one model answer. The model should generate many candidate programs/rules, critique them, challenge the critique, and propose repairs; deterministic Python execution and exact scoring must remain the only judge.
-
-Predeclared artifacts:
+Durable design/protocol artifacts:
 
 - `lab/design/MULTI-CANDIDATE-CRITIQUE-VERIFY.md`
 - `lab/experiments/T0022-multi-candidate-critique-verify-loop.json`
 - `lab/registry/proposed-tasks/T0022-MULTI-CANDIDATE-CRITIQUE-VERIFY-LOOP.json`
 
-The intended next queued task is `T0022-MULTI-CANDIDATE-CRITIQUE-VERIFY-LOOP`, blocked only by the active T0021 closure/queue integration. Prefer starting with `06df4c85`, because ARC-R032 executed lattice programs there but remained exact-wrong; use `0607ce86` only after T0021 produces durable failure taxonomy or freezes a compatible mechanism.
+If the first T0022 loop variant fails, evolve one variable at a time: proposal diversity, critic prompt, critique-of-critique, repair budget, IR translation constraints, or deterministic selector ranking. Preserve matched comparators and do not repeat an unchanged failed prompt.
 
-This direction is not permission to invent results. Model critique is proposal-generation only. Evidence must come from Python parsing, deterministic execution, exact training-pair scoring, candidate deduplication, cell-error ranking, matched comparator deltas, and durable artifacts.
+## Adjacent matched semantic ablation
+
+ARC-R036 predeclared exactly one matched semantic follow-up for `0607ce86`: `T0023-PERSISTENT-LATTICE-TOPOLOGY-ABLATION`.
+
+It changes only the partition source: infer separator-defined variable-span topology once from the original input and carry that immutable topology across subsequent peer-reduction steps, rather than re-inferring from mutated separator pixels. Freeze the same 27 operator parameterizations, shared-overlap alignment, state deduplication, task, and max depth 4.
+
+Protocol: `lab/experiments/T0023-persistent-lattice-topology-ablation.json`.
+
+This should remain adjacent to the multi-candidate direction rather than displacing it as the next active architecture task. If/when run, eliminating separator-loss failures without an exact program counts only as partial progress.
 
 Public evaluation remains sealed.
