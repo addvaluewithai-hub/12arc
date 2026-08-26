@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "task_id": "T0023-PERSISTENT-LATTICE-TOPOLOGY-ABLATION",
+  "hypothesis": "ARC-R036 showed that all 216 deeper execution failures arise because separator structure is destroyed and lattice topology is then re-inferred from the mutated grid. Carrying the original separator-defined partition topology across steps will remove that closure blocker and may make an exact depth-4 program reachable.",
+  "baseline": "ARC-R035 shared-overlap alignment search, diagnosed by ARC-R036",
+  "primary_change": "Infer separator-defined variable-span region topology once from each original input and keep that topology immutable across subsequent lattice_peer_reduce steps instead of re-inferring partitions from mutated grid pixels.",
+  "target_model": null,
+  "target_model_calls": 0,
+  "split": "permitted public ARC-AGI-2 training data only",
+  "task_ids": ["0607ce86"],
+  "frozen_controls": [
+    "same 27 lattice_peer_reduce parameterizations",
+    "ARC-R034 variable-span separator inference semantics at initial partition construction",
+    "ARC-R035 shared-overlap alignment",
+    "max search depth 4",
+    "state deduplication",
+    "0607ce86 public-training pairs only"
+  ],
+  "primary_metric": "exact training-consistent program under bounded deterministic search",
+  "secondary_metrics": [
+    "separator_structure_lost failure count versus ARC-R036 216",
+    "valid deeper transitions",
+    "unique reachable states",
+    "programs expanded",
+    "operator applications",
+    "best deterministic cell-error distance"
+  ],
+  "success_threshold": "Eliminate the separator_structure_lost blocker and find at least one exact training-consistent program within depth 4.",
+  "partial_success": "separator_structure_lost failures are eliminated or materially reduced and deeper transitions expand, but no exact program is found.",
+  "falsification": "If persistent initial topology does not remove the dominant separator-loss failure class, or removes it without improving bounded reachability/near-miss structure, reject topology persistence as the sufficient next semantic mechanism.",
+  "adversarial_interpretation": "ARC-R036 proves a transition-closure blocker, not solution sufficiency. Identity was already the closest reachable state by cell-error distance, so even perfect topology persistence may leave the operator family semantically wrong.",
+  "public_evaluation_used": false
+}
