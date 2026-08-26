@@ -54,6 +54,27 @@
         "prompt_tokens": 21,
         "total_tokens": 45
       }
+    },
+    {
+      "api_error": null,
+      "content_chars": 0,
+      "content_preview": "",
+      "finish_reason": "length",
+      "http_status": 200,
+      "latency_seconds": 41.016,
+      "model_requested": "openai/gpt-oss-120b",
+      "provider_message_preview": null,
+      "raw_body_preview": null,
+      "reasoning_chars": 126,
+      "request_succeeded": true,
+      "response_model": "openai/gpt-oss-120b",
+      "transport_error": null,
+      "usage": {
+        "completion_tokens": 32,
+        "prompt_tokens": 70,
+        "prompt_tokens_details": null,
+        "total_tokens": 102
+      }
     }
   ],
   "purpose": "NVIDIA hosted-model availability smoke test; non-ARC; prove whether DeepSeek versioned ID or alias is callable",
