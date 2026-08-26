@@ -1,0 +1,18 @@
+{
+  "cache_hit": false,
+  "input_tokens": 10851,
+  "model_requested": "nvidia/nemotron-3-ultra-550b-a55b",
+  "model_resolved": "nvidia/nemotron-3-ultra-550b-a55b",
+  "output_tokens": 3795,
+  "provider_metadata": {
+    "endpoint": "https://integrate.api.nvidia.com/v1/chat/completions",
+    "finish_reason": "stop",
+    "provider": "nvidia-nim",
+    "rate_limit_headers": {},
+    "reasoning_chars": 12352,
+    "usage_details": {}
+  },
+  "runtime_seconds": 93.84476086800001,
+  "text": "[\n  {\"schema_version\":1,\"steps\":[{\"op\":\"identity\"}]},\n  {\"schema_version\":1,\"steps\":[{\"op\":\"rotate90\"}]},\n  {\"schema_version\":1,\"steps\":[{\"op\":\"rotate180\"}]},\n  {\"schema_version\":1,\"steps\":[{\"op\":\"rotate270\"}]},\n  {\"schema_version\":1,\"steps\":[{\"op\":\"flip_h\"}]},\n  {\"schema_version\":1,\"steps\":[{\"op\":\"flip_v\"}]},\n  {\"schema_version\":1,\"steps\":[{\"op\":\"recolor\",\"from\":0,\"to\":1}]},\n  {\"schema_version\":1,\"steps\":[{\"op\":\"recolor\",\"from\":1,\"to\":0}]},\n  {\"schema_version\":2,\"steps\":[{\"op\":\"lattice_peer_reduce\",\"axis\":\"row\",\"reduce\":\"majority_nonbackground\",\"write\":\"background_only\"}]},\n  {\"schema_version\":2,\"steps\":[{\"op\":\"lattice_peer_reduce\",\"axis\":\"row\",\"reduce\":\"majority_nonbackground\",\"write\":\"all\"}]},\n  {\"schema_version\":2,\"steps\":[{\"op\":\"lattice_peer_reduce\",\"axis\":\"row\",\"reduce\":\"first_nonbackground\",\"write\":\"background_only\"}]},\n  {\"schema_version\":2,\"steps\":[{\"op\":\"lattice_peer_reduce\",\"axis\":\"row\",\"reduce\":\"first_nonbackground\",\"write\":\"all\"}]},\n  {\"schema_version\":2,\"steps\":[{\"op\":\"lattice_peer_reduce\",\"axis\":\"col\",\"reduce\":\"majority_nonbackground\",\"write\":\"background_only\"}]},\n  {\"schema_version\":2,\"steps\":[{\"op\":\"lattice_peer_reduce\",\"axis\":\"col\",\"reduce\":\"first_nonbackground\",\"write\":\"background_only\"}]},\n  {\"schema_version\":2,\"steps\":[{\"op\":\"lattice_peer_reduce\",\"axis\":\"all\",\"reduce\":\"majority_nonbackground\",\"write\":\"background_only\"}]},\n  {\"schema_version\":2,\"steps\":[{\"op\":\"lattice_peer_reduce\",\"axis\":\"all\",\"reduce\":\"first_nonbackground\",\"write\":\"background_only\"}]}\n]",
+  "total_tokens": 14646
+}
