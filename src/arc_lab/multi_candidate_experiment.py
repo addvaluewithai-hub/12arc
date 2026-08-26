@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any
 
 from .multi_candidate import AccountingRecord, merge_accounting, verify_candidate_batch
+from .multi_candidate_contract import prompt_contract_fragment, validate_candidate_contract
 from .target_model import CachedTargetClient, GenerationConfig, NvidiaNIMProvider, TargetRequest, TargetProviderError
 from .taskio import load_task
 
@@ -25,7 +26,7 @@ def _json_slice(text: str, opening: str, closing: str) -> Any:
 
 
 def _call(client: CachedTargetClient, *, task_id: str, attempt: int, prompt: str, generation: GenerationConfig):
-    request = TargetRequest(model=MODEL, prompt=prompt, solver_version="t0022-multi-candidate-v1", task_id=task_id, attempt_index=attempt, generation=generation)
+    request = TargetRequest(model=MODEL, prompt=prompt, solver_version="t0022-multi-candidate-v2-contract", task_id=task_id, attempt_index=attempt, generation=generation)
     response = client.generate(request)
     accounting = AccountingRecord(
         request_count=0 if response.cache_hit else 1,
@@ -41,16 +42,18 @@ def _call(client: CachedTargetClient, *, task_id: str, attempt: int, prompt: str
 def run(task_path: Path, *, task_id: str, cache_dir: Path) -> dict[str, Any]:
     task = load_task(task_path, require_test_outputs=False)
     train_json = json.dumps(task["train"], separators=(",", ":"))
+    contract = prompt_contract_fragment()
     client = CachedTargetClient(NvidiaNIMProvider(timeout_seconds=900), cache_dir, min_live_call_interval_seconds=1.0)
     accounts: list[AccountingRecord] = []
     raw_manifest: list[dict[str, Any]] = []
 
-    generation_prompt = f"""You are an ARC candidate-program generator. Training pairs: {train_json}\nReturn ONLY a JSON array of exactly 16 DISTINCT candidate programs. Each program must use schema_version 1 or 2 supported by the supplied research DSL. Prefer diverse hypotheses: visual/global, object/region, lattice, exception/minimal decompositions. Do not include task IDs, absolute task-specific coordinates, known target patterns, prose, confidence scores, or final test answers. The deterministic Python executor will judge candidates."""
+    generation_prompt = f"""You are an ARC candidate-program generator. Training pairs: {train_json}\n{contract}\nReturn ONLY a JSON array of exactly 16 DISTINCT executable candidate objects satisfying that contract. Prefer diverse hypotheses expressible by the allowed operators. Do not include task IDs, absolute task-specific coordinates, known target patterns, prose, confidence scores, or final test answers. The deterministic Python executor will judge candidates."""
     response, account = _call(client, task_id=task_id, attempt=0, prompt=generation_prompt, generation=GENERATION)
     accounts.append(account)
     generated = _json_slice(response.text, "[", "]")
     if not isinstance(generated, list):
         raise ValueError("generator did not return a JSON list")
+    generation_contract = validate_candidate_contract(generated)
     raw_manifest.append({"phase": "generate", "cache_hit": response.cache_hit, "response_text": response.text})
     first_score = verify_candidate_batch(generated, task["train"])
 
@@ -67,12 +70,13 @@ def run(task_path: Path, *, task_id: str, cache_dir: Path) -> dict[str, Any]:
     challenges = _json_slice(challenge_response.text, "{", "}")
     raw_manifest.append({"phase": "critique_the_critique", "cache_hit": challenge_response.cache_hit, "response_text": challenge_response.text})
 
-    repair_prompt = f"""Repair ARC candidate programs using only general rules. Training pairs: {train_json}\nOriginal normalized candidates and metrics: {json.dumps(compact_scores, separators=(",", ":"))}\nCritiques: {json.dumps(critiques, separators=(",", ":"))}\nChallenges: {json.dumps(challenges, separators=(",", ":"))}\nReturn ONLY a JSON array of up to 8 repaired schema_version 1 or 2 programs. No prose, confidence, task IDs, absolute task-specific coordinates, or test answers."""
+    repair_prompt = f"""Repair ARC candidate programs using only general rules. Training pairs: {train_json}\nOriginal normalized candidates and metrics: {json.dumps(compact_scores, separators=(",", ":"))}\nCritiques: {json.dumps(critiques, separators=(",", ":"))}\nChallenges: {json.dumps(challenges, separators=(",", ":"))}\n{contract}\nReturn ONLY a JSON array of up to 8 repaired executable candidate objects satisfying the contract. No prose, confidence, task IDs, absolute task-specific coordinates, or test answers."""
     repair_response, account = _call(client, task_id=task_id, attempt=3, prompt=repair_prompt, generation=GENERATION)
     accounts.append(account)
     repaired = _json_slice(repair_response.text, "[", "]")
     if not isinstance(repaired, list):
         raise ValueError("repairer did not return a JSON list")
+    repair_contract = validate_candidate_contract(repaired)
     raw_manifest.append({"phase": "repair", "cache_hit": repair_response.cache_hit, "response_text": repair_response.text})
 
     final_score = verify_candidate_batch([*generated, *repaired], task["train"])
@@ -81,9 +85,11 @@ def run(task_path: Path, *, task_id: str, cache_dir: Path) -> dict[str, Any]:
         "task_id": task_id,
         "provider": PROVIDER,
         "model": MODEL,
+        "solver_version": "t0022-multi-candidate-v2-contract",
         "generation_settings": {"generate_repair": asdict(GENERATION), "critique_challenge": asdict(CRITIQUE)},
         "attempts": 4,
         "raw_phase_manifest": raw_manifest,
+        "contract_validation": {"generation": generation_contract, "repair": repair_contract},
         "critique_manifest": critiques,
         "critique_the_critique_manifest": challenges,
         "pre_repair_verification": first_score,
