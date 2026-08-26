@@ -18,6 +18,22 @@
       "response_model": null,
       "transport_error": "HTTP 404",
       "usage": null
+    },
+    {
+      "api_error": null,
+      "content_chars": 0,
+      "content_preview": "",
+      "finish_reason": null,
+      "http_status": 410,
+      "latency_seconds": 0.056,
+      "model_requested": "deepseek-ai/deepseek-v4-flash",
+      "provider_message_preview": "The model 'deepseek-ai/deepseek-v4-flash' has reached its end of life on 2026-08-07T09:00:00Z and is no longer available.",
+      "raw_body_preview": "{\"type\":\"about:blank\",\"title\":\"Gone\",\"status\":410,\"detail\":\"The model 'deepseek-ai/deepseek-v4-flash' has reached its end of life on 2026-08-07T09:00:00Z and is no longer available.\"}\n",
+      "reasoning_chars": 0,
+      "request_succeeded": false,
+      "response_model": null,
+      "transport_error": "HTTP 410",
+      "usage": null
     }
   ],
   "purpose": "NVIDIA hosted-model availability smoke test; non-ARC; find a callable DeepSeek-family model or prove only control models work",
