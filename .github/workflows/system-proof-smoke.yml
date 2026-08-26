@@ -1,0 +1,91 @@
+name: system proof smoke
+
+on:
+  push:
+    paths:
+      - 'lab/triggers/system-proof-smoke.request'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: system-proof-smoke
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install -e '.[dev]'
+      - name: Validate registry guardrails
+        run: python lab/tools/registry_guard.py validate
+      - name: Run no-model system proof
+        run: |
+          python - <<'PY'
+          import json
+          import subprocess
+          from datetime import datetime, timezone
+          from pathlib import Path
+
+          from arc_lab.target_model import classify_provider_failure
+
+          trigger = json.loads(Path('lab/triggers/system-proof-smoke.request').read_text())
+          run_id = trigger['run']
+          if not run_id.startswith('SYSTEM-SMOKE-'):
+              raise SystemExit(f'unexpected smoke run id: {run_id}')
+
+          counter = json.loads(Path('lab/registry/run-counter.json').read_text())
+          queue = json.loads(Path('lab/registry/queue.json').read_text())
+          r040_path = Path('lab/results/ARC-R040-multi-candidate.json')
+          r040 = json.loads(r040_path.read_text()) if r040_path.exists() else None
+          synthetic_category = classify_provider_failure(
+              404,
+              "Function id 'example': Specified function in account 'example' is not found",
+          )
+          if synthetic_category != 'model_or_endpoint_unavailable':
+              raise SystemExit(f'provider classification regression: {synthetic_category}')
+
+          subprocess.run(['python', 'lab/tools/registry_guard.py', 'validate'], check=True)
+          task_ids = [task['id'] for task in queue['tasks']]
+          if len(task_ids) != len(set(task_ids)):
+              raise SystemExit('duplicate task ids detected')
+
+          result = {
+              'schema_version': 1,
+              'run': run_id,
+              'status': 'pass',
+              'kind': 'no_model_system_proof',
+              'trigger': trigger,
+              'checks': {
+                  'registry_guard_validate': 'pass',
+                  'queue_task_count': len(task_ids),
+                  'run_counter_schema_version': counter.get('schema_version'),
+                  'active_reservations': counter.get('active_reservations', []),
+                  'provider_failure_classifier_404_function_id': synthetic_category,
+                  'arc_r040_status_seen': r040.get('status') if isinstance(r040, dict) else None,
+                  'public_evaluation_used': False,
+              },
+              'created_at': datetime.now(timezone.utc).isoformat(),
+          }
+          out = Path('lab/results') / f'{run_id}.json'
+          out.write_text(json.dumps(result, indent=2, sort_keys=True) + '\n')
+          print(out)
+          PY
+      - name: Persist smoke result
+        run: |
+          RUN=$(python -c "import json; print(json.load(open('lab/triggers/system-proof-smoke.request'))['run'])")
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add -f "lab/results/${RUN}.json"
+          git diff --cached --name-only
+          git diff --cached --quiet && { echo 'No smoke result staged; refusing false success'; exit 1; }
+          git commit -m "Persist system proof smoke result"
+          git pull --rebase origin main
+          git push origin HEAD:main
