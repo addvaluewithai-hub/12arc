@@ -1,0 +1,40 @@
+name: Registry integrity guard
+
+on:
+  push:
+    paths:
+      - 'lab/registry/**'
+      - 'lab/triggers/**'
+      - 'lab/tools/registry_guard.py'
+      - '.github/workflows/registry-integrity.yml'
+  pull_request:
+    paths:
+      - 'lab/registry/**'
+      - 'lab/triggers/**'
+      - 'lab/tools/registry_guard.py'
+      - '.github/workflows/registry-integrity.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Validate queue/run counter JSON and invariants
+        run: python lab/tools/registry_guard.py validate
+      - name: Validate any active external triggers
+        run: |
+          shopt -s nullglob
+          for trigger in lab/triggers/*.request; do
+            echo "checking $trigger"
+            python lab/tools/registry_guard.py validate-trigger "$trigger" || true
+          done
+          # The per-trigger check is diagnostic only because old completed triggers may remain in the tree.
+          # Active workflows must call validate-trigger strictly before running an experiment.
