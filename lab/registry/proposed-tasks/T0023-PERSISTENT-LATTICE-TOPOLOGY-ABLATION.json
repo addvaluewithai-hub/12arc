@@ -1,0 +1,12 @@
+{
+  "id": "T0023-PERSISTENT-LATTICE-TOPOLOGY-ABLATION",
+  "title": "Preserve original lattice topology across peer-reduction steps and rerun bounded oracle search",
+  "type": "infrastructure-research",
+  "status": "proposed_after_T0022",
+  "priority": 62,
+  "depends_on": ["T0021-OVERLAP-SEMANTIC-CLOSURE-AUDIT"],
+  "recommended_role": "program-synthesis-researcher",
+  "success_test": "Keep ARC-R035 variable-span inference, shared-overlap alignment, 27 peer-reduction parameterizations, task 0607ce86 and max depth 4 frozen. Change only partition persistence: infer separator-defined topology once from the original input and carry it across steps. Success requires eliminating the ARC-R036 separator-loss blocker and finding an exact training-consistent program; blocker removal without an exact program is partial. Protocol: lab/experiments/T0023-persistent-lattice-topology-ablation.json.",
+  "evidence": "ARC-R036 classified 216/216 deeper failures as separator_structure_lost with exact message 'lattice inference requires at least two regions'.",
+  "claim": null
+}
