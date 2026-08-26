@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "task_id": "T0022A-MULTI-CANDIDATE-CRITIQUE-VERIFY-HARNESS",
+  "hypothesis": "A deterministic harness can make multi-candidate generation, critique, repair and Python selection measurable and safely executable through the authorized NVIDIA GitHub Actions path without treating model self-judgment as evidence.",
+  "baseline": "T0014/T0017 deterministic IR executors and exact scoring infrastructure",
+  "primary_change": "Add candidate-batch manifests, normalized-IR deduplication, critique/repair provenance, deterministic ranking metrics, cache accounting, and a push-triggered NVIDIA execution path for T0022; no target-model calls in this harness task.",
+  "target_model": null,
+  "target_model_calls": 0,
+  "split": "no benchmark scoring required beyond permitted public-training fixtures used in tests",
+  "frozen_controls": [
+    "Python exact execution/scoring remains authoritative",
+    "public evaluation remains sealed",
+    "no task-specific target patterns or evaluation hints",
+    "routine future target model remains deepseek-ai/deepseek-v4-flash-0731"
+  ],
+  "success_threshold": "Tests demonstrate fail-closed candidate parsing, normalized deduplication, deterministic ranking, critique/repair provenance, exact metric persistence, cache/request/token/runtime schema, and a trigger-by-push workflow that validates claim/reservation before future NVIDIA inference.",
+  "falsification": "If the harness cannot deterministically reproduce rankings from fixed candidate fixtures or cannot expose an authorized resumable execution path with complete accounting, T0022 remains blocked.",
+  "public_evaluation_used": false
+}
