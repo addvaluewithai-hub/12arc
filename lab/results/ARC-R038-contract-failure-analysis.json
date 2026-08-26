@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "run": "ARC-R038",
+  "task_id": "T0022-MULTI-CANDIDATE-CRITIQUE-VERIFY-LOOP",
+  "task_ids": ["06df4c85"],
+  "split": "permitted public ARC-AGI-2 training data only",
+  "provider": "nvidia-nim",
+  "model": "deepseek-ai/deepseek-v4-flash-0731",
+  "verdict": "INCONCLUSIVE",
+  "classification": "OPERATIONAL_CONTRACT_FAILURE",
+  "primary_failure": "prompt_to_ir_schema_mismatch",
+  "evidence": {
+    "request_count": 4,
+    "cache_hits": 0,
+    "input_tokens": 23769,
+    "output_tokens": 2156,
+    "total_tokens": 25925,
+    "runtime_seconds": 466.0348085349999,
+    "provider_failures": 0,
+    "model_response_parse_failures": 0,
+    "submitted_candidates": 24,
+    "candidate_ir_parseable": 0,
+    "candidate_ir_parse_failures": 24,
+    "unique_candidates": 0,
+    "duplicate_candidates": 0,
+    "best_candidate_id": null,
+    "critique_count": 0,
+    "critique_challenge_count": 0,
+    "public_evaluation_used": false
+  },
+  "failure_clusters": [
+    {
+      "cluster": "generation_natural_language_instructions",
+      "count": 16,
+      "description": "Generated records used schema_version plus a natural-language instructions field instead of a parser-supported executable IR object."
+    },
+    {
+      "cluster": "repair_pseudocode_schema",
+      "count": 8,
+      "description": "Repair records used string schema_version values and natural-language/pseudocode program fields rather than parser-supported IR."
+    }
+  ],
+  "comparator": {
+    "run": "ARC-R032",
+    "task_id": "06df4c85",
+    "candidate_exact_coverage": false,
+    "treatment_candidate_exact_coverage": false,
+    "new_solves": 0,
+    "regressions": 0,
+    "interpretation": "No architecture delta is attributable because ARC-R038 failed before executable candidate diversity was established."
+  },
+  "adversarial_interpretation": "The raw generated rules may contain useful semantic ideas, but crediting them as candidate quality would bypass the predeclared executable-IR contract. Conversely, 0/24 parseability does not falsify multi-candidate reasoning because the critique/repair loop never received valid executable candidates.",
+  "next_single_change": "Repair only the prompt-to-IR schema contract offline, with positive parser-compatible fixtures and regression tests for the exact ARC-R038 failure forms, before spending new model calls."
+}
