@@ -1,6 +1,8 @@
 {
-  "complete": false,
+  "complete": true,
   "created_at": "2026-08-26T08:55:15.016818+00:00",
+  "deepseek_alias_available": false,
+  "deepseek_versioned_available": false,
   "endpoint": "https://integrate.api.nvidia.com/v1/chat/completions",
   "models": [
     {
@@ -79,5 +81,9 @@
   ],
   "purpose": "NVIDIA hosted-model availability smoke test; non-ARC; prove whether DeepSeek versioned ID or alias is callable",
   "schema_version": 2,
-  "secret_persisted": false
+  "secret_persisted": false,
+  "successes": [
+    "nvidia/nemotron-3-ultra-550b-a55b",
+    "openai/gpt-oss-120b"
+  ]
 }
