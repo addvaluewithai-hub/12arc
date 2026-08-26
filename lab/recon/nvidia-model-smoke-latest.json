@@ -1,73 +1,7 @@
 {
-  "all_http_200": false,
-  "complete": true,
+  "complete": false,
   "endpoint": "https://integrate.api.nvidia.com/v1/chat/completions",
-  "models": [
-    {
-      "api_error": null,
-      "content_chars": 2,
-      "content_preview": "OK",
-      "finish_reason": "stop",
-      "http_status": 200,
-      "latency_seconds": 0.687,
-      "model_requested": "nvidia/nemotron-3-ultra-550b-a55b",
-      "reasoning_chars": 80,
-      "request_succeeded": true,
-      "response_model": "nvidia/nemotron-3-ultra-550b-a55b",
-      "transport_error": null,
-      "usage": {
-        "completion_tokens": 20,
-        "prompt_tokens": 21,
-        "total_tokens": 41
-      }
-    },
-    {
-      "api_error": null,
-      "content_chars": 3,
-      "content_preview": "OK.",
-      "finish_reason": "stop",
-      "http_status": 200,
-      "latency_seconds": 0.667,
-      "model_requested": "deepseek-ai/deepseek-v4-flash-0731",
-      "reasoning_chars": 0,
-      "request_succeeded": true,
-      "response_model": "deepseek-ai/deepseek-v4-flash-0731",
-      "transport_error": null,
-      "usage": {
-        "completion_tokens": 3,
-        "prompt_tokens": 9,
-        "total_tokens": 12
-      }
-    },
-    {
-      "api_error": null,
-      "content_chars": 0,
-      "content_preview": "",
-      "finish_reason": null,
-      "http_status": null,
-      "latency_seconds": 120.123,
-      "model_requested": "openai/gpt-oss-120b",
-      "reasoning_chars": 0,
-      "request_succeeded": false,
-      "response_model": null,
-      "transport_error": "TimeoutError: The read operation timed out",
-      "usage": null
-    },
-    {
-      "api_error": null,
-      "content_chars": 0,
-      "content_preview": "",
-      "finish_reason": null,
-      "http_status": null,
-      "latency_seconds": 120.13,
-      "model_requested": "google/gemma-4-31b-it",
-      "reasoning_chars": 0,
-      "request_succeeded": false,
-      "response_model": null,
-      "transport_error": "TimeoutError: The read operation timed out",
-      "usage": null
-    }
-  ],
+  "models": [],
   "purpose": "NVIDIA API key / hosted-model availability smoke test; non-ARC",
   "schema_version": 1,
   "secret_persisted": false
