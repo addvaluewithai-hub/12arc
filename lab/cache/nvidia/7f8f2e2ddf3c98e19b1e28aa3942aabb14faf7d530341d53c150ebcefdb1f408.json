@@ -1,0 +1,18 @@
+{
+  "cache_hit": false,
+  "input_tokens": 5955,
+  "model_requested": "nvidia/nemotron-3-ultra-550b-a55b",
+  "model_resolved": "nvidia/nemotron-3-ultra-550b-a55b",
+  "output_tokens": 402,
+  "provider_metadata": {
+    "endpoint": "https://integrate.api.nvidia.com/v1/chat/completions",
+    "finish_reason": "stop",
+    "provider": "nvidia-nim",
+    "rate_limit_headers": {},
+    "reasoning_chars": 1852,
+    "usage_details": {}
+  },
+  "runtime_seconds": 15.035059909000012,
+  "text": "{\"challenges\": []}",
+  "total_tokens": 6357
+}
