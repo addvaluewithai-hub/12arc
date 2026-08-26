@@ -19,7 +19,7 @@ env:
 jobs:
   smoke:
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    timeout-minutes: 8
     env:
       NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
     steps:
@@ -39,16 +39,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-      - name: Persist smoke start breadcrumb
-        run: |
-          mkdir -p lab/recon
-          printf '{"status":"started","run_id":"%s","trigger_sha":"%s","secret_persisted":false}\n' "$GITHUB_RUN_ID" "$GITHUB_SHA" > lab/recon/nvidia-model-smoke-start.json
-          git add lab/recon/nvidia-model-smoke-start.json
-          git commit -m "Record NVIDIA smoke start" || true
-          git pull --rebase origin main
-          git push origin HEAD:main
-
-      - name: Probe four NVIDIA-hosted models
+      - name: Probe DeepSeek aliases and controls
         shell: bash
         run: |
           mkdir -p artifacts lab/recon
@@ -59,15 +50,16 @@ jobs:
           import time
           import urllib.error
           import urllib.request
+          from datetime import datetime, timezone
           from pathlib import Path
 
           endpoint = os.environ["NVIDIA_ENDPOINT"]
           api_key = os.environ["NVIDIA_API_KEY"]
           models = [
-              "nvidia/nemotron-3-ultra-550b-a55b",
               "deepseek-ai/deepseek-v4-flash-0731",
+              "deepseek-ai/deepseek-v4-flash",
+              "nvidia/nemotron-3-ultra-550b-a55b",
               "openai/gpt-oss-120b",
-              "google/gemma-4-31b-it",
           ]
 
           def persist(report, label):
@@ -81,8 +73,9 @@ jobs:
                   subprocess.run(["git", "push", "origin", "HEAD:main"], check=True)
 
           report = {
-              "schema_version": 1,
-              "purpose": "NVIDIA API key / hosted-model availability smoke test; non-ARC",
+              "schema_version": 2,
+              "purpose": "NVIDIA hosted-model availability smoke test; non-ARC; prove whether DeepSeek versioned ID or alias is callable",
+              "created_at": datetime.now(timezone.utc).isoformat(),
               "endpoint": endpoint,
               "secret_persisted": False,
               "models": [],
@@ -94,8 +87,8 @@ jobs:
               payload = {
                   "model": model,
                   "messages": [{"role": "user", "content": "Reply with exactly OK."}],
-                  "max_tokens": 128,
-                  "temperature": 1.0,
+                  "max_tokens": 32,
+                  "temperature": 0,
                   "stream": False,
               }
               req = urllib.request.Request(
@@ -113,7 +106,7 @@ jobs:
               body = ""
               transport_error = None
               try:
-                  with urllib.request.urlopen(req, timeout=120) as response:
+                  with urllib.request.urlopen(req, timeout=45) as response:
                       status = response.status
                       body = response.read().decode("utf-8", errors="replace")
               except urllib.error.HTTPError as exc:
@@ -136,9 +129,11 @@ jobs:
               response_model = None
               usage = None
               api_error = None
+              provider_message = None
               if isinstance(data, dict):
                   response_model = data.get("model")
                   usage = data.get("usage")
+                  provider_message = data.get("message")
                   choices = data.get("choices") or []
                   if choices:
                       first = choices[0] or {}
@@ -148,14 +143,7 @@ jobs:
                       reasoning = message.get("reasoning_content") or message.get("reasoning") or ""
                   if data.get("error"):
                       err = data["error"]
-                      if isinstance(err, dict):
-                          api_error = {
-                              "type": err.get("type"),
-                              "code": err.get("code"),
-                              "message": str(err.get("message", ""))[:500],
-                          }
-                      else:
-                          api_error = {"message": str(err)[:500]}
+                      api_error = err if isinstance(err, dict) else {"message": str(err)[:1000]}
 
               report["models"].append({
                   "model_requested": model,
@@ -170,11 +158,16 @@ jobs:
                   "latency_seconds": round(latency, 3),
                   "transport_error": transport_error,
                   "api_error": api_error,
+                  "provider_message_preview": str(provider_message)[:1000] if provider_message is not None else None,
+                  "raw_body_preview": body[:1000] if status != 200 else None,
               })
               persist(report, model.replace("/", "-"))
 
+          successes = [item["model_requested"] for item in report["models"] if item["request_succeeded"]]
           report["complete"] = True
-          report["all_http_200"] = all(item["http_status"] == 200 for item in report["models"])
+          report["successes"] = successes
+          report["deepseek_versioned_available"] = any(item["model_requested"] == "deepseek-ai/deepseek-v4-flash-0731" and item["request_succeeded"] for item in report["models"])
+          report["deepseek_alias_available"] = any(item["model_requested"] == "deepseek-ai/deepseek-v4-flash" and item["request_succeeded"] for item in report["models"])
           persist(report, "probe complete")
           print(json.dumps(report, indent=2, sort_keys=True))
           PY
