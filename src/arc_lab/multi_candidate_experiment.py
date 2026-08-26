@@ -109,7 +109,22 @@ def main() -> None:
     try:
         result = run(args.task, task_id=args.task_id, cache_dir=args.cache_dir)
     except TargetProviderError as exc:
-        result = {"schema_version": 1, "task_id": args.task_id, "status": "provider_failure", "provider_failure": {"message": str(exc), "status_code": exc.status_code, "retryable": exc.retryable, "rate_limit_headers": exc.rate_limit_headers}, "public_evaluation_used": False}
+        result = {
+            "schema_version": 1,
+            "task_id": args.task_id,
+            "status": "provider_failure",
+            "provider": PROVIDER,
+            "model": MODEL,
+            "provider_failure": {
+                "message": str(exc),
+                "status_code": exc.status_code,
+                "retryable": exc.retryable,
+                "terminal": not exc.retryable,
+                "error_category": exc.error_category,
+                "rate_limit_headers": exc.rate_limit_headers,
+            },
+            "public_evaluation_used": False,
+        }
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(result, indent=2, sort_keys=True) + "\n")
 
