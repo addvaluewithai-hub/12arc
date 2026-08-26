@@ -1,60 +1,9 @@
 {
   "complete": false,
+  "created_at": "2026-08-26T08:55:15.016818+00:00",
   "endpoint": "https://integrate.api.nvidia.com/v1/chat/completions",
-  "models": [
-    {
-      "api_error": null,
-      "content_chars": 2,
-      "content_preview": "OK",
-      "finish_reason": "stop",
-      "http_status": 200,
-      "latency_seconds": 0.532,
-      "model_requested": "nvidia/nemotron-3-ultra-550b-a55b",
-      "reasoning_chars": 45,
-      "request_succeeded": true,
-      "response_model": "nvidia/nemotron-3-ultra-550b-a55b",
-      "transport_error": null,
-      "usage": {
-        "completion_tokens": 14,
-        "prompt_tokens": 21,
-        "total_tokens": 35
-      }
-    },
-    {
-      "api_error": null,
-      "content_chars": 0,
-      "content_preview": "",
-      "finish_reason": null,
-      "http_status": 404,
-      "latency_seconds": 0.075,
-      "model_requested": "deepseek-ai/deepseek-v4-flash-0731",
-      "reasoning_chars": 0,
-      "request_succeeded": false,
-      "response_model": null,
-      "transport_error": "HTTP 404",
-      "usage": null
-    },
-    {
-      "api_error": null,
-      "content_chars": 2,
-      "content_preview": "OK",
-      "finish_reason": "stop",
-      "http_status": 200,
-      "latency_seconds": 0.588,
-      "model_requested": "openai/gpt-oss-120b",
-      "reasoning_chars": 171,
-      "request_succeeded": true,
-      "response_model": "openai/gpt-oss-120b",
-      "transport_error": null,
-      "usage": {
-        "completion_tokens": 51,
-        "prompt_tokens": 70,
-        "prompt_tokens_details": null,
-        "total_tokens": 121
-      }
-    }
-  ],
-  "purpose": "NVIDIA API key / hosted-model availability smoke test; non-ARC",
-  "schema_version": 1,
+  "models": [],
+  "purpose": "NVIDIA hosted-model availability smoke test; non-ARC; prove whether DeepSeek versioned ID or alias is callable",
+  "schema_version": 2,
   "secret_persisted": false
 }
