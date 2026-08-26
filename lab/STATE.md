@@ -31,17 +31,25 @@ Interpretation: ARC-R035 removed the shape/alignment blocker, but repeated latti
 
 ## Next active research direction
 
-Promote `T0022-MULTI-CANDIDATE-CRITIQUE-VERIFY-LOOP` into the active queue as the next architecture experiment.
+The operator-requested architecture direction is the multi-candidate generate -> critique -> critique-the-critique -> repair -> Python verify/select loop. Before spending inference, the highest-priority ready task is `T0022A-MULTI-CANDIDATE-CRITIQUE-VERIFY-HARNESS`.
 
-The goal is to stop relying on one model proposal. Use the target model as a diverse proposal engine: generate many candidate rules/programs, critique them, critique the critique, repair candidates, then parse/execute/score every candidate in deterministic Python. Python is the judge; model confidence or critique text is not evidence.
+T0022A is a no-model infrastructure/research shift that must build and test:
 
-Preferred first task: `06df4c85`, because ARC-R032 already showed lattice programs executing there while remaining exact-wrong. This separates candidate-generation/search uncertainty from the `0607ce86` separator-topology issue.
+- candidate-batch manifests and normalized-IR deduplication;
+- critique and repair provenance without treating critique as evidence;
+- deterministic Python execution/scoring and selector ranking;
+- cache/request/token/runtime accounting schemas;
+- a validated push-triggered NVIDIA execution path for the subsequent T0022 target-model experiment.
 
-Durable design/protocol artifacts:
+Protocol: `lab/experiments/T0022A-multi-candidate-critique-verify-harness.json`.
+
+After T0022A passes, unblock `T0022-MULTI-CANDIDATE-CRITIQUE-VERIFY-LOOP`. Prefer its first target `06df4c85`, because ARC-R032 already showed lattice programs executing there while remaining exact-wrong. The target model should generate many candidates and critiques, but deterministic Python remains the judge.
+
+Durable direction artifacts:
 
 - `lab/design/MULTI-CANDIDATE-CRITIQUE-VERIFY.md`
+- `lab/experiments/T0022A-multi-candidate-critique-verify-harness.json`
 - `lab/experiments/T0022-multi-candidate-critique-verify-loop.json`
-- `lab/registry/proposed-tasks/T0022-MULTI-CANDIDATE-CRITIQUE-VERIFY-LOOP.json`
 
 If the first T0022 loop variant fails, evolve one variable at a time: proposal diversity, critic prompt, critique-of-critique, repair budget, IR translation constraints, or deterministic selector ranking. Preserve matched comparators and do not repeat an unchanged failed prompt.
 
@@ -53,6 +61,6 @@ It changes only the partition source: infer separator-defined variable-span topo
 
 Protocol: `lab/experiments/T0023-persistent-lattice-topology-ablation.json`.
 
-This should remain adjacent to the multi-candidate direction rather than displacing it as the next active architecture task. If/when run, eliminating separator-loss failures without an exact program counts only as partial progress.
+T0023 is intentionally blocked so it does not displace the multi-candidate direction. If/when run, eliminating separator-loss failures without an exact program counts only as partial progress.
 
 Public evaluation remains sealed.
