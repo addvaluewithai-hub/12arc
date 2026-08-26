@@ -1,130 +1,81 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "task_id": "T0022-MULTI-CANDIDATE-CRITIQUE-VERIFY-LOOP",
   "title": "Multi-candidate generate/critique/repair loop with deterministic Python selection",
-  "status": "predeclared_post_T0021_candidate",
+  "status": "ready_after_T0022A",
   "research_role": "reasoning-systems-inventor",
-  "motivation": "Single-candidate rule-first prompting has repeatedly produced parseable but exact-wrong programs. ARC-R030 and ARC-R032 showed that removing serialization/parse blockers was not sufficient; ARC-R035 showed the deterministic search space can be large but still miss exact programs. The next architecture hypothesis is that model inference should be used as a diverse proposal engine while Python remains the deterministic judge.",
-  "blocking_context": {
-    "current_active_task": "T0021-OVERLAP-SEMANTIC-CLOSURE-AUDIT",
-    "current_reserved_run": "ARC-R036",
-    "rule": "Do not start this protocol until the active T0021/ARC-R036 claim is resolved, unless a later shift explicitly converts this document into a queued task according to RUNNER.md."
+  "hypothesis": "A generate -> critique -> critique-the-critique -> repair -> deterministic verification loop can improve candidate coverage over single-answer rule-first prompting by broadening the proposal distribution while Python remains the judge.",
+  "primary_variable": "Multi-candidate proposal/critique/repair loop instead of a single candidate answer.",
+  "baseline": {
+    "primary_comparator_run": "ARC-R032",
+    "primary_task": "06df4c85",
+    "comparator_candidate_coverage": false,
+    "context_runs": ["ARC-R030", "ARC-R035", "ARC-R036"]
   },
-  "hypothesis": "A generate -> critique -> repair -> deterministic verification loop can improve candidate coverage versus single-answer rule-first prompting by producing a diverse set of candidate programs and letting Python select strictly by training-pair execution evidence rather than model self-confidence.",
-  "primary_variable": "Number/diversity of model-generated candidate programs plus critique/repair passes, while keeping the deterministic executor, exact scoring, task set, model/provider policy, and leakage controls fixed.",
-  "frozen_comparators": [
-    {
-      "run": "ARC-R030",
-      "description": "single-candidate rule-first overflow ablation; compact serialization; 0/2 exact coverage on 0607ce86 and 06df4c85"
-    },
-    {
-      "run": "ARC-R032",
-      "description": "schema-v2 lattice-region model ablation; 2/2 parseable but 0/2 exact coverage"
-    },
-    {
-      "run": "ARC-R035",
-      "description": "no-model bounded overlap-alignment search; 798 reachable states on 0607ce86 but no exact program"
-    }
-  ],
-  "initial_task_selection_policy": {
-    "preferred_first_task": "06df4c85",
-    "rationale": "ARC-R032 executed lattice programs for this task but produced exact-wrong outputs, making it a good first target for candidate diversity and Python ranking without the current T0021 failure-taxonomy dependency.",
-    "secondary_task": "0607ce86",
-    "condition": "Use after T0021 classifies the remaining semantic-closure failure modes, or if the queued task explicitly freezes a compatible T0021-derived target mechanism."
-  },
-  "loop_design": {
-    "generation": {
-      "candidate_count_target": "16-32 per task before deduplication",
-      "diversity_controls": [
-        "multiple independent prompts or seeds when provider supports it",
-        "prompt roles: visual rule, object/region rule, lattice rule, exception rule, minimal program rule",
-        "force candidates to be distinct at the normalized IR level"
-      ],
-      "output_format": "machine-parseable candidate IR or compact rule text that must be translated into IR before scoring"
-    },
-    "critique": {
-      "purpose": "Generate failure hypotheses and repair suggestions, not evidence.",
-      "required_checks": [
-        "which training pair is likely to fail",
-        "whether the candidate illegally relies on task ID, absolute coordinates, target colors, or target patterns",
-        "whether separators/unchanged regions are destroyed",
-        "whether the rule can be expressed in the current IR"
-      ]
-    },
-    "critique_the_critique": {
-      "purpose": "Challenge overconfident or incorrect model critiques and recover repairable candidates.",
-      "required_checks": [
-        "is the critique based on actual train-pair evidence or a guessed interpretation",
-        "is the candidate repairable without introducing leakage or task-specific constants",
-        "does a smaller equivalent rule exist"
-      ]
-    },
-    "repair": {
-      "max_repair_rounds": 2,
-      "rule": "Repairs may use critique text but must be re-parsed and re-executed from scratch."
-    },
-    "python_verifier": {
-      "authority": "Only deterministic Python execution and exact scoring count as evidence.",
-      "metrics": [
-        "parse_success",
-        "validation_failure_reason",
-        "exact_training_coverage",
-        "per_cell_error_distance",
-        "shape_match",
-        "unchanged_cell_preservation",
-        "separator_preservation",
-        "candidate_program_cost",
-        "normalized_ir_duplicate_cluster",
-        "new_coverage_vs_comparator",
-        "regressions_vs_comparator"
-      ]
-    },
-    "selector": {
-      "ranking_order": [
-        "exact training consistency",
-        "higher exact candidate coverage",
-        "lower deterministic cell-error distance",
-        "fewer structural violations",
-        "lower program cost / shorter normalized IR",
-        "stability across independently generated candidates"
-      ],
-      "forbidden": "Do not select a candidate because the model says it is best unless Python metrics also rank it best."
-    }
-  },
-  "model_policy": {
-    "provider": "NVIDIA NIM",
-    "routine_model": "deepseek-ai/deepseek-v4-flash-0731",
-    "secret": "NVIDIA_API_KEY",
-    "note": "Do not print, persist, or expose provider secrets. If the provider is unavailable, run only no-model harness or scoring work and record the blocker."
-  },
-  "leakage_policy": {
-    "allowed_data": "permitted public ARC training data and deterministic public-training-derived development splits only",
-    "forbidden_data": "private/sealed evaluation data and repeated public-evaluation feedback",
-    "requirement": "All reported candidate scoring must specify split and exact task IDs."
-  },
-  "success_criteria": {
-    "minimum_operational_success": [
-      "at least 8 parseable, non-duplicate candidates for the selected task",
-      "all candidates scored by Python with durable metrics artifact",
-      "no unsupported model-result claims"
+  "split": "permitted public ARC-AGI-2 training data only",
+  "task_ids": ["06df4c85"],
+  "provider": "nvidia-nim",
+  "model": "deepseek-ai/deepseek-v4-flash-0731",
+  "solver_version": "t0022-multi-candidate-v1",
+  "generation_contract": {
+    "calls": [
+      {"phase": "generate", "attempt_index": 0, "candidate_target": 16, "temperature": 0.7, "top_p": 0.95, "top_k": 64, "max_output_tokens": 4096},
+      {"phase": "critique", "attempt_index": 1, "temperature": 0.2, "top_p": 0.95, "top_k": 64, "max_output_tokens": 3072},
+      {"phase": "critique_the_critique", "attempt_index": 2, "temperature": 0.2, "top_p": 0.95, "top_k": 64, "max_output_tokens": 3072},
+      {"phase": "repair", "attempt_index": 3, "repair_candidate_max": 8, "temperature": 0.7, "top_p": 0.95, "top_k": 64, "max_output_tokens": 4096}
     ],
-    "research_success": [
-      ">=1 exact train-consistent candidate on the selected task, or",
-      "a dominant mechanically observed failure class across all candidates that motivates exactly one next ablation"
-    ],
-    "rejection_condition": "If candidate diversity remains high but Python scoring shows no near-miss improvement and no dominant actionable failure class, reject this loop variant and evolve the architecture rather than repeating the same prompt."
+    "maximum_model_requests": 4,
+    "cache_policy": "CachedTargetClient fingerprint includes provider/model/full prompt/settings/solver/task/attempt; identical calls must reuse cache.",
+    "provider_timeout_seconds": 900,
+    "minimum_live_call_interval_seconds": 1.0
   },
-  "required_artifacts": [
-    "candidate prompt/protocol file",
-    "raw sanitized model response cache or hashes",
-    "normalized candidate IR manifest",
-    "critique and repair manifest",
-    "Python scoring artifact",
-    "selector ranking artifact",
-    "failure-cluster analysis",
-    "matched comparator delta report",
-    "run report",
-    "queue/state/handoff updates"
+  "python_verifier": {
+    "authority": "Only deterministic Python execution and scoring count as evidence; critique text and model confidence never enter ranking.",
+    "ranking_order": [
+      "exact training consistency",
+      "number of exact training pairs",
+      "total cell-error distance",
+      "structural violations",
+      "normalized program cost",
+      "candidate fingerprint deterministic tie-break"
+    ],
+    "required_metrics": [
+      "submitted_candidates",
+      "parseable_candidates",
+      "parse_failures",
+      "unique_candidates",
+      "duplicate_candidates",
+      "exact_training_pairs",
+      "total_cell_error",
+      "shape_match",
+      "separator_preservation",
+      "program_cost"
+    ]
+  },
+  "success_threshold": "At least 8 parseable non-duplicate candidates and either at least one exact training-consistent candidate for 06df4c85 or a dominant mechanically observed failure class supporting exactly one next ablation.",
+  "falsification": "If candidate diversity is achieved but Python scoring yields neither an exact candidate nor meaningful near-miss/failure-cluster improvement, reject this loop variant and evolve exactly one component rather than repeating it unchanged.",
+  "required_accounting": [
+    "request_count",
+    "cache_hits",
+    "input_tokens",
+    "output_tokens",
+    "total_tokens",
+    "runtime_seconds",
+    "provider_failures",
+    "parse_failures",
+    "rate-limit/timeout observations",
+    "new coverage",
+    "regressions"
   ],
-  "evolution_policy": "If the first loop fails, evolve one variable at a time: candidate diversity prompt, critic prompt, repair budget, IR translation constraints, or selector ranking. Preserve matched comparators and do not tune on public evaluation."
+  "execution_path": {
+    "kind": "github-actions-push-trigger",
+    "workflow": ".github/workflows/t0022-multi-candidate.yml",
+    "trigger_file": "lab/triggers/t0022-multi-candidate.request",
+    "expected_result": "lab/results/{run}-multi-candidate.json",
+    "status_file": "lab/executions/{run}.json",
+    "max_wait_minutes": 180,
+    "required_secret": "NVIDIA_API_KEY"
+  },
+  "leakage_policy": "Public evaluation remains sealed; workflow sparse-checks out public training only and asserts evaluation is absent.",
+  "public_evaluation_used": false
 }
