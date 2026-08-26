@@ -50,6 +50,33 @@ class TargetResponse:
     provider_metadata: dict[str, Any] | None = None
 
 
+def classify_provider_failure(status_code: int | None, message: str) -> str:
+    """Return a stable, reportable provider-failure class.
+
+    This deliberately separates transient transport/rate-limit failures from
+    terminal configuration or catalog failures so scheduled shifts do not keep
+    re-triggering the same external run after the authorized provider path has
+    become unavailable.
+    """
+
+    lower = message.lower()
+    if status_code in {401, 403}:
+        return "auth_or_permission"
+    if status_code == 404:
+        if "function id" in lower or "specified function" in lower:
+            return "model_or_endpoint_unavailable"
+        if "model" in lower and "not found" in lower:
+            return "model_or_endpoint_unavailable"
+        return "provider_resource_not_found"
+    if status_code == 429:
+        return "rate_limited"
+    if status_code in {408, 500, 502, 503, 504, 529}:
+        return "transient_provider"
+    if status_code is None:
+        return "transport_or_client_failure"
+    return "provider_http_failure"
+
+
 class TargetProviderError(RuntimeError):
     """Sanitized provider failure carrying retry/rate-limit metadata."""
 
@@ -60,11 +87,15 @@ class TargetProviderError(RuntimeError):
         status_code: int | None = None,
         retryable: bool = False,
         rate_limit_headers: dict[str, str] | None = None,
+        error_category: str | None = None,
     ):
         super().__init__(message)
         self.status_code = status_code
         self.retryable = retryable
         self.rate_limit_headers = rate_limit_headers or {}
+        self.error_category = error_category or classify_provider_failure(
+            status_code, message
+        )
 
 
 class TargetProvider(Protocol):
@@ -160,6 +191,25 @@ class NvidiaNIMProvider:
             }
         if error is not None:
             return {"message": str(error)[:500]}
+        # NVIDIA sometimes returns top-level fields, or a top-level message that
+        # itself contains a JSON string. Preserve only sanitized diagnostics.
+        top_level = {
+            key: data.get(key)
+            for key in ("status", "title", "detail", "message")
+            if key in data
+        }
+        message = top_level.get("message")
+        if isinstance(message, str):
+            try:
+                nested = json.loads(message)
+            except json.JSONDecodeError:
+                nested = None
+            if isinstance(nested, dict):
+                for key in ("status", "title", "detail"):
+                    if key in nested:
+                        top_level[f"nested_{key}"] = str(nested[key])[:500]
+        if top_level:
+            return {key: str(value)[:500] for key, value in top_level.items()}
         return None
 
     @staticmethod
@@ -214,8 +264,9 @@ class NvidiaNIMProvider:
             body = exc.read().decode("utf-8", errors="replace")
             safe_error = self._safe_error_payload(body)
             detail = safe_error or {"message": body[:500]}
+            message = f"NVIDIA NIM HTTP {exc.code}: {detail}"
             raise TargetProviderError(
-                f"NVIDIA NIM HTTP {exc.code}: {detail}",
+                message,
                 status_code=exc.code,
                 retryable=exc.code in {408, 429, 500, 502, 503, 504, 529},
                 rate_limit_headers=self._rate_limit_headers(exc.headers),
