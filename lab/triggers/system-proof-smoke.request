@@ -1,0 +1,1 @@
+{"schema_version":1,"run":"SYSTEM-SMOKE-20260826T083600Z","requested_at":"2026-08-26T08:36:00Z","purpose":"prove registry guard, provider-failure classification, action execution and result persistence without target-model calls"}
