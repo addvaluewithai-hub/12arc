@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 from dataclasses import asdict
 from pathlib import Path
 from typing import Any
@@ -11,7 +12,8 @@ from .multi_candidate_contract import prompt_contract_fragment, validate_candida
 from .target_model import CachedTargetClient, GenerationConfig, NvidiaNIMProvider, TargetRequest, TargetProviderError
 from .taskio import load_task
 
-MODEL = "deepseek-ai/deepseek-v4-flash-0731"
+DEFAULT_MODEL = "deepseek-ai/deepseek-v4-flash-0731"
+MODEL = os.environ.get("ARC_TARGET_MODEL", DEFAULT_MODEL)
 PROVIDER = "nvidia-nim"
 GENERATION = GenerationConfig(temperature=0.7, top_p=0.95, top_k=64, max_output_tokens=4096)
 CRITIQUE = GenerationConfig(temperature=0.2, top_p=0.95, top_k=64, max_output_tokens=3072)
@@ -85,6 +87,8 @@ def run(task_path: Path, *, task_id: str, cache_dir: Path) -> dict[str, Any]:
         "task_id": task_id,
         "provider": PROVIDER,
         "model": MODEL,
+        "default_model": DEFAULT_MODEL,
+        "model_override_used": MODEL != DEFAULT_MODEL,
         "solver_version": "t0022-multi-candidate-v2-contract",
         "generation_settings": {"generate_repair": asdict(GENERATION), "critique_challenge": asdict(CRITIQUE)},
         "attempts": 4,
@@ -115,6 +119,8 @@ def main() -> None:
             "status": "provider_failure",
             "provider": PROVIDER,
             "model": MODEL,
+            "default_model": DEFAULT_MODEL,
+            "model_override_used": MODEL != DEFAULT_MODEL,
             "provider_failure": {
                 "message": str(exc),
                 "status_code": exc.status_code,
