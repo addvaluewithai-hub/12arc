@@ -2,35 +2,34 @@
 
 Updated: 2026-08-26
 Phase: **PHASE 2 — architecture research**
-Latest completed research run: **ARC-R040**
-Next unallocated research run: **ARC-R041**
+Latest completed research run: **ARC-R041**
+Next unallocated research run: **ARC-R042**
 
 ## Fixed comparator and current model policy
 
 ARC-R016 direct-JSON baseline remains frozen at **45/174 = 25.8621%** on deterministic public-training-derived `dev_validation` using NVIDIA NIM `deepseek-ai/deepseek-v4-flash-0731`. Public evaluation remains sealed.
 
-Current hosted execution is under the temporary provider/model failover policy in `lab/config.json`: DeepSeek V4 Flash endpoints are presently unavailable on the authorized NVIDIA path, while `nvidia/nemotron-3-ultra-550b-a55b` is the current working NVIDIA target model. Nemotron runs must be labeled as provider/model failover experiments and must not be treated as matched DeepSeek reruns.
+Current hosted execution remains under the temporary provider/model failover policy in `lab/config.json`: DeepSeek V4 Flash endpoints are unavailable on the authorized NVIDIA path and `nvidia/nemotron-3-ultra-550b-a55b` is the current working target model. Nemotron runs must not be represented as matched DeepSeek reruns.
 
 ## Current evidence chain
 
-ARC-R038 attempted the first multi-candidate generate -> critique -> critique-the-critique -> repair -> Python-select loop on public-training task `06df4c85` using DeepSeek V4 Flash. It was operationally inconclusive because all 24 submitted candidate records failed the executable IR parser, so no valid candidate reached critique or deterministic selection.
+ARC-R038 exposed a generation/repair prompt-to-executable-IR contract failure. ARC-R039 hardened that boundary offline. ARC-R040 then advanced a provider-failover Nemotron execution to critique with executable candidates, but terminated at `critique_parse_or_retry`; no critique-the-critique, repair, final deterministic selection, exact coverage, new-solve, or regression claim was valid.
 
-ARC-R039 repaired only the generation/repair executable-IR prompt contract and validated it offline: 10/10 representative fixtures were parseable and unique, malformed ARC-R038 forms failed closed, and parser/executor/ranking semantics remained frozen.
+ARC-R041 completed `T0022D-CRITIQUE-CONTRACT-HARDENING` with **zero target-model calls**. The persisted ARC-R040 critic and critic-retry responses are now replayed as regression fixtures and fail closed under exact critique contracts. New exact validators require fixed top-level containers, exact record keys, 64-character candidate fingerprints, unique/known candidate IDs, typed training-pair indices/booleans, non-empty text fields, and no extra keys. The hardened runner also substitutes exact correction instructions for critique and critique-the-critique while leaving generation/repair IR semantics, execution, scoring, and deterministic selection unchanged.
 
-ARC-R040 resumed the same reserved T0022C run after the external workflow completed. The durable result used NVIDIA NIM `nvidia/nemotron-3-ultra-550b-a55b` under the temporary failover policy, not the frozen DeepSeek comparator, so it is **not a matched DeepSeek rerun**.
+The offline end-to-end gate replays the persisted ARC-R040 recovered generation batch: **16/16 parseable candidates and 16 unique candidates** in the selected recovery record, comfortably above the >=8 requirement. Strict mocked critique and critique-the-critique manifests validate, a valid repair candidate is admitted, and deterministic Python selection is reached. GitHub Actions CI run **32962601395** passed. This is an `INFRA_ONLY / PASS` result: it establishes machine-contract enforceability and offline traversability, not live-model compliance or an ARC solve.
 
-ARC-R040 made 4 provider requests with 36,532 input tokens, 15,059 output tokens, 51,591 total tokens and 378.378 seconds runtime. Provider failures were 0; public evaluation was not used. Candidate flow advanced to the critique phase with 14 candidates, materially beyond ARC-R038's zero executable-candidate boundary. However, the critic response failed its machine-readable JSON contract (`JsonContractError`, `failure_stage=critique_parse_or_retry`) even after the recovery path. The run ended `operational_failure` before critique-the-critique, repair and final deterministic Python selection.
-
-Therefore no exact candidate coverage, new solve, regression or architecture-quality delta is claimable from ARC-R040. The multi-candidate reasoning hypothesis remains untested end-to-end. The strongest model-independent conclusion is that phase-level machine contracts are not yet hardened uniformly across the loop.
-
-Run report: `lab/runs/2026-08-26/ARC-R040.md`.
+Validation artifact: `lab/validation/T0022D-critique-contract-hardening.json`.
+Run report: `lab/runs/2026-08-26/ARC-R041.md`.
 
 ## Next active research direction
 
-Highest-priority ready task: `T0022D-CRITIQUE-CONTRACT-HARDENING`.
+Highest-priority ready task: `T0022E-HARDENED-PHASE-CONTRACT-RERUN`.
 
-This is a no-model infrastructure-research task. Replay the persisted ARC-R040 critic failure as a regression fixture, define exact fail-closed schemas for critique and critique-the-critique, and verify offline that representative valid fixtures can traverse critique -> critique-the-critique -> repair -> deterministic selection without loosening candidate/executor semantics or accepting arbitrary prose. Only after that gate passes should a new target-model experiment be predeclared.
+T0022E is the single predeclared follow-up target-model experiment on exactly public-training task `06df4c85`. It routes the existing loop through `arc_lab.multi_candidate_hardened`, changing only the critique/challenge machine boundary and correction instructions. Under current policy it uses NVIDIA NIM `nvidia/nemotron-3-ultra-550b-a55b`; it is a provider/model failover experiment and **not** a matched DeepSeek rerun. Operational success requires >=8 parseable non-duplicate generated candidates and completion through strict critique, strict critique-the-critique, repair, and final deterministic Python selection. Research progress then requires an exact training-consistent candidate or a dominant mechanically observed failure class supporting one next ablation.
 
-`T0023-PERSISTENT-LATTICE-TOPOLOGY-ABLATION` remains blocked so it does not displace the multi-candidate direction before the architecture loop obtains a complete interpretable run.
+Protocol: `lab/experiments/T0022E-hardened-phase-contract-rerun.json`.
+
+`T0023-PERSISTENT-LATTICE-TOPOLOGY-ABLATION` remains blocked so it does not displace the multi-candidate direction before a complete interpretable architecture-loop run.
 
 Public evaluation remains sealed.
