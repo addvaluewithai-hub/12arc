@@ -1,0 +1,94 @@
+name: T0022 multi-candidate critique verify
+
+on:
+  push:
+    paths:
+      - 'lab/triggers/t0022-multi-candidate.request'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: t0022-multi-candidate
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install -e '.[dev]'
+      - name: Validate trigger claim and reservation
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          trigger=json.loads(Path('lab/triggers/t0022-multi-candidate.request').read_text())
+          queue=json.loads(Path('lab/registry/queue.json').read_text())
+          counter=json.loads(Path('lab/registry/run-counter.json').read_text())
+          assert trigger['schema_version']==1
+          assert trigger['task_id']=='T0022-MULTI-CANDIDATE-CRITIQUE-VERIFY-LOOP'
+          task=next(t for t in queue['tasks'] if t['id']==trigger['task_id'])
+          assert task['status']=='claimed'
+          assert task['claim']['shift_id']==trigger['shift_id']
+          matches=[r for r in counter['active_reservations'] if r['run']==trigger['run'] and r['task_id']==trigger['task_id'] and r['shift_id']==trigger['shift_id']]
+          assert len(matches)==1
+          PY
+      - name: Fetch pinned public training task only
+        run: |
+          git init /tmp/arc-agi-2
+          git -C /tmp/arc-agi-2 remote add origin https://github.com/arcprize/ARC-AGI-2.git
+          git -C /tmp/arc-agi-2 sparse-checkout init --cone
+          git -C /tmp/arc-agi-2 sparse-checkout set data/training
+          git -C /tmp/arc-agi-2 fetch --depth=1 origin f3283f727488ad98fe575ea6a5ac981e4a188e49
+          git -C /tmp/arc-agi-2 checkout FETCH_HEAD
+          test ! -e /tmp/arc-agi-2/data/evaluation
+          test -f /tmp/arc-agi-2/data/training/06df4c85.json
+      - name: Mark execution running
+        run: |
+          python - <<'PY'
+          import json
+          from datetime import datetime, timezone
+          from pathlib import Path
+          t=json.loads(Path('lab/triggers/t0022-multi-candidate.request').read_text())
+          p=Path('lab/executions')/f"{t['run']}.json"
+          p.write_text(json.dumps({'schema_version':1,'run':t['run'],'task_id':t['task_id'],'status':'running','workflow':'t0022-multi-candidate.yml','started_at':datetime.now(timezone.utc).isoformat(),'expected_result':f"lab/results/{t['run']}-multi-candidate.json"},indent=2,sort_keys=True)+'\n')
+          PY
+      - name: Run frozen T0022 experiment
+        env:
+          NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
+        run: |
+          RUN=$(python -c "import json; print(json.load(open('lab/triggers/t0022-multi-candidate.request'))['run'])")
+          python -m arc_lab.multi_candidate_experiment \
+            --task /tmp/arc-agi-2/data/training/06df4c85.json \
+            --task-id 06df4c85 \
+            --cache-dir lab/cache/nvidia \
+            --output "lab/results/${RUN}-multi-candidate.json"
+      - name: Complete execution status and persist
+        run: |
+          python - <<'PY'
+          import json
+          from datetime import datetime, timezone
+          from pathlib import Path
+          t=json.loads(Path('lab/triggers/t0022-multi-candidate.request').read_text())
+          result=Path('lab/results')/f"{t['run']}-multi-candidate.json"
+          assert result.exists()
+          payload=json.loads(result.read_text())
+          status='failed' if payload.get('status')=='provider_failure' else 'complete'
+          p=Path('lab/executions')/f"{t['run']}.json"
+          state=json.loads(p.read_text())
+          state.update({'status':status,'completed_at':datetime.now(timezone.utc).isoformat(),'result_path':str(result)})
+          p.write_text(json.dumps(state,indent=2,sort_keys=True)+'\n')
+          PY
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add lab/results lab/executions lab/cache/nvidia || true
+          git commit -m "Persist T0022 external result" || true
+          git pull --rebase origin main
+          git push origin HEAD:main
