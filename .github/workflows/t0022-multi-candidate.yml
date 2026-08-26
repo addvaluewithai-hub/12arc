@@ -33,7 +33,10 @@ jobs:
           queue=json.loads(Path('lab/registry/queue.json').read_text())
           counter=json.loads(Path('lab/registry/run-counter.json').read_text())
           assert trigger['schema_version']==1
-          assert trigger['task_id']=='T0022-MULTI-CANDIDATE-CRITIQUE-VERIFY-LOOP'
+          assert trigger['task_id'] in {
+              'T0022-MULTI-CANDIDATE-CRITIQUE-VERIFY-LOOP',
+              'T0022C-MULTI-CANDIDATE-CONTRACT-MATCHED-RERUN',
+          }
           task=next(t for t in queue['tasks'] if t['id']==trigger['task_id'])
           assert task['status']=='claimed'
           assert task['claim']['shift_id']==trigger['shift_id']
@@ -60,7 +63,7 @@ jobs:
           p=Path('lab/executions')/f"{t['run']}.json"
           p.write_text(json.dumps({'schema_version':1,'run':t['run'],'task_id':t['task_id'],'status':'running','workflow':'t0022-multi-candidate.yml','started_at':datetime.now(timezone.utc).isoformat(),'expected_result':f"lab/results/{t['run']}-multi-candidate.json"},indent=2,sort_keys=True)+'\n')
           PY
-      - name: Run frozen T0022 experiment
+      - name: Run frozen multi-candidate experiment
         env:
           NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
         run: |
@@ -89,10 +92,10 @@ jobs:
       - name: Upload recovery artifact before Git persistence
         uses: actions/upload-artifact@v4
         with:
-          name: ARC-R038-t0022-recovery-evidence
+          name: t0022-multi-candidate-evidence-${{ github.run_id }}
           path: |
-            lab/results/ARC-R038-multi-candidate.json
-            lab/executions/ARC-R038.json
+            lab/results/*-multi-candidate.json
+            lab/executions/ARC-R*.json
             lab/cache/nvidia
           if-no-files-found: error
           retention-days: 30
