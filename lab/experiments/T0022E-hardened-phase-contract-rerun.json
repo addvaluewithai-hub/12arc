@@ -1,0 +1,81 @@
+{
+  "schema_version": 1,
+  "experiment_id": "T0022E-HARDENED-PHASE-CONTRACT-RERUN",
+  "hypothesis": "On public-training task 06df4c85, exact fail-closed critique and critique-the-critique contracts will allow the existing multi-candidate loop to traverse critique, challenge, repair, and deterministic Python selection without accepting arbitrary prose; if the loop completes, the resulting candidate evidence will distinguish interface failure from reasoning/search failure.",
+  "baseline": {
+    "run": "ARC-R040",
+    "task_id": "06df4c85",
+    "provider": "nvidia-nim",
+    "model": "nvidia/nemotron-3-ultra-550b-a55b",
+    "verdict": "INCONCLUSIVE",
+    "failure_stage": "critique_parse_or_retry",
+    "note": "ARC-R040 is a provider-failover execution and is not a matched DeepSeek comparator."
+  },
+  "primary_treatment": "Replace only the loose critique/challenge machine boundary with exact record schemas and exact correction instructions; generation/repair executable-IR semantics, executor, scorer, selector, task, and phase generation settings remain frozen.",
+  "target_model": {
+    "provider": "nvidia-nim",
+    "model": "nvidia/nemotron-3-ultra-550b-a55b",
+    "policy_basis": "current repository failover configuration",
+    "matched_deepseek_claim_allowed": false
+  },
+  "task_split": "permitted public ARC-AGI-2 training only",
+  "task_ids": ["06df4c85"],
+  "public_evaluation_used": false,
+  "solver_entrypoint": "python -m arc_lab.multi_candidate_hardened",
+  "generation_settings": {
+    "generate_repair": {"temperature": 0.7, "top_p": 0.95, "top_k": 64, "max_output_tokens": 4096},
+    "critique_challenge": {"temperature": 0.2, "top_p": 0.95, "top_k": 64, "max_output_tokens": 3072},
+    "json_repair": {"temperature": 0.0, "top_p": 1.0, "top_k": null, "max_output_tokens": 4096}
+  },
+  "attempts_search_budget": {
+    "primary_phases": 4,
+    "json_correction_retries": "at most one deterministic correction request per phase boundary already supported by the frozen runner",
+    "candidate_generation_count": 16,
+    "repair_candidate_count": "1..8"
+  },
+  "primary_metric": "full_loop_contract_completion",
+  "secondary_diagnostics": [
+    "parseable and unique generated candidates",
+    "critique contract validity",
+    "challenge contract validity",
+    "repair contract validity",
+    "exact training-consistent candidate coverage",
+    "deterministic best candidate",
+    "request/token/runtime accounting",
+    "provider failures and parse failures",
+    "failure stage and cluster"
+  ],
+  "operational_success_threshold": "At least 8 parseable non-duplicate generated candidates and successful traversal through strict critique, strict critique-the-critique, repair, and final deterministic Python selection.",
+  "research_progress_threshold": "After operational success, either at least one exact training-consistent candidate or one dominant mechanically observed failure class/near-miss that supports a single next ablation.",
+  "falsification_conditions": [
+    "Strict phase contracts still fail before repair/final selection.",
+    "The treatment requires relaxing candidate/executor semantics or accepting arbitrary prose.",
+    "No mechanically interpretable candidate evidence survives the completed loop."
+  ],
+  "frozen_controls": [
+    "task 06df4c85",
+    "public-training-only data boundary",
+    "candidate executable IR schemas",
+    "candidate executor and exact scorer",
+    "deterministic selector",
+    "generation and repair prompt-to-IR contract",
+    "phase generation settings and token budgets"
+  ],
+  "required_reporting": [
+    "provider/model/version",
+    "prompt/protocol",
+    "reasoning and generation settings",
+    "output-token budget",
+    "attempt/search budget",
+    "request count",
+    "input/output/total tokens",
+    "runtime",
+    "exact score and exact training coverage",
+    "new coverage and regressions where comparator-compatible",
+    "parse failures",
+    "provider failures",
+    "rate-limit/timeout observations",
+    "failure clusters",
+    "adversarial interpretation"
+  ]
+}
