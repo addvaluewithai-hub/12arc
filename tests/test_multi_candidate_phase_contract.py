@@ -27,28 +27,39 @@ def _r040_manifest():
     return json.loads(R040_RESULT.read_text())
 
 
-def _phase_text(name: str) -> str:
-    result = _r040_manifest()
-    for record in result["raw_phase_manifest"]:
-        if record["phase"] == name:
-            return record["response_text"]
-    raise AssertionError(f"missing phase {name}")
+def _phase_records(*names: str):
+    wanted = set(names)
+    return [record for record in _r040_manifest()["raw_phase_manifest"] if record["phase"] in wanted]
 
 
 def _r040_generated():
-    return _json_slice(
-        _phase_text("generate"),
-        "[",
-        "]",
-        accept=_candidate_acceptor(expected_count=16),
-    )
+    records = _phase_records("generate", "generate_json_retry")
+    assert records, "ARC-R040 must persist generation/recovery evidence"
+    errors = []
+    for record in records:
+        try:
+            return _json_slice(
+                record["response_text"],
+                "[",
+                "]",
+                accept=_candidate_acceptor(expected_count=16),
+            )
+        except JsonContractError as exc:
+            errors.append(str(exc))
+    raise AssertionError(f"ARC-R040 has no contract-valid 16-candidate generation record: {errors}")
 
 
 def test_arc_r040_critic_failure_replays_and_fails_closed():
-    raw = _phase_text("critique")
-    assert raw.startswith("We need to produce a JSON object")
-    with pytest.raises(JsonContractError):
-        _json_slice(raw, "{", "}", accept=strict_phase_acceptor("critiques"))
+    records = _phase_records("critique", "critique_json_retry")
+    assert records, "ARC-R040 must persist critic and/or critic-recovery evidence"
+    for record in records:
+        with pytest.raises(JsonContractError):
+            _json_slice(
+                record["response_text"],
+                "{",
+                "}",
+                accept=strict_phase_acceptor("critiques"),
+            )
 
 
 def test_strict_critique_and_challenge_contracts_reject_loose_shapes():
