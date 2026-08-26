@@ -1,1 +1,1 @@
-{"schema_version":1,"task_id":"T0022C-MULTI-CANDIDATE-CONTRACT-MATCHED-RERUN","run":"ARC-R040","shift_id":"ARC-SHIFT-20260826T071027Z","requested_at":"2026-08-26T09:50:00Z","operator_override":"provider_failover_to_nemotron_after_deepseek_unavailable","recovery_fix":"enforced_json_extraction_and_model_json_retry","retry_reason":"nvidia_503_retryable_transient_provider"}
+{"schema_version":1,"task_id":"T0022E-HARDENED-PHASE-CONTRACT-RERUN","run":"ARC-R042","shift_id":"ARC-SHIFT-20260826T120625Z","requested_at":"2026-08-26T12:06:25Z"}
