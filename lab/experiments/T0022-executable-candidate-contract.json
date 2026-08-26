@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "contract_id": "t0022-executable-candidate-contract-v1",
+  "purpose": "Machine-checkable model-facing contract for T0022 generation and repair outputs. This document does not change parser or executor semantics.",
+  "top_level": {
+    "required_keys": ["schema_version", "steps"],
+    "additional_keys_allowed": false,
+    "schema_version_type": "integer",
+    "supported_versions": [1, 2]
+  },
+  "schema_1": {
+    "max_steps": 8,
+    "parameter_free_ops": ["identity", "rotate90", "rotate180", "rotate270", "flip_h", "flip_v"],
+    "parameter_free_step_shape": {"op": "rotate90"},
+    "recolor_step_shape": {"op": "recolor", "from": 1, "to": 2},
+    "color_domain": "integers 0..9",
+    "valid_example": {"schema_version": 1, "steps": [{"op": "rotate90"}]}
+  },
+  "schema_2": {
+    "max_steps": 4,
+    "ops": ["identity", "lattice_peer_reduce"],
+    "identity_step_shape": {"op": "identity"},
+    "lattice_peer_reduce_step_shape": {
+      "op": "lattice_peer_reduce",
+      "axis": "row",
+      "reduce": "majority_nonbackground",
+      "write": "background_only"
+    },
+    "axis_values": ["all", "row", "col"],
+    "reduce_values": ["majority", "majority_nonbackground", "first_nonbackground"],
+    "write_values": ["all", "background_only", "outliers_only"],
+    "valid_example": {
+      "schema_version": 2,
+      "steps": [{"op": "lattice_peer_reduce", "axis": "row", "reduce": "majority_nonbackground", "write": "background_only"}]
+    }
+  },
+  "explicitly_forbidden_arc_r038_forms": [
+    {"schema_version": 1, "instructions": "natural-language rule"},
+    {"schema_version": "2", "strategy": "general repair", "program": "pseudocode string"}
+  ],
+  "runtime_policy": "Responses may still contain malformed records; the existing fail-closed parser records them as candidate-IR parse failures. Model confidence and critique never override Python verification.",
+  "leakage": "Generic contract only; contains no ARC task answers, no public-evaluation content, and no task-specific constants."
+}
