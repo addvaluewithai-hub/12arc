@@ -61,11 +61,12 @@ jobs:
           from pathlib import Path
           t=json.loads(Path('lab/triggers/t0022-multi-candidate.request').read_text())
           p=Path('lab/executions')/f"{t['run']}.json"
-          p.write_text(json.dumps({'schema_version':1,'run':t['run'],'task_id':t['task_id'],'status':'running','workflow':'t0022-multi-candidate.yml','started_at':datetime.now(timezone.utc).isoformat(),'expected_result':f"lab/results/{t['run']}-multi-candidate.json"},indent=2,sort_keys=True)+'\n')
+          p.write_text(json.dumps({'schema_version':1,'run':t['run'],'task_id':t['task_id'],'status':'running','workflow':'t0022-multi-candidate.yml','started_at':datetime.now(timezone.utc).isoformat(),'expected_result':f"lab/results/{t['run']}-multi-candidate.json",'provider_failover_model':'nvidia/nemotron-3-ultra-550b-a55b','provider_failover_from':'deepseek-ai/deepseek-v4-flash-0731'},indent=2,sort_keys=True)+'\n')
           PY
-      - name: Run frozen multi-candidate experiment
+      - name: Run provider-failover multi-candidate experiment
         env:
           NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
+          ARC_TARGET_MODEL: nvidia/nemotron-3-ultra-550b-a55b
         run: |
           RUN=$(python -c "import json; print(json.load(open('lab/triggers/t0022-multi-candidate.request'))['run'])")
           python -m arc_lab.multi_candidate_experiment \
