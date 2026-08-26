@@ -1,24 +1,28 @@
 {
-  "schema_version": 2,
+  "schema_version": 3,
   "project": "ARC Research Lab",
   "competition": "ARC Prize 2026 / ARC-AGI-2",
   "authoritative_runner": "lab/RUNNER.md",
   "max_tasks_per_shift": 1,
   "claim_lease_minutes": 120,
   "primary_hosted_provider": "nvidia-nim",
-  "primary_target_model": "deepseek-ai/deepseek-v4-flash-0731",
-  "escalation_target_model": "nvidia/nemotron-3-ultra-550b-a55b",
-  "target_model_policy_status": "DeepSeek selected by ARC-R015 and frozen direct-JSON baseline established by ARC-R016 at 45/174 (25.8621%) on deterministic dev_validation",
+  "primary_target_model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "previous_primary_target_model": "deepseek-ai/deepseek-v4-flash-0731",
+  "target_model_policy_status": "TEMPORARY_PROVIDER_FAILOVER. DeepSeek V4 Flash 0731 was selected by ARC-R015 and used for the frozen ARC-R016 baseline, but current NVIDIA smoke evidence on 2026-08-26 shows deepseek-ai/deepseek-v4-flash-0731 returns HTTP 404 function-not-found, deepseek-ai/deepseek-v4-flash returns HTTP 410 end-of-life, and deepseek-ai/deepseek-v4-pro returns HTTP 410 end-of-life. Nemotron 3 Ultra returned HTTP 200 on the same endpoint/key and is the temporary working NVIDIA target path. Do not compare Nemotron runs as matched DeepSeek reruns; label them as provider/model failover experiments until DeepSeek is restored.",
   "active_target_models": [
-    "deepseek-ai/deepseek-v4-flash-0731",
     "nvidia/nemotron-3-ultra-550b-a55b"
+  ],
+  "temporarily_unavailable_target_models": [
+    "deepseek-ai/deepseek-v4-flash-0731",
+    "deepseek-ai/deepseek-v4-flash",
+    "deepseek-ai/deepseek-v4-pro"
   ],
   "legacy_comparators": [
     "gemma-4-26b-a4b-it",
     "gemma-4-31b-it",
     "openai/gpt-oss-120b"
   ],
-  "operator_direction": "Use DeepSeek V4 Flash as the routine NVIDIA baseline/research engine. Nemotron remains an escalation/research candidate. Do not spend routine research budget on Gemma or GPT-OSS; use them only when an explicit comparator/parity question justifies the call.",
+  "operator_direction": "Use Nemotron 3 Ultra as the temporary working NVIDIA target model while DeepSeek endpoints are unavailable. Keep DeepSeek baseline/comparator labels explicit and do not silently treat Nemotron results as matched DeepSeek results. Do not spend routine research budget on Gemma or GPT-OSS; use them only when an explicit comparator/parity question justifies the call.",
   "research_team_role": "invent algorithms, prompts, representations and experiments; do not substitute itself for target-model benchmark execution",
   "development_feedback": "public-training-derived deterministic splits only",
   "public_eval_policy": "milestone-only sealed evaluation; never use repeated public-eval feedback to tune the solver",
