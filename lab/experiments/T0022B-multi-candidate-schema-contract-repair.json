@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "task_id": "T0022B-MULTI-CANDIDATE-SCHEMA-CONTRACT-REPAIR",
+  "title": "Repair generator/repair prompt-to-IR schema contract and validate fail-closed parsing offline",
+  "type": "infrastructure-research",
+  "hypothesis": "ARC-R038 failed operationally because the generation and repair prompts did not constrain outputs to the parser-supported executable IR contract; making that contract explicit and mechanically testable will restore executable candidate flow without changing the multi-candidate reasoning architecture.",
+  "primary_variable": "prompt/output schema contract only",
+  "frozen_components": [
+    "T0022A deterministic parser/verifier semantics",
+    "candidate normalization and deduplication",
+    "Python ranking policy",
+    "selected target task for eventual matched rerun: 06df4c85",
+    "NVIDIA NIM DeepSeek V4 Flash model/provider for eventual rerun"
+  ],
+  "target_model_calls": 0,
+  "required_work": [
+    "specify parser-supported schema-v1 and schema-v2 candidate examples in the prompt contract",
+    "make generation and repair response contracts machine-checkable",
+    "add positive fixtures that parse, normalize, deduplicate and score",
+    "add negative regression fixtures for ARC-R038 natural-language instructions records",
+    "add negative regression fixtures for string schema_version plus pseudocode program records",
+    "predeclare a matched T0022C rerun only after the offline gate passes"
+  ],
+  "success_threshold": "At least 8 representative non-duplicate fixture candidates pass parse, normalize, deduplicate and deterministic Python scoring; all ARC-R038 malformed forms fail closed with explicit reasons.",
+  "falsification": "If parser-supported prompt contracts cannot represent a sufficiently diverse candidate batch without changing solver semantics, record the interface limitation and redesign the IR translation layer rather than spending model calls.",
+  "leakage_policy": "No public evaluation. No target-model calls. Fixtures must be generic contract examples and must not encode target answers.",
+  "expected_artifacts": [
+    "prompt/schema contract specification",
+    "positive and negative fixtures/tests",
+    "offline validation artifact",
+    "matched T0022C protocol",
+    "queue/state/handoff updates"
+  ]
+}
