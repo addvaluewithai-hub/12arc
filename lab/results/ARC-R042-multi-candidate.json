@@ -1,0 +1,18 @@
+{
+  "default_model": "deepseek-ai/deepseek-v4-flash-0731",
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "model_override_used": true,
+  "provider": "nvidia-nim",
+  "provider_failure": {
+    "error_category": "transient_provider",
+    "message": "NVIDIA NIM HTTP 503: {'type': 'Service Unavailable', 'code': 503, 'message': 'Service temporarily overloaded'}",
+    "rate_limit_headers": {},
+    "retryable": true,
+    "status_code": 503,
+    "terminal": false
+  },
+  "public_evaluation_used": false,
+  "schema_version": 1,
+  "status": "provider_failure",
+  "task_id": "06df4c85"
+}

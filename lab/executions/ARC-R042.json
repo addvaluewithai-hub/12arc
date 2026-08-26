@@ -1,0 +1,13 @@
+{
+  "completed_at": "2026-08-26T12:10:58.290749+00:00",
+  "expected_result": "lab/results/ARC-R042-multi-candidate.json",
+  "provider_failover_from": "deepseek-ai/deepseek-v4-flash-0731",
+  "provider_failover_model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "result_path": "lab/results/ARC-R042-multi-candidate.json",
+  "run": "ARC-R042",
+  "schema_version": 1,
+  "started_at": "2026-08-26T12:10:57.598054+00:00",
+  "status": "failed",
+  "task_id": "T0022E-HARDENED-PHASE-CONTRACT-RERUN",
+  "workflow": "t0022-multi-candidate.yml"
+}
