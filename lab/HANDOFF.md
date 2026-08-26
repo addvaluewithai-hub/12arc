@@ -2,58 +2,66 @@
 
 Start from `lab/RUNNER.md` and current Git state.
 
-## ARC-R037 closed — T0022A multi-candidate harness
+## ARC-R038 closed — T0022 multi-candidate loop was operationally inconclusive
 
-`T0022A-MULTI-CANDIDATE-CRITIQUE-VERIFY-HARNESS` completed as **INFRA_ONLY / PASS** with zero target-model calls. Public evaluation was not used.
+`T0022-MULTI-CANDIDATE-CRITIQUE-VERIFY-LOOP` is closed as **INCONCLUSIVE / OPERATIONAL_CONTRACT_FAILURE**. This is not a rejection of multi-candidate reasoning.
 
 Durable evidence:
 
-- `src/arc_lab/multi_candidate.py`
-- `src/arc_lab/multi_candidate_experiment.py`
-- `tests/test_multi_candidate.py`
-- `.github/workflows/t0022-multi-candidate.yml`
-- `lab/validation/T0022A-multi-candidate-harness.json`
-- `lab/runs/2026-08-26/ARC-R037.md`
-- `lab/experiments/T0022-multi-candidate-critique-verify-loop.json`
+- `lab/results/ARC-R038-multi-candidate.json`
+- `lab/results/ARC-R038-contract-failure-analysis.json`
+- `lab/executions/ARC-R038.json`
+- `lab/runs/2026-08-26/ARC-R038.md`
 
-GitHub Actions CI run `32918156374` on commit `378103e667752b8250ed88495b05838d8aa34969` completed successfully. Pytest, policy validation, deterministic split reproduction, and pinned public-training-only validation all passed.
+The authorized NVIDIA path completed on public-training task `06df4c85` using `deepseek-ai/deepseek-v4-flash-0731`:
 
-The harness now provides fail-closed schema-v1/schema-v2 parsing, normalized-IR deduplication, deterministic Python execution/ranking, cell-error and separator-preservation diagnostics, critique/repair provenance, complete accounting fields, cached/resumable model calls, and an authorized push-triggered NVIDIA path.
+- requests: **4**
+- cache hits: **0**
+- input tokens: **23,769**
+- output tokens: **2,156**
+- total tokens: **25,925**
+- runtime: **466.0348 s**
+- provider failures: **0**
+- public evaluation used: **false**
 
-Core rule remains: **the model proposes; Python judges**. Critique and critique-the-critique are proposal/repair mechanisms only and never count as evidence or selector input.
+But the executable candidate contract failed before the intended reasoning loop could operate:
 
-## Next task: T0022 multi-candidate critique/verify loop
+- submitted candidate records: **24**
+- executable IR parseable: **0/24**
+- unique executable candidates: **0**
+- best candidate: none
+- valid-candidate critiques: **0**
+- critique challenges: **0**
 
-`T0022-MULTI-CANDIDATE-CRITIQUE-VERIFY-LOOP` should now be the highest-priority ready task.
+Generation returned JSON records containing `schema_version` plus natural-language `instructions`; repair returned string-valued `schema_version` and natural-language/pseudocode `program` fields. The T0022A parser correctly failed these closed because they are not supported executable schema-v1/v2 IR objects.
 
-Protocol: `lab/experiments/T0022-multi-candidate-critique-verify-loop.json`.
-Execution workflow: `.github/workflows/t0022-multi-candidate.yml`.
-Trigger: `lab/triggers/t0022-multi-candidate.request`.
-Expected result: `lab/results/{run}-multi-candidate.json`.
-Status file: `lab/executions/{run}.json`.
-Max external wait: 180 minutes.
-Required secret: `NVIDIA_API_KEY`.
+Important accounting distinction: ARC-R038 top-level `parse_failures=0` means the provider responses themselves were parseable JSON. The candidate verifier separately records **24 candidate-IR parse failures**. Do not report these as zero candidate parse failures.
 
-Frozen first experiment:
+Mechanically, exact candidate coverage is still 0/1 on `06df4c85` versus ARC-R032's 0/1, with no new solves or regressions. Do not treat that as evidence against the architecture because the predeclared minimum of 8 parseable non-duplicate candidates was never reached.
 
-- split: permitted public ARC-AGI-2 training data only;
-- exact task: `06df4c85`;
-- provider/model: NVIDIA NIM / `deepseek-ai/deepseek-v4-flash-0731`;
-- 4 model phases: generate, critique, critique-the-critique, repair;
-- generation: 16 candidates, temperature 0.7, top_p 0.95, top_k 64, max_output_tokens 4096;
-- critique: temperature 0.2, top_p 0.95, top_k 64, max_output_tokens 3072;
-- critique-the-critique: same critique settings;
-- repair: up to 8 candidates, temperature 0.7, top_p 0.95, top_k 64, max_output_tokens 4096;
-- maximum requests: 4, with identical-call cache reuse;
-- provider timeout: 900 seconds;
-- comparator: ARC-R032 task-level candidate coverage on `06df4c85` (false / exact-wrong).
+## Next task: T0022B schema-contract repair
 
-Success requires at least 8 parseable non-duplicate candidates and either an exact train-consistent candidate or a dominant mechanically observed failure class that supports one next ablation.
+Highest-priority ready task is `T0022B-MULTI-CANDIDATE-SCHEMA-CONTRACT-REPAIR`.
 
-If it fails, do not simply rerun the same prompt. Evolve exactly one variable at a time: proposal diversity, critic prompt, critique-of-critique, repair budget, IR translation constraints, or selector ranking.
+Protocol: `lab/experiments/T0022B-multi-candidate-schema-contract-repair.json`.
+
+This is a no-model gate. Change **only** the prompt/output contract between generation/repair and the existing deterministic parser. Keep parser/verifier semantics, candidate normalization/deduplication, Python ranking, and the eventual `06df4c85` comparator setup frozen.
+
+Required work:
+
+- specify parser-supported executable schema-v1/v2 examples in the model-facing contract;
+- make generation/repair outputs machine-checkable against that contract;
+- add positive fixtures that pass parse → normalize → deduplicate → Python score;
+- add negative regression fixtures for the exact ARC-R038 `instructions` and pseudocode `program` failure forms;
+- require at least **8 representative non-duplicate fixtures** to pass offline;
+- then predeclare exactly one matched T0022C rerun on `06df4c85`.
+
+Do not make target-model calls in T0022B. If the contract cannot express diverse candidates without changing solver semantics, record that interface limitation and redesign the translation layer instead of forcing another inference run.
 
 ## Adjacent semantic follow-up
 
-`T0023-PERSISTENT-LATTICE-TOPOLOGY-ABLATION` remains blocked. It is the matched ARC-R036 follow-up for `0607ce86` and should not displace the requested multi-candidate direction unless later evidence/operator priority changes.
+`T0023-PERSISTENT-LATTICE-TOPOLOGY-ABLATION` remains blocked. It is the matched ARC-R036 follow-up on `0607ce86` and should not displace the multi-candidate direction unless later evidence or operator priority changes.
+
+Run registry after ARC-R038 closure: latest completed run **ARC-R038**, no active reservations, next run **ARC-R039**.
 
 Public evaluation remains sealed.
